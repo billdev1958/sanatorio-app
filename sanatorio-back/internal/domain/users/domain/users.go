@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type Role int32
+type Role int
 
 const (
 	Admin = iota
@@ -30,13 +30,14 @@ type Account struct {
 	Rol      int
 }
 
-type Doctor struct {
+type DoctorUser struct {
 	User
 	Account
+	Especialidad      int
 	CedulaProfesional string
 }
 
-type Patient struct {
+type PatientUser struct {
 	User
 	Account
 	FechaNacimiento time.Time
