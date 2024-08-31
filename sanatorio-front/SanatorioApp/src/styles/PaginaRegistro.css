@@ -1,0 +1,48 @@
+.center{
+    
+    margin: 0 auto;
+    /* background-color: red; */
+    width: 70%;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    padding: 100px 0px 100px 0px;    
+    text-align: center;
+}
+.center .center-left{
+    
+    font-weight: bold;
+    
+}
+.center label{
+    padding: 10px;
+    display: flex;
+    justify-content: right;
+}
+.center input{
+    margin: 9px;
+    display: flex;
+    justify-content: right;
+    border: 1px solid gray;
+}
+.center2{
+    margin: 0 auto;
+    text-align: center;
+    padding-top: 100px;
+}
+.class-h3 {
+    font-weight: bold;
+}
+.class-h1{
+    font-weight: bold;
+    font-size: 2rem;
+    padding-bottom: 20px;
+}
+.center2 .class-button{
+    border: 1px solid rgb(255, 255, 255);
+    border-radius: 15px;
+    padding: 10px;
+    background-color: blue;
+    font-weight: bold;
+    color: white;
+    margin-top: 30px;
+}
