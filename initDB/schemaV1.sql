@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS cat_rol (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS account (
@@ -8,55 +10,77 @@ CREATE TABLE IF NOT EXISTS account (
     user_id INT NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    rol INT NOT NULL
+    rol INT NOT NULL,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    password_change_at TIMESTAMP
+
 );
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    account_id UUID,
     name VARCHAR(255) NOT NULL,
     lastname1 VARCHAR(255) NOT NULL,
-    lastname2 VARCHAR(255) NOT NULL
-);
+    lastname2 VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+  );
 
 CREATE TABLE IF NOT EXISTS super_user (
-    account_id UUID PRIMARY KEY
+  id SERIAL PRIMARY KEY,
+  account_id UUID,
+  curp VARCHAR(18),
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS patient_user (
-    account_id UUID PRIMARY KEY,
-    curp VARCHAR(18)
+    id SERIAL PRIMARY KEY,
+    account_id UUID,
+    curp VARCHAR(18),
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 -- Cites --
 
 CREATE TABLE IF NOT EXISTS cat_specialty (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(60)
+    name VARCHAR(60),
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS appointment_status (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE
+    name VARCHAR(50) NOT NULL UNIQUE,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS office_status(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(60)
-);
+    name VARCHAR(60),
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+  );
 
 CREATE TABLE IF NOT EXISTS office (
     id SERIAL PRIMARY KEY,
     name VARCHAR(60),
     specialty_id INTEGER,
     status_id INTEGER,
-    doctor_account_id UUID
+    doctor_account_id UUID,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS doctor_user (
     account_id UUID PRIMARY KEY,
     id_specialty INT,
-    medical_license VARCHAR(255)
+    medical_license VARCHAR(255),
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS schedule (
@@ -66,6 +90,8 @@ CREATE TABLE IF NOT EXISTS schedule (
     day_of_week INT NOT NULL, -- 0 = Sunday, 1 = Monday, ..., 6 = Saturday
     time_start TIME NOT NULL,
     time_end TIME NOT NULL,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
     CONSTRAINT chk_office_status CHECK (
         (SELECT status_id FROM office WHERE id = office_id) = 1 -- Status 1 podría representar 'Disponible'
     )
@@ -80,6 +106,8 @@ CREATE TABLE IF NOT EXISTS appointment (
     time_end TIMESTAMP,
     schedule_id INTEGER,
     status_id INTEGER,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
     CONSTRAINT chk_time_validity CHECK (time_start < time_end)
 );
 
@@ -91,14 +119,14 @@ FOREIGN KEY (rol) REFERENCES cat_rol(id);
 
 ALTER TABLE users
 ADD CONSTRAINT fk_account_id_users
-FOREIGN KEY (account_id) REFERENCES account(id);
+FOREIGN KEY (user_id) REFERENCES account(id);
 
 ALTER TABLE super_user
 ADD CONSTRAINT fk_account_id_super_user
 FOREIGN KEY (account_id) REFERENCES account(id);
 
-ALTER TABLE patient
-ADD CONSTRAINT fk_account_id_patient
+ALTER TABLE patient_user
+ADD CONSTRAINT fk_account_id_patient_user
 FOREIGN KEY (account_id) REFERENCES account(id);
 
 ALTER TABLE office
@@ -111,19 +139,19 @@ FOREIGN KEY (status_id) REFERENCES office_status(id);
 
 ALTER TABLE office
 ADD CONSTRAINT fk_doctor_office
-FOREIGN KEY (doctor_account_id) REFERENCES doctor(account_id);
+FOREIGN KEY (doctor_account_id) REFERENCES doctor_user(account_id);
 
-ALTER TABLE doctor
-ADD CONSTRAINT fk_account_id_doctor
+ALTER TABLE doctor_user
+ADD CONSTRAINT fk_account_id_doctor_user
 FOREIGN KEY (account_id) REFERENCES account(id);
 
-ALTER TABLE doctor
+ALTER TABLE doctor_user
 ADD CONSTRAINT fk_cat_id_specialty
 FOREIGN KEY (id_specialty) REFERENCES cat_specialty(id);
 
 ALTER TABLE schedule
 ADD CONSTRAINT fk_doctor_schedule
-FOREIGN KEY (doctor_account_id) REFERENCES doctor(account_id);
+FOREIGN KEY (doctor_account_id) REFERENCES doctor_user(account_id);
 
 ALTER TABLE schedule
 ADD CONSTRAINT fk_office_schedule
@@ -135,11 +163,11 @@ FOREIGN KEY (schedule_id) REFERENCES schedule(id);
 
 ALTER TABLE appointment
 ADD CONSTRAINT fk_doctor_appointment
-FOREIGN KEY (doctor_account_id) REFERENCES doctor(account_id);
+FOREIGN KEY (doctor_account_id) REFERENCES doctor_user(account_id);
 
 ALTER TABLE appointment
 ADD CONSTRAINT fk_patient_appointment
-FOREIGN KEY (patient_account_id) REFERENCES patient(account_id);
+FOREIGN KEY (patient_account_id) REFERENCES patient_user(account_id);
 
 ALTER TABLE appointment
 ADD CONSTRAINT fk_office_appointment
