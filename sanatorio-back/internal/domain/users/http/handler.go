@@ -1,9 +1,10 @@
 package v1
 
 import (
-	"log"
+	"encoding/json"
 	"net/http"
 	user "sanatorioApp/internal/domain/users"
+	"sanatorioApp/internal/domain/users/http/models"
 )
 
 type handler struct {
@@ -15,20 +16,32 @@ func NewHandler(uc user.Usecase) *handler {
 }
 
 func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-
-	// Llama al usecase para obtener el mensaje desde la base de datos
-	message, err := h.uc.RegisterUser(r.Context())
+	// Decodificar el cuerpo de la solicitud en el modelo RegisterUserRequest
+	request := models.RegisterUserRequest{}
+	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		log.Printf("error getting message from usecase: %v", err)
-		http.Error(w, "failed to retrieve message", http.StatusInternalServerError)
+		// Respuesta de error si el payload no es válido
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte(message))
+	// Llamar al caso de uso para registrar el usuario
+	response, err := h.uc.RegisterUser(r.Context(), request)
 	if err != nil {
-		log.Printf("error writing response: %v", err)
-		http.Error(w, "failed to write response", http.StatusInternalServerError)
+		// Manejar el error y enviar una respuesta adecuada usando response
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	// Configurar el tipo de contenido de la respuesta y el estado HTTP
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	// Enviar la respuesta exitosa usando response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
 	}
 }
