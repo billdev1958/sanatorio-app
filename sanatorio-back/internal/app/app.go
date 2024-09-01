@@ -23,7 +23,7 @@ type App struct {
 }
 
 func NewApp(port string) (*App, error) {
-	dsn := "postgres://root:secret@localhost:5432/university_db?sslmode=disable"
+	dsn := "postgres://root:secret@db:5432/university_db?sslmode=disable"
 
 	db, err := setupDatabase(dsn)
 	if err != nil {
