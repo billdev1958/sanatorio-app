@@ -1,0 +1,59 @@
+package auth
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+)
+
+// TODO AGREGAR A ENV
+var secretKey = []byte("secret-key")
+
+type Claims struct {
+	AccountID uuid.UUID
+	Role      int
+	jwt.RegisteredClaims
+}
+
+func GenerateJWT(accountID uuid.UUID, role int) (string, error) {
+	claims := Claims{
+		AccountID: accountID,
+		Role:      role,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(8 * time.Hour)),
+			Issuer:    "sanatorio-app",
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+func ValidateJWT(tokenString string) (*Claims, error) {
+	claims := &Claims{}
+
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		// Validar que el método de firma sea HMAC.
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return secretKey, nil
+	})
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse token: %w", err)
+	}
+
+	if !token.Valid {
+		return nil, fmt.Errorf("invalid token: %w", jwt.ErrSignatureInvalid)
+	}
+
+	return claims, nil
+}

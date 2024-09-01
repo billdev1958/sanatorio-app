@@ -35,6 +35,21 @@ type Account struct {
 	Rol       int
 }
 
+type Users struct {
+	User
+	Email string
+	Rol   int
+	Curp  string
+}
+
+type Doctors struct {
+	User
+	Email          string
+	Rol            int
+	MedicalLicense string
+	Specialty      int
+}
+
 type SuperUser struct {
 	ID int
 	User
@@ -61,15 +76,54 @@ type UserResponse struct {
 	Email string
 }
 
-type RegisterUser struct {
+type AdminData struct {
+	AccountAdminID uuid.UUID
+	RolAdmmin      int
+	AdminPassword  string
+}
+
+type RegisterUserByAdmin struct {
+	AdminData
 	User
 	Account
 	DocumentID string
 }
 
-type RegisterDoctor struct {
+type RegisterDoctorByAdmin struct {
+	AdminData
 	User
 	Account
 	SpecialtyID int
 	DocumentID  string
+}
+
+type LoginUser struct {
+	Email    string
+	Password string
+}
+
+type LoginResponse struct {
+	AccountID uuid.UUID
+	Role      int
+}
+
+type UpdateUser struct {
+	AccountID uuid.UUID
+	Name      string
+	Lastname1 string
+	Lastname2 string
+	Email     string
+	Password  string
+	Curp      string
+}
+
+type UpdateDoctor struct {
+	AccountID      uuid.UUID
+	Name           string
+	Lastname1      string
+	Lastname2      string
+	Email          string
+	Password       string
+	SpecialtyID    int
+	MedicalLicense string
 }

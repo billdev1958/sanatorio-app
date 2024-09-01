@@ -96,5 +96,10 @@ func seedDatabase(dbPool *pgxpool.Pool) error {
 		log.Fatalf("error seeding office status %v\n", err)
 	}
 
+	err = storage.SeedAdminUser(context.Background())
+	if err != nil {
+		log.Fatalf("error seeding user  %v\n", err)
+	}
+
 	return nil
 }

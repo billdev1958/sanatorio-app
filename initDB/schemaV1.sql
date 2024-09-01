@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS cat_rol (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS account (
@@ -13,8 +14,8 @@ CREATE TABLE IF NOT EXISTS account (
     rol INT NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
-    password_change_at TIMESTAMP
-
+    password_change_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -23,15 +24,17 @@ CREATE TABLE IF NOT EXISTS users (
     lastname1 VARCHAR(255) NOT NULL,
     lastname2 VARCHAR(255) NOT NULL,
     created_at TIMESTAMP,
-    updated_at TIMESTAMP
-  );
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
 
 CREATE TABLE IF NOT EXISTS super_user (
-  id SERIAL PRIMARY KEY,
-  account_id UUID,
-  curp VARCHAR(18),
-  created_at TIMESTAMP,
-  updated_at TIMESTAMP
+    id SERIAL PRIMARY KEY,
+    account_id UUID,
+    curp VARCHAR(18),
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS patient_user (
@@ -39,31 +42,33 @@ CREATE TABLE IF NOT EXISTS patient_user (
     account_id UUID,
     curp VARCHAR(18),
     created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
-
--- Cites --
 
 CREATE TABLE IF NOT EXISTS cat_specialty (
     id SERIAL PRIMARY KEY,
     name VARCHAR(60),
     created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS appointment_status (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
     created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS office_status(
     id SERIAL PRIMARY KEY,
     name VARCHAR(60),
     created_at TIMESTAMP,
-    updated_at TIMESTAMP
-  );
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
 
 CREATE TABLE IF NOT EXISTS office (
     id SERIAL PRIMARY KEY,
@@ -72,7 +77,8 @@ CREATE TABLE IF NOT EXISTS office (
     status_id INTEGER,
     doctor_account_id UUID,
     created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS doctor_user (
@@ -80,21 +86,19 @@ CREATE TABLE IF NOT EXISTS doctor_user (
     id_specialty INT,
     medical_license VARCHAR(255),
     created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS schedule (
     id SERIAL PRIMARY KEY,
-    doctor_account_id UUID,
-    office_id INTEGER,
-    day_of_week INT NOT NULL, -- 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    office_id INTEGER, 
+    day_of_week INT NOT NULL,
     time_start TIME NOT NULL,
     time_end TIME NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
-    CONSTRAINT chk_office_status CHECK (
-        (SELECT status_id FROM office WHERE id = office_id) = 1 -- Status 1 podría representar 'Disponible'
-    )
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS appointment (
@@ -107,7 +111,8 @@ CREATE TABLE IF NOT EXISTS appointment (
     schedule_id INTEGER,
     status_id INTEGER,
     created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP,
     CONSTRAINT chk_time_validity CHECK (time_start < time_end)
 );
 
@@ -176,3 +181,21 @@ FOREIGN KEY (office_id) REFERENCES office(id);
 ALTER TABLE appointment
 ADD CONSTRAINT fk_status_appointment
 FOREIGN KEY (status_id) REFERENCES appointment_status(id);
+
+-- Función de validación --
+
+CREATE OR REPLACE FUNCTION validate_office_status() 
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (SELECT status_id FROM office WHERE id = NEW.office_id) != 1 THEN
+        RAISE EXCEPTION 'The office is not available for scheduling';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger para validar el estado de la oficina antes de insertar o actualizar en la tabla schedule --
+
+CREATE TRIGGER trigger_validate_office_status
+BEFORE INSERT OR UPDATE ON schedule
+FOR EACH ROW EXECUTE FUNCTION validate_office_status();
