@@ -3,67 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
-	user "sanatorioApp/internal/domain/users"
-	"sanatorioApp/internal/domain/users/entities"
-	postgres "sanatorioApp/internal/infraestructure/db"
-	"time"
-
-	"github.com/jackc/pgx/v5"
 )
-
-type userRepository struct {
-	storage *postgres.PgxStorage
-}
-
-func NewUserRepository(storage *postgres.PgxStorage) user.Repository {
-	return &userRepository{storage: storage}
-}
-
-// Función para registrar un usuario y devolver el userID generado
-func (pr *userRepository) RegisterUser(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin) (int, string, error) {
-	var userID int
-	var name string
-	query := "INSERT INTO users (name, lastname1, lastname2, created_at) VALUES ($1, $2, $3, $4) RETURNING id, name"
-	err := tx.QueryRow(ctx, query, ru.Name, ru.Lastname1, ru.Lastname2, time.Now()).Scan(&userID, &name)
-	if err != nil {
-		return 0, "", fmt.Errorf("insert user: %w", err)
-	}
-	return userID, name, nil
-}
-
-// Función para registrar la cuenta utilizando el userID generado
-func (pr *userRepository) RegisterAccount(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin, userID int) (string, error) {
-	var email string
-	query := "INSERT INTO account (id, user_id, email, password, rol, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING email"
-	err := tx.QueryRow(ctx, query, ru.AccountID, userID, ru.Email, ru.Password, ru.Rol, time.Now()).Scan(&email)
-	if err != nil {
-		return "", fmt.Errorf("insert account: %w", err)
-	}
-	return email, nil
-}
-
-// Función para registrar el tipo de usuario en la tabla correspondiente
-func (pr *userRepository) RegisterTypeUser(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin) error {
-	var query string
-	var values []interface{}
-
-	if ru.Rol == entities.SuperUsuario {
-		query = "INSERT INTO super_user (account_id, curp, created_at, updated_at) VALUES ($1, $2, NOW(), NOW())"
-		values = []interface{}{ru.AccountID, ru.DocumentID}
-	} else if ru.Rol == entities.Patient {
-		query = "INSERT INTO patient_user (account_id, curp, created_at, updated_at) VALUES ($1, $2, NOW(), NOW())"
-		values = []interface{}{ru.AccountID, ru.DocumentID}
-	} else {
-		return fmt.Errorf("unknown role: %d", ru.Rol)
-	}
-
-	_, err := tx.Exec(ctx, query, values...)
-	if err != nil {
-		return fmt.Errorf("insert into table: %w", err)
-	}
-
-	return nil
-}
 
 // DeleteUser elimina un usuario y su cuenta asociada de la base de datos.
 func (ur *userRepository) DeleteUser(ctx context.Context, accountID string) (string, error) {

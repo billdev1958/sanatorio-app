@@ -170,6 +170,8 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 	}, nil
 }
 
+func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPatient) (models.Response, error)
+
 func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (models.Response, error) {
 	loginUser := entities.LoginUser{
 		Email:    request.Email,
