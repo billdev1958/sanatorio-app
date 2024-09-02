@@ -15,7 +15,7 @@ type Repository interface {
 	// Registros
 	RegisterUserTransaction(ctx context.Context, ru entities.RegisterUserByAdmin) (entities.UserResponse, error)
 	RegisterDoctorTransaction(ctx context.Context, rd entities.RegisterDoctorByAdmin) (response entities.UserResponse, err error)
-
+	RegisterPatientTransaction(ctx context.Context, rp entities.PatientUser) (response entities.UserResponse, err error)
 	RegisterUser(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin) (userID int, name string, err error)
 	RegisterAccount(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin, userID int) (string, error)
 	RegisterTypeUser(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin) error

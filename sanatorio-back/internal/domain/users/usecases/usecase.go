@@ -170,12 +170,52 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 	}, nil
 }
 
-/*func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPatient) (models.Response, error) {
-	rol := 1
+func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPatient) (models.Response, error) {
+	// Definir el rol para el paciente
+	rol := 3
 
-	registerPatient := entities.PatientUser{}
+	// Hashear la contraseña del nuevo paciente
+	hashedPassword, err := password.HashPassword(request.Password)
+	if err != nil {
+		return models.Response{
+			Status:  "error",
+			Message: "Failed to hash password",
+			Errors:  map[string]string{"password": err.Error()},
+		}, err
+	}
 
-}*/
+	// Crear la entidad PatientUser con los datos de la solicitud
+	registerPatient := entities.PatientUser{
+		Name:      request.Name,
+		Lastname1: request.Lastname1,
+		Lastname2: request.Lastname2,
+		AccountID: uuid.New(), // Asignar un nuevo UUID
+		Email:     request.Email,
+		Password:  hashedPassword,
+		Rol:       rol,
+		Curp:      request.Curp, // Asignar el CURP al paciente
+	}
+
+	// Intentar registrar el paciente en una transacción
+	patientResponse, err := u.repo.RegisterPatientTransaction(ctx, registerPatient)
+	if err != nil {
+		return models.Response{
+			Status:  "error",
+			Message: "Failed to register patient",
+			Errors:  map[string]string{"register": err.Error()},
+		}, err
+	}
+
+	// Retornar la respuesta exitosa
+	return models.Response{
+		Status:  "success",
+		Message: "Patient registered successfully",
+		Data: models.UserData{
+			Name:  patientResponse.Name,
+			Email: patientResponse.Email,
+		},
+	}, nil
+}
 
 func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (models.Response, error) {
 	loginUser := entities.LoginUser{

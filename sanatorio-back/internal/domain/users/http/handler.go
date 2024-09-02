@@ -76,6 +76,36 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *handler) RegisterPatient(w http.ResponseWriter, r *http.Request) {
+	// Decodificar el cuerpo de la solicitud en el modelo RegisterPatient
+	var request models.RegisterPatient
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	// Llamar al caso de uso para registrar el paciente
+	response, err := h.uc.RegisterPatient(r.Context(), request)
+	if err != nil {
+		// Manejar el error y enviar una respuesta adecuada usando response
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	// Configurar el tipo de contenido de la respuesta y el estado HTTP
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	// Enviar la respuesta exitosa usando response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
+}
+
 func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	// Extraer el accountID de la ruta del URL
 	accountID := r.PathValue("accountID")

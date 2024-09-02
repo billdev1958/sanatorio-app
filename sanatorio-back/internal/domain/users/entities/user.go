@@ -65,10 +65,14 @@ type DoctorUser struct {
 }
 
 type PatientUser struct {
-	ID int
-	User
-	Account
-	Curp string
+	Name      string
+	Lastname1 string
+	Lastname2 string
+	AccountID uuid.UUID
+	Email     string
+	Password  string
+	Rol       int
+	Curp      string
 }
 
 type UserResponse struct {
