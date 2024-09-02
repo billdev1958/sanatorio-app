@@ -109,7 +109,7 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 	adminRole := claims.Role
 
 	// Verificar que el rol es de administrador antes de proceder
-	if adminRole != 1 { // Supongamos que 1 es el rol de administrador
+	if adminRole != 1 {
 		return models.Response{
 			Status:  "error",
 			Message: "Unauthorized: insufficient permissions",
@@ -117,7 +117,14 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 		}, nil
 	}
 
-	// Hashear la contraseña del nuevo doctor
+	if request.Rol != 2 {
+		return models.Response{
+			Status:  "error",
+			Message: "Invalid role for doctor",
+			Errors:  map[string]string{"role": "Invalid role, expected role ID 2 for doctor"},
+		}, nil
+	}
+
 	hashedPassword, err := password.HashPassword(request.Password)
 	if err != nil {
 		return models.Response{
@@ -127,7 +134,6 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 		}, err
 	}
 
-	// Crear la entidad RegisterDoctorByAdmin con los datos del administrador y del doctor
 	registerDoctor := entities.RegisterDoctorByAdmin{
 		AdminData: entities.AdminData{
 			AccountAdminID: adminAccountID,
@@ -149,7 +155,6 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 		SpecialtyID: request.Specialty,
 	}
 
-	// Intentar registrar el doctor en una transacción
 	doctorResponse, err := u.repo.RegisterDoctorTransaction(ctx, registerDoctor)
 	if err != nil {
 		return models.Response{
@@ -159,7 +164,6 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 		}, err
 	}
 
-	// Retornar la respuesta exitosa
 	return models.Response{
 		Status:  "success",
 		Message: "Doctor registered successfully",

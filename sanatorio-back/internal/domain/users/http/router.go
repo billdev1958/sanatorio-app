@@ -10,6 +10,7 @@ func (h *handler) UserRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /v1/login", h.LoginUser)
 	mux.HandleFunc("POST /v1/patients", h.RegisterPatient)
 	mux.Handle("POST /v1/users", auth.AuthMiddleware(http.HandlerFunc(h.RegisterUser)))
+	mux.Handle("POST /v1/doctors", auth.AuthMiddleware(http.HandlerFunc(h.RegisterDoctor)))
 
 	mux.Handle("PUT /v1/users", auth.AuthMiddleware(http.HandlerFunc(h.UpdateUser)))
 	mux.Handle("PUT /v1/doctors", auth.AuthMiddleware(http.HandlerFunc(h.UpdateDoctor)))

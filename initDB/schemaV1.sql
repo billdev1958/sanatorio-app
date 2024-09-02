@@ -82,8 +82,9 @@ CREATE TABLE IF NOT EXISTS office (
 );
 
 CREATE TABLE IF NOT EXISTS doctor_user (
-    account_id UUID PRIMARY KEY,
-    id_specialty INT,
+    id SERIAL PRIMARY KEY,
+    account_id UUID,
+    specialty_id INT,
     medical_license VARCHAR(255),
     created_at TIMESTAMP,
     updated_at TIMESTAMP,

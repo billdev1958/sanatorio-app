@@ -34,6 +34,17 @@ func (pr *userRepository) RegisterUser(ctx context.Context, tx pgx.Tx, ru entiti
 	return userID, name, nil
 }
 
+func (pr *userRepository) RegisterdDoctor(ctx context.Context, tx pgx.Tx, ru entities.RegisterDoctorByAdmin) (int, string, error) {
+	var userID int
+	var name string
+	query := "INSERT INTO users (name, lastname1, lastname2, created_at) VALUES ($1, $2, $3, $4) RETURNING id, name"
+	err := tx.QueryRow(ctx, query, ru.Name, ru.Lastname1, ru.Lastname2, time.Now()).Scan(&userID, &name)
+	if err != nil {
+		return 0, "", fmt.Errorf("insert user: %w", err)
+	}
+	return userID, name, nil
+}
+
 func (pr *userRepository) RegisterPatient(ctx context.Context, tx pgx.Tx, ru entities.PatientUser) (int, string, error) {
 	var userID int
 	var name string
@@ -47,6 +58,16 @@ func (pr *userRepository) RegisterPatient(ctx context.Context, tx pgx.Tx, ru ent
 
 // Función para registrar la cuenta utilizando el userID generado
 func (pr *userRepository) RegisterAccount(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin, userID int) (string, error) {
+	var email string
+	query := "INSERT INTO account (id, user_id, email, password, rol, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING email"
+	err := tx.QueryRow(ctx, query, ru.AccountID, userID, ru.Email, ru.Password, ru.Rol, time.Now()).Scan(&email)
+	if err != nil {
+		return "", fmt.Errorf("insert account: %w", err)
+	}
+	return email, nil
+}
+
+func (pr *userRepository) RegisterAccountDoctor(ctx context.Context, tx pgx.Tx, ru entities.RegisterDoctorByAdmin, userID int) (string, error) {
 	var email string
 	query := "INSERT INTO account (id, user_id, email, password, rol, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING email"
 	err := tx.QueryRow(ctx, query, ru.AccountID, userID, ru.Email, ru.Password, ru.Rol, time.Now()).Scan(&email)

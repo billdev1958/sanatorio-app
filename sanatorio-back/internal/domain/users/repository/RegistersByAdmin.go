@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"sanatorioApp/internal/domain/users/entities"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -98,34 +99,28 @@ func (ur *userRepository) RegisterDoctorTransaction(ctx context.Context, rd enti
 
 	// Verificar la contraseña del administrador antes de proceder
 	isValid, err := ur.CheckAdminPassword(ctxTx, tx, rd.AccountAdminID, rd.AdminPassword)
-	if err != nil || !isValid {
+	if err != nil {
 		return response, fmt.Errorf("failed to authenticate admin: %w", err)
+	}
+	if !isValid {
+		return response, fmt.Errorf("failed to authenticate admin: invalid password")
 	}
 
 	// Registrar el usuario y obtener el userID generado
-	userID, name, err := ur.RegisterUser(ctxTx, tx, entities.RegisterUserByAdmin{
-		User:       rd.User,
-		Account:    rd.Account,
-		DocumentID: rd.DocumentID,
-	})
+	userID, name, err := ur.RegisterdDoctor(ctxTx, tx, rd)
 	if err != nil {
-		return response, err
+		return response, fmt.Errorf("failed to register user: %w", err)
 	}
 
 	// Registrar la cuenta utilizando el userID generado
-	email, err := ur.RegisterAccount(ctxTx, tx, entities.RegisterUserByAdmin{
-		User:       rd.User,
-		Account:    rd.Account,
-		DocumentID: rd.DocumentID,
-	}, userID)
+	email, err := ur.RegisterAccountDoctor(ctxTx, tx, rd, userID)
 	if err != nil {
-		return response, err
+		return response, fmt.Errorf("failed to register account: %w", err)
 	}
 
-	// Registrar al doctor en su tabla correspondiente
 	err = ur.RegisterTypeDoctor(ctxTx, tx, rd)
 	if err != nil {
-		return response, err
+		return response, fmt.Errorf("failed to register user type: %w", err)
 	}
 
 	// Construir la respuesta
@@ -139,8 +134,8 @@ func (ur *userRepository) RegisterDoctorTransaction(ctx context.Context, rd enti
 
 // Función para registrar el doctor en su tabla correspondiente
 func (pr *userRepository) RegisterTypeDoctor(ctx context.Context, tx pgx.Tx, rd entities.RegisterDoctorByAdmin) error {
-	query := "INSERT INTO doctor_user (user_id, account_id, specialty_id, medical_license) VALUES ($1, $2, $3, $4)"
-	_, err := tx.Exec(ctx, query, rd.AccountID, rd.SpecialtyID, rd.DocumentID)
+	query := "INSERT INTO doctor_user (account_id, specialty_id, medical_license, created_at) VALUES ($1, $2, $3, $4)"
+	_, err := tx.Exec(ctx, query, rd.AccountID, rd.SpecialtyID, rd.DocumentID, time.Now())
 	if err != nil {
 		return fmt.Errorf("insert into table: %w", err)
 	}
@@ -153,10 +148,10 @@ func (pr *userRepository) RegisterTypeUser(ctx context.Context, tx pgx.Tx, ru en
 	var values []interface{}
 
 	if ru.Rol == entities.SuperUsuario {
-		query = "INSERT INTO super_user (account_id, curp, created_at, updated_at) VALUES ($1, $2, NOW(), NOW())"
+		query = "INSERT INTO super_user (account_id, curp, created_at) VALUES ($1, $2, NOW())"
 		values = []interface{}{ru.AccountID, ru.DocumentID}
 	} else if ru.Rol == entities.Patient {
-		query = "INSERT INTO patient_user (account_id, curp, created_at, updated_at) VALUES ($1, $2, NOW(), NOW())"
+		query = "INSERT INTO patient_user (account_id, curp, created_at) VALUES ($1, $2, NOW())"
 		values = []interface{}{ru.AccountID, ru.DocumentID}
 	} else {
 		return fmt.Errorf("unknown role: %d", ru.Rol)
