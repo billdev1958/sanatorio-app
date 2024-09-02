@@ -24,6 +24,9 @@ WORKDIR /app
 # Copiar el binario desde la etapa de construcción
 COPY --from=builder /app/sanatorio-back /app/sanatorio-back
 
+COPY .env .env
+
+
 # Exponer el puerto en el que corre tu aplicación (ajusta según tu configuración)
 EXPOSE 8080
 

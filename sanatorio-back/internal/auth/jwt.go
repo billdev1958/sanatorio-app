@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -9,7 +10,14 @@ import (
 )
 
 // TODO AGREGAR A ENV
-var secretKey = []byte("secret-key")
+var secretKey []byte
+
+func init() {
+	secretKey = []byte(os.Getenv("JWT_SECRET_KEY"))
+	if len(secretKey) == 0 {
+		panic("JWT_SECRET_KEY is not set in environment variables")
+	}
+}
 
 type Claims struct {
 	AccountID uuid.UUID

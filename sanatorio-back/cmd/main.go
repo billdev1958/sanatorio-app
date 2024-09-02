@@ -6,9 +6,8 @@ import (
 )
 
 func main() {
-	port := "8080"
 
-	application, err := app.NewApp(port)
+	application, err := app.NewApp()
 	if err != nil {
 		log.Fatalf("failed to initialize app: %v", err)
 	}

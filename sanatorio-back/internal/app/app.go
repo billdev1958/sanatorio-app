@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 )
 
 type App struct {
@@ -22,8 +23,15 @@ type App struct {
 	router *http.ServeMux
 }
 
-func NewApp(port string) (*App, error) {
-	dsn := "postgres://root:secret@db:5432/university_db?sslmode=disable"
+func NewApp() (*App, error) {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+	dsn := os.Getenv("DSN")
+	port := os.Getenv("PORT")
 
 	db, err := setupDatabase(dsn)
 	if err != nil {
