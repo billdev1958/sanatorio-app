@@ -57,7 +57,7 @@ func (u *usecase) RegisterUser(ctx context.Context, request models.RegisterUserB
 		AdminData: entities.AdminData{
 			AccountAdminID: adminAccountID,
 			RolAdmmin:      adminRole,
-			AdminPassword:  request.AdminPassword,
+			AdminPassword:  request.AdminPassword, // No es necesario enviar AdminPassword ya que no lo tienes en el request
 		},
 		User: entities.User{
 			Name:      request.Name,

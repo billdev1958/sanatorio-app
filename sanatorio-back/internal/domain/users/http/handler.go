@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	user "sanatorioApp/internal/domain/users"
 	"sanatorioApp/internal/domain/users/http/models"
@@ -48,6 +49,10 @@ func (h *handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
+
+	// Verifica si el logging funciona
+	log.Println("Inicio del handler RegisterUser")
+
 	// Decodificar el cuerpo de la solicitud en el modelo RegisterUserRequest
 	request := models.RegisterUserByAdminRequest{}
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -56,6 +61,8 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
+
+	log.Printf("Recibido request: %+v", request)
 
 	// Llamar al caso de uso para registrar el usuario
 	response, err := h.uc.RegisterUser(r.Context(), request)
@@ -86,6 +93,8 @@ func (h *handler) RegisterDoctor(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
+
+	log.Printf("Recibido request: %+v", request)
 
 	// Llamar al caso de uso para registrar el doctor
 	response, err := h.uc.RegisterDoctor(r.Context(), request)

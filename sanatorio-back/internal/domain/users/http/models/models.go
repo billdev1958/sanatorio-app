@@ -23,15 +23,14 @@ type AdminData struct {
 
 // Registers
 type RegisterUserByAdminRequest struct {
-	AdminData
-	Name      string    `json:"name"`
-	Lastname1 string    `json:"lastname1"`
-	Lastname2 string    `json:"lastname2"`
-	AccountID uuid.UUID `json:"account_id"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	Rol       int       `json:"rol"`
-	Curp      string    `json:"curp"`
+	Name          string `json:"name"`
+	Lastname1     string `json:"lastname1"`
+	Lastname2     string `json:"lastname2"`
+	Email         string `json:"email"`
+	Password      string `json:"password"`
+	Rol           int    `json:"rol"`
+	Curp          string `json:"curp"`
+	AdminPassword string `json:"admin_password"`
 }
 
 type RegisterDoctorByAdminRequest struct {
