@@ -20,6 +20,8 @@ func (h *handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	var request models.LoginUser
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
+		// Configurar primero los headers antes de enviar cualquier respuesta
+		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
@@ -27,16 +29,16 @@ func (h *handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	// Llamar al caso de uso para autenticar al usuario
 	response, err := h.uc.LoginUser(r.Context(), request)
 	if err != nil {
-		// Manejar el error de autenticación
+		// Configurar primero los headers antes de enviar cualquier respuesta
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(response)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Authentication failed"})
 		return
 	}
 
 	// Configurar el tipo de contenido de la respuesta y el estado HTTP
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusOK) // Esta línea fija el código de estado y debe ser antes de escribir el cuerpo
 
 	// Enviar la respuesta exitosa con el token JWT
 	if err := json.NewEncoder(w).Encode(response); err != nil {

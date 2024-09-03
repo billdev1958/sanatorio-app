@@ -15,6 +15,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 )
 
 type App struct {
@@ -56,9 +57,19 @@ func (app *App) Run() error {
 	middleware.Logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 	loggingMiddleware := middleware.NewLoggingMiddleware(app.router)
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPatch, http.MethodOptions},
+		AllowedHeaders:   []string{"Origin", "Content-Type", "Authorization", "Accept", "Success", "OK"},
+		AllowCredentials: true,
+	})
+
+	handler := c.Handler(loggingMiddleware)
+
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%s", app.port),
-		Handler: loggingMiddleware,
+		Handler: handler,
 	}
 
 	if err := StartService(context.Background(), app.DB, app.router); err != nil {
