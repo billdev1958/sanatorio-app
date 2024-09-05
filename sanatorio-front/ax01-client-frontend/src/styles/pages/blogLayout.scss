@@ -1,0 +1,70 @@
+.blogPage {
+    background-color: #fff;
+    color: #333;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    padding: 48px;
+    max-width: 1000px;
+    margin: auto;
+    
+  }
+  
+
+  
+  .blogPageTitle {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 60px;
+  }
+  
+  .blogPost {
+    margin-bottom: 60px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid #eaeaea; /* Añade una línea sutil para separar los posts */
+  }
+  
+  .blogPostHeader {
+    margin-bottom: 20px;
+  }
+  
+  .blogPostCategory {
+    color: #6e6e73;
+    font-size: 16px;
+    font-weight: normal;
+    letter-spacing: 0.05em; /* Añade espaciado entre letras para la categoría */
+  }
+  
+  .blogPostTitle {
+    font-size: 28px;
+    margin: 10px 0 20px;
+    font-weight: bold;
+  }
+  
+  .blogPostContent p {
+    font-size: 18px; /* Aumenta el tamaño del texto para mejorar la legibilidad */
+    margin: 0;
+  }
+  
+  @media (max-width: 768px) {
+    .blogPage {
+      padding: 24px;
+    }
+  
+    .blogPageTitle {
+      font-size: 28px;
+      margin-bottom: 40px;
+    }
+  
+    .blogPostTitle {
+      font-size: 24px;
+    }
+  
+    .blogPostContent p {
+      font-size: 16px;
+    }
+  }
+  .blogPostMeta {
+    font-size: 0.9rem;
+    color: #6e6e73;
+    margin-bottom: 20px;
+  }

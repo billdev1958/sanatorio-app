@@ -1,0 +1,153 @@
+.servicesPage {
+    font-family: Arial, sans-serif;
+    color: #333;
+    padding: 60px 20px;
+    background-color: #f8f9fa; /* Cambiar el color de fondo */
+}
+
+.heroSection h1 {
+    font-size: 2.5rem; /* Aumentar el tamaño del título */
+    color: #1d1d1f;
+}
+
+.heroSection p {
+    font-size: 1.1rem; /* Aumentar el tamaño del texto */
+    color: #6e6e73;
+    max-width: 800px;
+    margin: 20px auto;
+    text-align: center; /* Centrar el texto */
+}
+
+.servicesSection {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.serviceCard {
+    width: 350px; /* Aumenta el ancho de las tarjetas */
+    min-height: 400px;
+    height: auto; /* Permite que la altura se ajuste al contenido */
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribuye el contenido verticalmente */
+}
+.serviceCard:hover {
+    transform: scale(1.1); /* Desplazar ligeramente hacia arriba al pasar el cursor */
+    box-shadow: 0 8px 12px rgba(0,0,0,0.2); /* Aumentar la sombra */
+}
+
+.serviceIcon {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+    display: block; /* Asegurar que el icono esté centrado verticalmente */
+    margin: 0 auto 20px; /* Centrar el icono horizontalmente */
+}
+
+.serviceCard h3 {
+    margin-top: 0;
+    font-size: 1.5rem; /* Aumentar el tamaño del título */
+    color: #1d1d1f;
+}
+
+.serviceCard p {
+    font-size: 1rem; /* Aumentar el tamaño del texto */
+    color: #6e6e73;
+    line-height: 1.5; /* Ajustar el interlineado */
+}
+
+/* Agregando media query para ajustar la imagen en pantallas pequeñas */
+@media (max-width: 768px) {
+    .servicesSection {
+        flex-direction: column; /* Cambia a columna para apilamiento vertical */
+    }
+
+    .serviceCard {
+        width: 100%; /* Ocupa todo el ancho disponible */
+        /* Opcional: Si quieres que la primera tarjeta sea diferente */
+        /* Esto no afecta el tamaño, solo como una referencia para posibles estilos específicos */
+    }
+
+    .serviceCard:first-child {
+        min-height: 100vh; /* Hace que la primera tarjeta ocupe toda la altura de la pantalla */
+    }
+
+    .serviceIcon {
+        width: 100%; /* Hace que la imagen ocupe todo el ancho disponible */
+        height: auto; /* Ajusta la altura automáticamente para mantener la proporción */
+    }
+}
+//Investigacion
+
+
+.investigacion-page {
+    background-color: #f8f9fa; /* Color de fondo similar al de Apple */
+}
+
+.header-investigacion {
+    background-color: #ffffff; /* Fondo blanco */
+    padding: 20px;
+    text-align: center; /* Centrar contenido */
+}
+
+.header-logo-investigacion {
+    max-width: 100%; /* Ancho máximo */
+    height: auto; /* Altura automática para mantener la proporción */
+    display: block; /* Para centrar horizontalmente */
+    margin: 0 auto 20px; /* Centrar horizontalmente y agregar margen inferior */
+}
+
+.intro-section,
+.opensource-section {
+    padding: 50px 20px; /* Espaciado interior */
+    text-align: center; /* Centrar texto */
+}
+
+.intro-content,
+.opensource-content {
+    max-width: 800px; /* Ancho máximo del contenido */
+    margin: 0 auto; /* Centrar horizontalmente */
+}
+
+.intro-content h2,
+.opensource-content h2 {
+    font-size: 2.5rem; /* Tamaño de título */
+    color: #333333; /* Color de texto */
+}
+
+.intro-content p,
+.opensource-content p {
+    font-size: 1.2rem; /* Tamaño de texto */
+    color: #666666; /* Color de texto secundario */
+    line-height: 1.6; /* Altura de línea */
+}
+
+.footer {
+    background-color: #ffffff; /* Fondo blanco */
+    padding: 20px;
+    text-align: center; /* Centrar texto */
+    box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+.footer-content {
+    color: #666666; /* Color de texto secundario */
+}
+
+.middle-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.planet-image {
+    max-width: 200px; /* Ajusta el ancho máximo de la imagen según sea necesario */
+    height: auto; /* Para mantener la proporción de la imagen */
+}

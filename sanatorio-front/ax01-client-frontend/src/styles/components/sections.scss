@@ -1,0 +1,32 @@
+.Section-Container { 
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Esto alinea los elementos a la derecha */
+    height: 100%;
+    width: 100%; /* Asegura que el contenedor se expanda al ancho total disponible */
+    border-bottom: 2px solid black;}
+
+/* Nuevo contenedor para el h2 para alinearlo a la derecha */
+.H2-Container {
+    color: aliceblue;
+    width: 100%; /* Ajustado para ocupar todo el ancho y no limitarlo al 25% */
+    display: flex; /* Asegúrate de usar display: flex para aplicar justify-content */
+    justify-content: flex-end; /* Esto alineará el contenido a la derecha */
+    padding-right: 10px;
+}
+
+.Logos-Container {
+    background-color: aliceblue;
+    display: flex;
+    justify-content: space-around; /* Mantiene los logos distribuidos equitativamente */
+    width: 100%; /* Asegura que los logos usen todo el ancho disponible */
+}
+
+.section-logo {
+    width: 5rem; /* Asegúrate de que el tamaño de los logos sea consistente */
+    /* Si necesitas que .world-logo tenga un tamaño diferente, ajusta esta clase por separado */
+}
+
+.world-logo{
+    width: 7rem;
+}

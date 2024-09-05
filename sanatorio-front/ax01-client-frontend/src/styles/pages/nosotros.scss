@@ -1,0 +1,78 @@
+.text-container-nosotros {
+    text-align: start;
+    width: 50%;
+    padding: 20px; /* Añade algo de relleno para no tener el texto pegado a los bordes */
+}
+
+.text-container-nosotros h1 {
+    font-size: 2em; /* Tamaño de fuente grande para el encabezado */
+    color: #1d1d1f; /* Un negro casi completo, para darle importancia al título */
+    margin-bottom: 0.5em; /* Reduce el margen inferior para acercar el título al párrafo */
+}
+
+.text-container-nosotros p {
+    text-align: left;
+    font-size: 1em; /* Mantén el tamaño de fuente del párrafo a un nivel legible pero no demasiado grande */
+    color: #6e6e73; /* Un gris más claro para el texto del párrafo, mejora la legibilidad */
+    line-height: 1.6; /* Aumenta el interlineado para mejorar la legibilidad */
+}
+
+.header-nosotros {
+    width: 100%;
+    background-color: #f8f8f7; /* Usa el mismo color de fondo que el cuerpo para un diseño cohesivo */
+    padding: 40px 20px; /* Aumenta el relleno para dar más espacio */
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Hace la sombra un poco más prominente para darle profundidad */
+}
+
+.header-content-nosotros {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Cambia a 'space-between' para distribuir el espacio igualmente */
+    max-width: 1200px; /* Limita el ancho máximo para no tener líneas de texto demasiado largas */
+    margin: auto; /* Centra el contenido */
+}
+
+.header-logo-nosotros{
+    /* Elimina el width auto para controlar el tamaño directamente */
+    height: auto; /* Cambia a auto para mantener la proporción según el ancho especificado */
+    max-width: 200px; /* Establece un ancho máximo más grande */
+    max-height: 150px; /* Establece una altura máxima para controlar el tamaño y mantener la proporción */
+    margin: 0 20px; /* Mantén los márgenes para un adecuado espaciado */
+}
+
+/* Opcional: Si quieres que uno de los logos sea más grande que el otro, puedes especificar tamaños diferentes */
+
+
+@keyframes rotateLogo {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .header-logo-world {
+    height: auto; /* Cambia a auto para mantener la proporción según el ancho especificado */
+    max-width: 200px; /* Establece un ancho máximo más grande */
+    max-height: 150px; /* Establece una altura máxima para controlar el tamaño y mantener la proporción */
+    margin: 0 20px; /* Mantén los márgenes para un adecuado espaciado */
+    animation: rotateLogo 10s linear infinite;
+  }
+
+  @media (max-width: 768px) {
+    .header-logo-nosotros, .header-logo-world {
+        display: none; /* Oculta las imágenes en pantallas pequeñas */
+    }
+
+    .text-container-nosotros {
+        width: 100%; /* Permite que el contenedor de texto ocupe todo el ancho disponible */
+        padding: 20px; /* Mantiene el relleno para el texto */
+    }
+
+    .header-content-nosotros {
+        flex-direction: column; /* Cambia la disposición a vertical */
+        text-align: center; /* Asegura que el texto esté centrado */
+    }
+}

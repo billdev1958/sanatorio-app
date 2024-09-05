@@ -1,0 +1,236 @@
+.header {
+    background-color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .header-logo {
+    width: 25fr; /* O el tamaño que prefieras para tu logo */
+    margin-bottom: 20px;
+  }
+  
+  .text-container{
+    text-align: start;
+    margin-right: 10rem; /* Considerar ajustar este margen para dispositivos más pequeños */
+    display: flex; /* Habilita flexbox para este contenedor */
+    flex-direction: column; /* Organiza los elementos en una columna */
+    align-items: center; 
+  }
+
+  .header-title {
+    font-size: 2rem;
+    color: aliceblue;
+    margin: 0;
+  }
+  .header-subtitle-h2 {
+    margin-top: 2rem;
+    font-size: 1.5rem;
+    color: aliceblue;
+    margin: 0;
+  }
+.header-subtitle-h3{
+  margin-top: 2rem;
+  font-size: 1rem;
+  color: grey;
+  margin: 0;
+}
+
+/* Ajuste para responsividad */
+@media (max-width: 768px) {
+  .header-content {
+      flex-direction: column;
+  }
+
+  .header-logo {
+      order: -1; /* Coloca el logo arriba */
+      width: 50%; /* Ajusta el tamaño del logo para pantallas pequeñas */
+      margin-bottom: 10px; /* Reduce el margen */
+  }
+
+  .text-container {
+      margin-right: 0;
+  }
+
+  .header-title, .header-subtitle-h2 {
+      font-size: 1.2rem; /* Reduce el tamaño del texto para dispositivos más pequeños */
+      text-align: center; /* Asegura que el texto esté centrado bajo el logo */
+  }
+}
+
+@media (max-width: 480px) {
+  .header-logo {
+      width: 60%; /* Ajusta el tamaño para dispositivos muy pequeños */
+  }
+
+  .header-title, .header-subtitle-h2 {
+      font-size: 1rem; /* Ajuste adicional para pantallas muy pequeñas */
+  }
+}
+
+// Header blue
+.header-b {
+  width: 100%;
+  background-color: #007bff;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+
+
+//Header white
+.header-w {
+  width: 100%;
+  background-color: aliceblue;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-content-w {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Cambiado para separar el texto y el logo */
+}
+
+.header-logo-w {
+  width: 20%; /* O el tamaño que prefieras para tu logo */
+  margin-left: 20px; /* Ajusta según sea necesario para alinear */
+  order: 2; /* Asegura que el logo esté al final en pantallas grandes */
+}
+
+.text-container-w{
+  text-align: start;
+  margin-right: 10rem;
+  order: 1; /* Asegura que el texto esté al principio */
+  flex: 1; /* Permite que el contenedor de texto ocupe todo el espacio disponible */
+}
+
+.header-title-w, .header-subtitle-h2-w, .header-subtitle-h3-w {
+  color: black;
+  margin: 0;
+}
+
+.header-title-w {
+  font-size: 2rem;
+}
+
+.header-subtitle-h2-w, .header-subtitle-h3-w {
+  margin-top: 2rem;
+}
+
+.header-subtitle-h2-w {
+  font-size: 1.5rem;
+}
+
+.header-subtitle-h3-w {
+  font-size: 1rem;
+  color: grey;
+}
+
+/* Ajustes para responsividad */
+@media (max-width: 768px) {
+  .header-content-w {
+    flex-direction: column-reverse; /* Cambia el orden: logo arriba, texto abajo */
+    text-align: center;
+  }
+
+  .text-container-w, .header-logo-w {
+    margin-right: 0;
+    margin-left: 0; /* Elimina los márgenes laterales para centrar en pantallas pequeñas */
+  }
+
+  .header-logo-w {
+    width: 50%; /* Ajusta el tamaño del logo para pantallas más pequeñas */
+    margin-bottom: 20px; /* Espacio entre el logo y el texto */
+  }
+
+  .header-title-w, .header-subtitle-h2-w, .header-subtitle-h3-w {
+    text-align: center; /* Centra el texto en pantallas pequeñas */
+  }
+}
+
+//Contact header
+.contact-header {
+  background-color: #ffffff; /* Fondo blanco */
+  color: #333; /* Texto oscuro para contraste */
+  padding: 60px 20px; /* Aumenta el padding vertical para más altura */
+  text-align: center; /* Centrar el contenido */
+  border-bottom: 2px solid #eaeaea; /* Línea sutil en la parte inferior, más gruesa */
+}
+
+.contact-container h1, .contact-info p, .social-icons a {
+  margin-bottom: 30px; /* Espacio debajo de cada sección */
+}
+
+.contact-container h1 {
+  font-size: 30px; /* Título más grande */
+}
+
+.contact-info, .social-icons {
+  display: flex;
+  justify-content: center; /* Centrado horizontal */
+  gap: 40px; /* Espacio entre elementos */
+}
+
+.contact-info p, .social-icons a {
+  font-size: 20px; /* Tamaño para contacto y íconos */
+  display: flex;
+  align-items: center; /* Alineación vertical */
+}
+
+.contact-info i, .social-icons i {
+  margin-right: 12px; /* Espacio antes del texto/ícono */
+  font-size: 24px; /* Íconos más grandes */
+}
+
+.social-icons a {
+  color: #333; /* Color de íconos */
+  text-decoration: none; /* Sin subrayado */
+}
+
+.social-icons a:hover {
+  color: #007bff; /* Color al pasar el ratón */
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .contact-header {
+    padding: 30px 10px; /* Reduce el padding en pantallas pequeñas */
+  }
+
+  .contact-container h1 {
+    font-size: 24px; /* Reduce el tamaño del título para pantallas pequeñas */
+  }
+
+  .contact-info {
+    flex-direction: column; /* Cambia la disposición a columna en pantallas pequeñas */
+    gap: 20px; /* Reduce el espacio entre elementos */
+  }
+
+  .contact-info p {
+    font-size: 18px; /* Ajusta el tamaño del texto para mejorar la legibilidad */
+  }
+
+  .contact-info i {
+    font-size: 22px; /* Ajusta ligeramente el tamaño de los íconos */
+  }
+}
+
+/* Si has descomentado y deseas incluir los estilos de .social-icons, asegúrate de adaptarlos de manera similar */
+@media (max-width: 768px) {
+  .social-icons {
+    gap: 20px; /* Ajusta el espacio entre los íconos */
+  }
+
+  .social-icons a {
+    font-size: 18px; /* Ajusta el tamaño de los íconos para dispositivos móviles */
+  }
+}

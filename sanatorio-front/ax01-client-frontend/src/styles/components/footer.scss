@@ -1,0 +1,29 @@
+.minimal-footer {
+    background-color: #fff; /* Fondo blanco para un look limpio */
+    color: #333; /* Texto oscuro para contraste */
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    padding: 10px 0; /* Reducido para menos altura */
+    text-align: center;
+    border-top: 1px solid #eaeaea; /* Una línea sutil para separar el footer */
+  }
+  
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  .footer-links {
+    margin-top: 5px; /* Menos espacio arriba */
+  }
+  
+  .footer-links a {
+    color: #333;
+    text-decoration: none;
+    margin: 0 10px; /* Espaciado horizontal ligeramente reducido entre enlaces */
+    font-size: 14px; /* Tamaño de fuente reducido para menos altura */
+  }
+  
+  .footer-links a:hover {
+    text-decoration: underline; /* Subraya los enlaces al pasar el mouse para mejorar la interactividad */
+  }
