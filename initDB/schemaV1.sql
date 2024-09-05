@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS cat_rol (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS account (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     rol INT NOT NULL,
-    created_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     password_change_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -23,33 +23,33 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(255) NOT NULL,
     lastname1 VARCHAR(255) NOT NULL,
     lastname2 VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS super_user (
     id SERIAL PRIMARY KEY,
-    account_id UUID,
-    curp VARCHAR(18),
-    created_at TIMESTAMP,
+    account_id UUID NOT NULL,
+    curp VARCHAR(18) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS patient_user (
     id SERIAL PRIMARY KEY,
-    account_id UUID,
-    curp VARCHAR(18),
-    created_at TIMESTAMP,
+    account_id UUID NOT NULL,
+    curp VARCHAR(18) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS cat_specialty (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(60),
-    created_at TIMESTAMP,
+    name VARCHAR(60) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
@@ -57,66 +57,65 @@ CREATE TABLE IF NOT EXISTS cat_specialty (
 CREATE TABLE IF NOT EXISTS appointment_status (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
-    created_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS office_status(
     id SERIAL PRIMARY KEY,
-    name VARCHAR(60),
-    created_at TIMESTAMP,
+    name VARCHAR(60) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS office (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(60),
-    specialty_id INTEGER,
-    status_id INTEGER,
-    doctor_account_id UUID,
-    created_at TIMESTAMP,
+    name VARCHAR(60) NOT NULL,
+    specialty_id INTEGER NOT NULL,
+    status_id INTEGER NOT NULL,
+    doctor_account_id UUID NOT NULL,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS doctor_user (
     id SERIAL PRIMARY KEY,
-    account_id UUID,
-    specialty_id INT,
-    medical_license VARCHAR(255),
-    created_at TIMESTAMP,
+    account_id UUID NOT NULL,
+    specialty_id INT NOT NULL,
+    medical_license VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS schedule (
     id SERIAL PRIMARY KEY,
-    office_id INTEGER, 
+    office_id INTEGER NOT NULL, 
     day_of_week INT NOT NULL,
     time_start TIME NOT NULL,
     time_end TIME NOT NULL,
-    created_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS appointment (
     id UUID PRIMARY KEY,
-    doctor_account_id UUID,
-    patient_account_id UUID,
-    office_id INTEGER,
-    time_start TIMESTAMP,
-    time_end TIMESTAMP,
-    schedule_id INTEGER,
-    status_id INTEGER,
-    created_at TIMESTAMP,
+    doctor_account_id UUID NOT NULL,
+    patient_account_id UUID NOT NULL,
+    office_id INTEGER NOT NULL,
+    time_start TIMESTAMP NOT NULL,
+    time_end TIMESTAMP NOT NULL,
+    schedule_id INTEGER NOT NULL,
+    status_id INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
     CONSTRAINT chk_time_validity CHECK (time_start < time_end)
 );
-
 -- Foreign keys --
 
 ALTER TABLE account

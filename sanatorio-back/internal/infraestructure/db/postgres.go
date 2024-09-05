@@ -33,9 +33,9 @@ func (storage *PgxStorage) SeedRoles(ctx context.Context) (err error) {
 		return nil
 	}
 
-	query := "INSERT INTO cat_rol (name) VALUES($1)"
+	query := "INSERT INTO cat_rol (name, created_at) VALUES($1, $2)"
 	for _, value := range rolesValues {
-		_, err = storage.DbPool.Exec(ctx, query, value)
+		_, err = storage.DbPool.Exec(ctx, query, value, time.Now())
 		if err != nil {
 			return fmt.Errorf("insert roles: %w", err)
 		}
@@ -46,7 +46,7 @@ func (storage *PgxStorage) SeedRoles(ctx context.Context) (err error) {
 }
 
 func (storage *PgxStorage) SeedOfficeStatus(ctx context.Context) (err error) {
-	statusValues := [3]string{"Disponible", "No disponible", "Mantenimiento"}
+	statusValues := [2]string{"Disponible", "No disponible"}
 
 	var count int
 	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM office_status").Scan(&count)
@@ -58,9 +58,9 @@ func (storage *PgxStorage) SeedOfficeStatus(ctx context.Context) (err error) {
 		return nil
 	}
 
-	query := "INSERT INTO office_status (name) VALUES($1)"
+	query := "INSERT INTO office_status (name, created_at) VALUES($1, $2)"
 	for _, value := range statusValues {
-		_, err = storage.DbPool.Exec(ctx, query, value)
+		_, err = storage.DbPool.Exec(ctx, query, value, time.Now())
 		if err != nil {
 			return fmt.Errorf("insert office status: %w", err)
 		}
@@ -114,5 +114,60 @@ func (storage *PgxStorage) SeedAdminUser(ctx context.Context) (err error) {
 	}
 
 	fmt.Println("Usuario administrador insertado correctamente")
+	return nil
+}
+
+func (storage *PgxStorage) SeedSpecialties(ctx context.Context) (err error) {
+	specialtiesValues := [4]string{"Cardiologo", "Dermatologo", "Pediatra", "Ginecologia"}
+
+	var count int
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM cat_specialty").Scan(&count)
+	if err != nil {
+		return fmt.Errorf("count specialties: %w", err)
+	}
+
+	if count > 0 {
+		fmt.Println("La tabla cat_specialty ya contiene datos")
+		return nil
+	}
+
+	query := "INSERT INTO cat_specialty (name, created_at) VALUES($1, $2)"
+	for _, value := range specialtiesValues {
+		_, err = storage.DbPool.Exec(ctx, query, value, time.Now())
+		if err != nil {
+			return fmt.Errorf("insert specialties: %w", err)
+		}
+	}
+
+	fmt.Println("Especialidades insertadas correctamente en cat_specialty")
+	return nil
+}
+
+func (storage *PgxStorage) SeedAppointmentStatus(ctx context.Context) (err error) {
+	// Estados de la cita que vamos a insertar
+	statusValues := [2]string{"Confirmada", "Cancelada"}
+
+	// Verificar si ya hay datos en la tabla appointment_status
+	var count int
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM appointment_status").Scan(&count)
+	if err != nil {
+		return fmt.Errorf("count appointment status: %w", err)
+	}
+
+	if count > 0 {
+		fmt.Println("La tabla appointment_status ya contiene datos")
+		return nil
+	}
+
+	// Query para insertar los estados
+	query := "INSERT INTO appointment_status (name, created_at) VALUES($1, $2)"
+	for _, value := range statusValues {
+		_, err = storage.DbPool.Exec(ctx, query, value, time.Now())
+		if err != nil {
+			return fmt.Errorf("insert appointment status: %w", err)
+		}
+	}
+
+	fmt.Println("Estados de citas insertados correctamente en appointment_status")
 	return nil
 }

@@ -9,14 +9,15 @@ type Usecase interface {
 	//REGISTER
 	RegisterUser(ctx context.Context, request models.RegisterUserByAdminRequest) (models.Response, error)
 	RegisterDoctor(ctx context.Context, request models.RegisterDoctorByAdminRequest) (models.Response, error)
-	RegisterPatient(ctx context.Context, request models.RegisterPatient) (models.Response, error)
+	RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.Response, error)
 
 	LoginUser(ctx context.Context, lu models.LoginUser) (models.Response, error)
 	// GET
-	GetUsers(ctx context.Context) ([]models.Users, error)
+	GetUsers(ctx context.Context) ([]models.UsersRequest, error)
 	GetDoctors(ctx context.Context) ([]models.Doctors, error)
-	GetDoctorByID(ctx context.Context, accountID string) (models.Response, error)
-	GetUserByID(ctx context.Context, accountID string) (models.Response, error)
+	GetDoctorByID(ctx context.Context, userID int) (models.Response, error)
+	GetUserByID(ctx context.Context, userID int) (models.Response, error)
+	GetAllUsers(ctx context.Context) (models.Response, error)
 
 	// EDIT
 	UpdateUser(ctx context.Context, userUpdate models.UpdateUser) (models.Response, error)

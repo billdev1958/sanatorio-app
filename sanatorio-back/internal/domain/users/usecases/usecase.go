@@ -52,12 +52,11 @@ func (u *usecase) RegisterUser(ctx context.Context, request models.RegisterUserB
 		}, err
 	}
 
-	// Crear la entidad RegisterUserByAdmin con los datos del administrador y del usuario
 	registerUser := entities.RegisterUserByAdmin{
 		AdminData: entities.AdminData{
 			AccountAdminID: adminAccountID,
 			RolAdmmin:      adminRole,
-			AdminPassword:  request.AdminPassword, // No es necesario enviar AdminPassword ya que no lo tienes en el request
+			AdminPassword:  request.AdminPassword,
 		},
 		User: entities.User{
 			Name:      request.Name,
@@ -109,7 +108,7 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 	adminRole := claims.Role
 
 	// Verificar que el rol es de administrador antes de proceder
-	if adminRole != 1 {
+	if adminRole != 1 { // Supongamos que 1 es el rol de administrador
 		return models.Response{
 			Status:  "error",
 			Message: "Unauthorized: insufficient permissions",
@@ -117,6 +116,7 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 		}, nil
 	}
 
+	// Verificar que el rol proporcionado es de doctor (Rol = 2)
 	if request.Rol != 2 {
 		return models.Response{
 			Status:  "error",
@@ -125,6 +125,7 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 		}, nil
 	}
 
+	// Hashear la contraseña del nuevo doctor
 	hashedPassword, err := password.HashPassword(request.Password)
 	if err != nil {
 		return models.Response{
@@ -134,6 +135,7 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 		}, err
 	}
 
+	// Crear la estructura del doctor a registrar
 	registerDoctor := entities.RegisterDoctorByAdmin{
 		AdminData: entities.AdminData{
 			AccountAdminID: adminAccountID,
@@ -146,15 +148,16 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 			Lastname2: request.Lastname2,
 		},
 		Account: entities.Account{
-			AccountID: uuid.New(),
+			AccountID: uuid.New(), // Generar un nuevo UUID para el doctor
 			Email:     request.Email,
 			Password:  hashedPassword,
 			Rol:       request.Rol,
 		},
-		DocumentID:  request.MedicalLicense,
-		SpecialtyID: request.Specialty,
+		DocumentID:  request.MedicalLicense, // Asignar el número de licencia médica
+		SpecialtyID: request.Specialty,      // Asignar el ID de la especialidad médica
 	}
 
+	// Intentar registrar al doctor en una transacción
 	doctorResponse, err := u.repo.RegisterDoctorTransaction(ctx, registerDoctor)
 	if err != nil {
 		return models.Response{
@@ -164,6 +167,7 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 		}, err
 	}
 
+	// Retornar la respuesta exitosa con los datos del doctor
 	return models.Response{
 		Status:  "success",
 		Message: "Doctor registered successfully",
@@ -174,7 +178,7 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 	}, nil
 }
 
-func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPatient) (models.Response, error) {
+func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.Response, error) {
 	// Definir el rol para el paciente
 	rol := 3
 
@@ -257,9 +261,28 @@ func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (mode
 
 }
 
-func (u *usecase) GetUserByID(ctx context.Context, accountID string) (models.Response, error) {
+func (u *usecase) GetAllUsers(ctx context.Context) (models.Response, error) {
+	// Llama al repositorio para obtener la lista de usuarios (superusuarios, doctores y pacientes)
+	users, err := u.repo.GetAllUsers(ctx)
+	if err != nil {
+		return models.Response{
+			Status:  "error",
+			Message: "Failed to retrieve users",
+			Errors:  map[string]string{"get_users": err.Error()},
+		}, err
+	}
+
+	// Crear la respuesta
+	return models.Response{
+		Status:  "success",
+		Message: "Users retrieved successfully",
+		Data:    users,
+	}, nil
+}
+
+func (u *usecase) GetUserByID(ctx context.Context, userID int) (models.Response, error) {
 	// Llama al repositorio para obtener el usuario por ID
-	userEntity, err := u.repo.GetUserByID(ctx, accountID)
+	userEntity, err := u.repo.GetUserByID(ctx, userID)
 	if err != nil {
 		return models.Response{
 			Status:  "error",
@@ -268,7 +291,6 @@ func (u *usecase) GetUserByID(ctx context.Context, accountID string) (models.Res
 		}, err
 	}
 
-	// Mapea los datos obtenidos a la estructura de respuesta del modelo HTTP
 	userData := models.User{
 		ID:        userEntity.ID,
 		Name:      userEntity.Name,
@@ -276,9 +298,9 @@ func (u *usecase) GetUserByID(ctx context.Context, accountID string) (models.Res
 		Lastname2: userEntity.Lastname2,
 		Email:     userEntity.Email,
 		Curp:      userEntity.Curp,
+		AccountID: userEntity.AccountID,
 	}
 
-	// Construir la respuesta exitosa
 	return models.Response{
 		Status:  "success",
 		Message: "User retrieved successfully",
@@ -286,34 +308,35 @@ func (u *usecase) GetUserByID(ctx context.Context, accountID string) (models.Res
 	}, nil
 }
 
-func (u *usecase) GetUsers(ctx context.Context) ([]models.Users, error) {
-	// Llama al repositorio para obtener la lista de usuarios
+func (u *usecase) GetUsers(ctx context.Context) ([]models.UsersRequest, error) {
 	users, err := u.repo.GetUsers(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Mapea los datos obtenidos a la estructura de respuesta del modelo HTTP
-	var response []models.Users
+	var response []models.UsersRequest
 	for _, user := range users {
-		response = append(response, models.Users{
-			User: models.User{
-				ID:        user.ID,
-				Name:      user.Name,
-				Lastname1: user.Lastname1,
-				Lastname2: user.Lastname2,
-			},
-			Email: user.Email,
-			Curp:  user.Curp,
+		var createdAtStr string
+		if !user.Created_At.IsZero() {
+			createdAtStr = user.Created_At.Format("2006-01-02 15:04:05")
+		}
+
+		response = append(response, models.UsersRequest{
+			ID:         user.ID,
+			Name:       user.Name,
+			Lastname1:  user.Lastname1,
+			Lastname2:  user.Lastname2,
+			Email:      user.Email,
+			Curp:       user.Curp,
+			Created_At: createdAtStr,
 		})
 	}
 
 	return response, nil
 }
 
-func (u *usecase) GetDoctorByID(ctx context.Context, accountID string) (models.Response, error) {
-	// Llama al repositorio para obtener el doctor por ID
-	doctorEntity, err := u.repo.GetDoctorByID(ctx, accountID)
+func (u *usecase) GetDoctorByID(ctx context.Context, userID int) (models.Response, error) {
+	doctorEntity, err := u.repo.GetDoctorByID(ctx, userID)
 	if err != nil {
 		return models.Response{
 			Status:  "error",
@@ -322,20 +345,17 @@ func (u *usecase) GetDoctorByID(ctx context.Context, accountID string) (models.R
 		}, err
 	}
 
-	// Mapea los datos obtenidos a la estructura de respuesta del modelo HTTP
 	doctorData := models.Doctors{
-		User: models.User{
-			ID:        doctorEntity.ID,
-			Name:      doctorEntity.Name,
-			Lastname1: doctorEntity.Lastname1,
-			Lastname2: doctorEntity.Lastname2,
-		},
+		ID:             doctorEntity.ID,
+		Name:           doctorEntity.Name,
+		Lastname1:      doctorEntity.Lastname1,
+		Lastname2:      doctorEntity.Lastname2,
 		Email:          doctorEntity.Email,
 		MedicalLicense: doctorEntity.MedicalLicense,
 		Specialty:      doctorEntity.Specialty,
+		AccountID:      doctorEntity.AccountID,
 	}
 
-	// Construir la respuesta exitosa
 	return models.Response{
 		Status:  "success",
 		Message: "Doctor retrieved successfully",
@@ -344,35 +364,55 @@ func (u *usecase) GetDoctorByID(ctx context.Context, accountID string) (models.R
 }
 
 func (u *usecase) GetDoctors(ctx context.Context) ([]models.Doctors, error) {
-	// Llama al repositorio para obtener la lista de doctores
 	doctors, err := u.repo.GetDoctors(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// Mapea los datos obtenidos a la estructura de respuesta del modelo HTTP
 	var response []models.Doctors
 	for _, doctor := range doctors {
 		response = append(response, models.Doctors{
-			User: models.User{
-				ID:        doctor.ID,
-				Name:      doctor.Name,
-				Lastname1: doctor.Lastname1,
-				Lastname2: doctor.Lastname2,
-			},
+			ID:             doctor.ID,
+			Name:           doctor.Name,
+			Lastname1:      doctor.Lastname1,
+			Lastname2:      doctor.Lastname2,
 			Email:          doctor.Email,
 			MedicalLicense: doctor.MedicalLicense,
 			Specialty:      doctor.Specialty,
+			AccountID:      doctor.AccountID,
 		})
 	}
 
 	return response, nil
 }
 
-// UpdateUser actualiza la información de un usuario existente.
 func (u *usecase) UpdateUser(ctx context.Context, userUpdate models.UpdateUser) (models.Response, error) {
-	// Convertir de models.UpdateUser a entities.UpdateUser
+	claims := auth.ExtractClaims(ctx)
+	if claims == nil {
+		return models.Response{
+			Status:  "error",
+			Message: "Unauthorized: no claims found in context",
+			Errors:  map[string]string{"authorization": "No claims found in context"},
+		}, nil
+	}
+
+	adminAccountID := claims.AccountID
+	adminRole := claims.Role
+
+	if adminRole != 1 {
+		return models.Response{
+			Status:  "error",
+			Message: "Unauthorized: insufficient permissions",
+			Errors:  map[string]string{"authorization": "User does not have admin privileges"},
+		}, nil
+	}
+
 	updateUser := entities.UpdateUser{
+		AdminData: entities.AdminData{
+			AccountAdminID: adminAccountID,
+			RolAdmmin:      adminRole,
+			AdminPassword:  userUpdate.AdminPassword,
+		},
 		AccountID: userUpdate.AccountID,
 		Name:      userUpdate.Name,
 		Lastname1: userUpdate.Lastname1,
@@ -382,7 +422,6 @@ func (u *usecase) UpdateUser(ctx context.Context, userUpdate models.UpdateUser) 
 		Curp:      userUpdate.Curp,
 	}
 
-	// Llama al repositorio para actualizar el usuario
 	message, err := u.repo.UpdateUser(ctx, updateUser)
 	if err != nil {
 		return models.Response{
@@ -398,10 +437,33 @@ func (u *usecase) UpdateUser(ctx context.Context, userUpdate models.UpdateUser) 
 	}, nil
 }
 
-// UpdateDoctor actualiza la información de un doctor existente.
 func (u *usecase) UpdateDoctor(ctx context.Context, doctorUpdate models.UpdateDoctor) (models.Response, error) {
-	// Convertir de models.UpdateDoctor a entities.UpdateDoctor
+	claims := auth.ExtractClaims(ctx)
+	if claims == nil {
+		return models.Response{
+			Status:  "error",
+			Message: "Unauthorized: no claims found in context",
+			Errors:  map[string]string{"authorization": "No claims found in context"},
+		}, nil
+	}
+
+	adminAccountID := claims.AccountID
+	adminRole := claims.Role
+
+	if adminRole != 1 {
+		return models.Response{
+			Status:  "error",
+			Message: "Unauthorized: insufficient permissions",
+			Errors:  map[string]string{"authorization": "User does not have admin privileges"},
+		}, nil
+	}
+
 	updateDoctorEntity := entities.UpdateDoctor{
+		AdminData: entities.AdminData{
+			AccountAdminID: adminAccountID,
+			RolAdmmin:      adminRole,
+			AdminPassword:  doctorUpdate.AdminPassword,
+		},
 		AccountID:      doctorUpdate.AccountID,
 		Name:           doctorUpdate.Name,
 		Lastname1:      doctorUpdate.Lastname1,
@@ -412,7 +474,6 @@ func (u *usecase) UpdateDoctor(ctx context.Context, doctorUpdate models.UpdateDo
 		SpecialtyID:    doctorUpdate.SpecialtyID,
 	}
 
-	// Llama al repositorio para actualizar el doctor
 	message, err := u.repo.UpdateDoctor(ctx, updateDoctorEntity)
 	if err != nil {
 		return models.Response{

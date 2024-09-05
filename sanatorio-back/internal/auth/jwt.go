@@ -41,6 +41,7 @@ func GenerateJWT(accountID uuid.UUID, role int) (string, error) {
 		return "", err
 	}
 
+	fmt.Println("Token being generated:", tokenString) // Aquí
 	return tokenString, nil
 }
 
@@ -56,12 +57,15 @@ func ValidateJWT(tokenString string) (*Claims, error) {
 	})
 
 	if err != nil {
+		fmt.Println("Error parsing token:", err)
 		return nil, fmt.Errorf("failed to parse token: %w", err)
 	}
 
 	if !token.Valid {
+		fmt.Println("Token is invalid:", tokenString)
 		return nil, fmt.Errorf("invalid token: %w", jwt.ErrSignatureInvalid)
 	}
 
+	fmt.Println("Token is valid, claims:", claims)
 	return claims, nil
 }

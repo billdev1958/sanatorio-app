@@ -1,6 +1,10 @@
 package entities
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Rol int
 
@@ -27,19 +31,13 @@ type User struct {
 	Lastname2 string
 }
 
-type Account struct {
-	AccountID uuid.UUID
-	UserID    int
-	Email     string
-	Password  string
-	Rol       int
-}
-
 type Users struct {
 	User
-	Email string
-	Rol   int
-	Curp  string
+	Email      string
+	Rol        int
+	Curp       string
+	Created_At time.Time
+	AccountID  uuid.UUID
 }
 
 type Doctors struct {
@@ -48,13 +46,16 @@ type Doctors struct {
 	Rol            int
 	MedicalLicense string
 	Specialty      int
+	AccountID      uuid.UUID
 }
 
 type SuperUser struct {
-	ID int
 	User
-	Account
-	Curp string
+	Email      string
+	Rol        int
+	Curp       string
+	Created_At time.Time
+	AccountID  uuid.UUID
 }
 
 type DoctorUser struct {
@@ -62,6 +63,14 @@ type DoctorUser struct {
 	User
 	Account
 	MedicalLicense string
+}
+
+type Account struct {
+	AccountID uuid.UUID
+	UserID    int
+	Email     string
+	Password  string
+	Rol       int
 }
 
 type PatientUser struct {
@@ -112,6 +121,7 @@ type LoginResponse struct {
 }
 
 type UpdateUser struct {
+	AdminData
 	AccountID uuid.UUID
 	Name      string
 	Lastname1 string
@@ -122,6 +132,7 @@ type UpdateUser struct {
 }
 
 type UpdateDoctor struct {
+	AdminData
 	AccountID      uuid.UUID
 	Name           string
 	Lastname1      string

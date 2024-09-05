@@ -19,13 +19,13 @@ type Repository interface {
 	RegisterUser(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin) (userID int, name string, err error)
 	RegisterAccount(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin, userID int) (string, error)
 	RegisterTypeUser(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin) error
-	RegisterTypeDoctor(ctx context.Context, tx pgx.Tx, ru entities.RegisterDoctorByAdmin) error
-
+	RegisterTypeDoctor(ctx context.Context, tx pgx.Tx, rd entities.RegisterDoctorByAdmin) error
 	// GetUsers
 	GetUsers(ctx context.Context) ([]entities.Users, error)
 	GetDoctors(ctx context.Context) ([]entities.Doctors, error)
-	GetDoctorByID(ctx context.Context, accountID string) (entities.Doctors, error)
-	GetUserByID(ctx context.Context, accountID string) (entities.Users, error)
+	GetDoctorByID(ctx context.Context, userID int) (entities.Doctors, error)
+	GetUserByID(ctx context.Context, userID int) (entities.Users, error)
+	GetAllUsers(ctx context.Context) ([]interface{}, error)
 
 	// Edit Users
 	UpdateUser(ctx context.Context, userUpdate entities.UpdateUser) (string, error)

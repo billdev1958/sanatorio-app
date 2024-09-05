@@ -9,15 +9,22 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// UpdateUser actualiza los campos de un usuario en las tablas users y account.
-// Solo se actualizan los campos que no están vacíos en la solicitud.
-// La operación se realiza dentro de una transacción para garantizar la consistencia de los datos.
 func (ur *userRepository) UpdateUser(ctx context.Context, userUpdate entities.UpdateUser) (string, error) {
+	// Iniciar la transacción
 	tx, err := ur.storage.DbPool.Begin(ctx)
 	if err != nil {
 		return "", fmt.Errorf("failed to begin transaction: %w", err)
 	}
 	defer tx.Rollback(ctx) // Asegura que la transacción se revierta si no se confirma
+
+	// Verificar la contraseña del administrador antes de proceder
+	isValid, err := ur.CheckAdminPassword(ctx, tx, userUpdate.AccountAdminID, userUpdate.AdminPassword)
+	if err != nil {
+		return "", fmt.Errorf("failed to authenticate admin: %w", err)
+	}
+	if !isValid {
+		return "", fmt.Errorf("authentication failed: invalid credentials")
+	}
 
 	// Verificar que el usuario existe a partir del account_id
 	var existingUserID int
@@ -90,14 +97,22 @@ func (ur *userRepository) UpdateUser(ctx context.Context, userUpdate entities.Up
 	return fmt.Sprintf("User %s updated successfully", updatedName), nil
 }
 
-// UpdateDoctor actualiza los campos de un doctor en las tablas users, account y doctor_user.
-// La operación se realiza dentro de una transacción para garantizar la consistencia de los datos.
 func (ur *userRepository) UpdateDoctor(ctx context.Context, doctorUpdate entities.UpdateDoctor) (string, error) {
+	// Iniciar la transacción
 	tx, err := ur.storage.DbPool.Begin(ctx)
 	if err != nil {
 		return "", fmt.Errorf("failed to begin transaction: %w", err)
 	}
 	defer tx.Rollback(ctx)
+
+	// Verificar la contraseña del administrador antes de proceder
+	isValid, err := ur.CheckAdminPassword(ctx, tx, doctorUpdate.AccountAdminID, doctorUpdate.AdminPassword)
+	if err != nil {
+		return "", fmt.Errorf("failed to authenticate admin: %w", err)
+	}
+	if !isValid {
+		return "", fmt.Errorf("authentication failed: invalid credentials")
+	}
 
 	var setClauses []string
 	var args []interface{}
