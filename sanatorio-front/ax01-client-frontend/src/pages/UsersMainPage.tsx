@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UserCard from '../components/UserCard';
+import UserCard from '../components/UserCard'; // Componente reutilizable
 import FilterNav from '../components/FilterNav';
-import { Users, Doctor, Filters } from '../models.tsx/users';
+import { Users, Filters } from '../models.tsx/users'; // Importamos solo Users
 import { getUsers } from '../services/getUsers';
 
 function UsersMainPage() {
-  const [users, setUsers] = useState<(Users | Doctor)[]>([]); // Aceptamos tanto Users como Doctor
-  const [filteredUsers, setFilteredUsers] = useState<(Users | Doctor)[]>([]);
+  const [users, setUsers] = useState<Users[]>([]); // Solo aceptamos Users
+  const [filteredUsers, setFilteredUsers] = useState<Users[]>([]);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
@@ -19,8 +19,9 @@ function UsersMainPage() {
           throw new Error('Token not found');
         }
         const data = await getUsers(token);
-        setUsers(data);
-        setFilteredUsers(data); // Inicializar con todos los usuarios
+        const normalUsers = data.filter((user: Users) => user.role !== 2); // Excluir doctores
+        setUsers(normalUsers);
+        setFilteredUsers(normalUsers); // Inicializar con todos los usuarios normales
       } catch (error) {
         console.error("Error al cargar los usuarios:", error);
       }
@@ -31,11 +32,6 @@ function UsersMainPage() {
 
   const handleFilterChange = (filters: Filters) => {
     let filtered = [...users];
-
-    // Filtrar por role
-    if (filters.role !== undefined) {
-      filtered = filtered.filter(user => user.role === filters.role);
-    }
 
     // Filtrar por nombre
     if (filters.name?.trim()) {
@@ -59,7 +55,6 @@ function UsersMainPage() {
   };
 
   const goToAddPatient = () => navigate('/register/user');
-  const goToAddDoctor = () => navigate('/register/doctor');
 
   return (
     <div className="usersMainPage">
@@ -91,9 +86,6 @@ function UsersMainPage() {
           <div className="addMenu">
             <button className="addMenuItem" onClick={goToAddPatient}>
               Agregar Paciente o SuperUsuario
-            </button>
-            <button className="addMenuItem" onClick={goToAddDoctor}>
-              Agregar Doctor
             </button>
           </div>
         )}

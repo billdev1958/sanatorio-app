@@ -7,7 +7,7 @@ import (
 	"sanatorioApp/internal/domain/users/http/models"
 )
 
-func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
+func (h *handler) RegisterSuperUser(w http.ResponseWriter, r *http.Request) {
 	log.Println("Inicio del handler RegisterUser")
 
 	request := models.RegisterUserByAdminRequest{}
@@ -19,7 +19,7 @@ func (h *handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Recibido request: %+v", request)
 
-	response, err := h.uc.RegisterUser(r.Context(), request)
+	response, err := h.uc.RegisterSuperUser(r.Context(), request)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)

@@ -41,7 +41,7 @@ func GenerateJWT(accountID uuid.UUID, role int) (string, error) {
 		return "", err
 	}
 
-	fmt.Println("Token being generated:", tokenString) // Aquí
+	fmt.Println("Token being generated:", tokenString)
 	return tokenString, nil
 }
 

@@ -42,7 +42,7 @@ func (h *handler) GetDoctorByID(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) GetUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := h.uc.GetUsers(r.Context())
+	users, err := h.uc.GetSuperAdmins(r.Context())
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -98,7 +98,7 @@ func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := h.uc.GetUserByID(r.Context(), userID)
+	response, err := h.uc.GetSuperAdminByID(r.Context(), userID)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -113,28 +113,4 @@ func (h *handler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
-}
-
-func (h *handler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
-	// Llama al caso de uso para obtener la lista combinada de todos los usuarios
-	users, err := h.uc.GetAllUsers(r.Context())
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(models.Response{
-			Status:  "error",
-			Message: "Failed to retrieve users",
-			Errors:  err.Error(),
-		})
-		return
-	}
-
-	// Responde con la lista de todos los usuarios
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(models.Response{
-		Status:  "success",
-		Message: "Users, Doctors, and SuperUsers retrieved successfully",
-		Data:    users,
-	})
 }

@@ -2,17 +2,14 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"sanatorioApp/internal/domain/users/entities"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
-func (ur *userRepository) GetUserByID(ctx context.Context, userID int) (entities.Users, error) {
-	var user entities.Users
+func (ur *userRepository) GetSuperUserByID(ctx context.Context, superUserID int) (entities.SuperUser, error) {
+	var user entities.SuperUser
 
 	query := `
 		SELECT u.id, u.name, u.lastname1, u.lastname2, a.email, a.rol, su.curp, a.id AS account_id
@@ -22,7 +19,7 @@ func (ur *userRepository) GetUserByID(ctx context.Context, userID int) (entities
 		WHERE u.deleted_at IS NULL AND a.deleted_at IS NULL AND u.id = $1
 	`
 
-	err := ur.storage.DbPool.QueryRow(ctx, query, userID).Scan(
+	err := ur.storage.DbPool.QueryRow(ctx, query, superUserID).Scan(
 		&user.ID,
 		&user.Name,
 		&user.Lastname1,
@@ -35,7 +32,7 @@ func (ur *userRepository) GetUserByID(ctx context.Context, userID int) (entities
 
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return user, fmt.Errorf("user with ID %v not found", userID)
+			return user, fmt.Errorf("user with ID %v not found", superUserID)
 		}
 		return user, fmt.Errorf("failed to get user by ID: %w", err)
 	}
@@ -43,8 +40,8 @@ func (ur *userRepository) GetUserByID(ctx context.Context, userID int) (entities
 	return user, nil
 }
 
-func (ur *userRepository) GetUsers(ctx context.Context) ([]entities.Users, error) {
-	var users []entities.Users
+func (ur *userRepository) GetSuperAdmins(ctx context.Context) ([]entities.SuperUser, error) {
+	var users []entities.SuperUser
 
 	query := `
 		SELECT u.id, u.name, u.lastname1, u.lastname2, a.email, a.rol, 
@@ -62,33 +59,19 @@ func (ur *userRepository) GetUsers(ctx context.Context) ([]entities.Users, error
 	defer rows.Close()
 
 	for rows.Next() {
-		var user entities.Users
-		var curp sql.NullString
-		var createdAt sql.NullTime
+		var user entities.SuperUser
 
-		// Escanear los valores de las filas, incluidos los que pueden ser nulos
-		err := rows.Scan(&user.ID, &user.Name, &user.Lastname1, &user.Lastname2, &user.Email, &user.Rol, &curp, &createdAt)
+		// Escanear los valores directamente
+		err := rows.Scan(&user.ID, &user.Name, &user.Lastname1, &user.Lastname2, &user.Email, &user.Rol, &user.Curp, &user.Created_At)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
 
-		// Asignar los valores, verificando si son válidos
-		if curp.Valid {
-			user.Curp = curp.String
-		} else {
-			user.Curp = "" // Asignar valor por defecto si es NULL
-		}
-
-		if createdAt.Valid {
-			user.Created_At = createdAt.Time
-		} else {
-			user.Created_At = time.Time{} // Asignar valor por defecto si es NULL
-		}
-
+		// Agregar el usuario a la lista
 		users = append(users, user)
 	}
 
-	// Check for any errors encountered during iteration
+	// Comprobar si hubo errores durante la iteración
 	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("rows iteration error: %w", err)
 	}
@@ -96,8 +79,8 @@ func (ur *userRepository) GetUsers(ctx context.Context) ([]entities.Users, error
 	return users, nil
 }
 
-func (ur *userRepository) GetDoctorByID(ctx context.Context, userID int) (entities.Doctors, error) {
-	var doctor entities.Doctors
+func (ur *userRepository) GetDoctorByID(ctx context.Context, doctorID int) (entities.DoctorUser, error) {
+	var doctor entities.DoctorUser
 
 	query := `
 		SELECT u.id, u.name, u.lastname1, u.lastname2, a.email, a.rol, a.id AS account_id, du.medical_license, du.id_specialty
@@ -107,7 +90,7 @@ func (ur *userRepository) GetDoctorByID(ctx context.Context, userID int) (entiti
 		WHERE u.deleted_at IS NULL AND a.deleted_at IS NULL AND du.deleted_at IS NULL AND u.id = $1
 	`
 
-	err := ur.storage.DbPool.QueryRow(ctx, query, userID).Scan(
+	err := ur.storage.DbPool.QueryRow(ctx, query, doctorID).Scan(
 		&doctor.ID,
 		&doctor.Name,
 		&doctor.Lastname1,
@@ -115,13 +98,13 @@ func (ur *userRepository) GetDoctorByID(ctx context.Context, userID int) (entiti
 		&doctor.Email,
 		&doctor.Rol,
 		&doctor.MedicalLicense,
-		&doctor.Specialty,
+		&doctor.SpecialtyID,
 		&doctor.AccountID,
 	)
 
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return doctor, fmt.Errorf("doctor with ID %v not found", userID)
+			return doctor, fmt.Errorf("doctor with ID %v not found", doctorID)
 		}
 		return doctor, fmt.Errorf("failed to get doctor by ID: %w", err)
 	}
@@ -129,8 +112,8 @@ func (ur *userRepository) GetDoctorByID(ctx context.Context, userID int) (entiti
 	return doctor, nil
 }
 
-func (ur *userRepository) GetDoctors(ctx context.Context) ([]entities.Doctors, error) {
-	var doctors []entities.Doctors
+func (ur *userRepository) GetDoctors(ctx context.Context) ([]entities.DoctorUser, error) {
+	var doctors []entities.DoctorUser
 
 	query := `
 		SELECT u.id, u.name, u.lastname1, u.lastname2, a.email, a.rol, du.medical_license, du.specialty_id
@@ -147,8 +130,8 @@ func (ur *userRepository) GetDoctors(ctx context.Context) ([]entities.Doctors, e
 	defer rows.Close()
 
 	for rows.Next() {
-		var doctor entities.Doctors
-		err := rows.Scan(&doctor.ID, &doctor.Name, &doctor.Lastname1, &doctor.Lastname2, &doctor.Email, &doctor.Rol, &doctor.MedicalLicense, &doctor.Specialty)
+		var doctor entities.DoctorUser
+		err := rows.Scan(&doctor.ID, &doctor.Name, &doctor.Lastname1, &doctor.Lastname2, &doctor.Email, &doctor.Rol, &doctor.MedicalLicense, &doctor.SpecialtyID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
@@ -162,14 +145,15 @@ func (ur *userRepository) GetDoctors(ctx context.Context) ([]entities.Doctors, e
 	return doctors, nil
 }
 
-func (ur *userRepository) GetAllUsers(ctx context.Context) ([]interface{}, error) {
-	var users []interface{}
+func (ur *userRepository) GetPatients(ctx context.Context) ([]entities.PatientUser, error) {
+	var users []entities.PatientUser
 
 	query := `
-		SELECT u.id, u.name, u.lastname1, u.lastname2, a.email, a.rol, a.created_at, a.id AS account_id, du.medical_license, du.specialty_id
+		SELECT u.id, u.name, u.lastname1, u.lastname2, a.email, a.rol, 
+		       su.curp, su.created_at
 		FROM users u
 		INNER JOIN account a ON u.id = a.user_id
-		LEFT JOIN doctor_user du ON a.id = du.account_id
+		LEFT JOIN patient su ON a.id = su.account_id
 		WHERE u.deleted_at IS NULL AND a.deleted_at IS NULL
 	`
 
@@ -180,68 +164,19 @@ func (ur *userRepository) GetAllUsers(ctx context.Context) ([]interface{}, error
 	defer rows.Close()
 
 	for rows.Next() {
-		var id int
-		var name, lastname1, lastname2, email string
-		var rol int
-		var createdAt time.Time
-		var accountID uuid.UUID
-		var medicalLicense sql.NullString // Usamos NullString para manejar valores NULL
-		var specialty sql.NullInt32       // Usamos NullInt32 para manejar valores NULL
+		var user entities.PatientUser
 
-		err := rows.Scan(&id, &name, &lastname1, &lastname2, &email, &rol, &createdAt, &accountID, &medicalLicense, &specialty)
+		// Escanear los valores directamente
+		err := rows.Scan(&user.ID, &user.Name, &user.Lastname1, &user.Lastname2, &user.Email, &user.Rol, &user.Curp, &user.Created_At)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
 
-		switch rol {
-		case 1: // SuperUsuario
-			superUser := entities.SuperUser{
-				User: entities.User{
-					ID:        id,
-					Name:      name,
-					Lastname1: lastname1,
-					Lastname2: lastname2,
-				},
-				Email:      email,
-				Rol:        rol,
-				Created_At: createdAt,
-				AccountID:  accountID,
-			}
-			users = append(users, superUser)
-
-		case 2: // Doctor
-			doctor := entities.Doctors{
-				User: entities.User{
-					ID:        id,
-					Name:      name,
-					Lastname1: lastname1,
-					Lastname2: lastname2,
-				},
-				Email:          email,
-				Rol:            rol,
-				MedicalLicense: medicalLicense.String, // Asignamos el valor de NullString
-				Specialty:      int(specialty.Int32),  // Asignamos el valor de NullInt32
-				AccountID:      accountID,
-			}
-			users = append(users, doctor)
-
-		case 3: // Paciente
-			patient := entities.Users{
-				User: entities.User{
-					ID:        id,
-					Name:      name,
-					Lastname1: lastname1,
-					Lastname2: lastname2,
-				},
-				Email:      email,
-				Rol:        rol,
-				Created_At: createdAt,
-				AccountID:  accountID,
-			}
-			users = append(users, patient)
-		}
+		// Agregar el usuario a la lista
+		users = append(users, user)
 	}
 
+	// Comprobar si hubo errores durante la iteración
 	if err = rows.Err(); err != nil {
 		return nil, fmt.Errorf("rows iteration error: %w", err)
 	}

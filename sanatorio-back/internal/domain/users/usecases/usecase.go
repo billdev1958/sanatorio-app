@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"sanatorioApp/internal/auth"
 	user "sanatorioApp/internal/domain/users"
 	"sanatorioApp/internal/domain/users/entities"
@@ -19,45 +20,39 @@ func NewUsecase(repo user.Repository) user.Usecase {
 	return &usecase{repo: repo}
 }
 
-func (u *usecase) RegisterUser(ctx context.Context, request models.RegisterUserByAdminRequest) (models.Response, error) {
+func (u *usecase) RegisterSuperUser(ctx context.Context, request models.RegisterUserByAdminRequest) (models.UserData, error) {
 	// Extraer los claims del contexto para obtener AccountID y RolAdmin
 	claims := auth.ExtractClaims(ctx)
 	if claims == nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Unauthorized: no claims found in context",
-			Errors:  map[string]string{"authorization": "No claims found in context"},
-		}, nil
+		return models.UserData{}, fmt.Errorf("unauthorized: no claims found in context")
 	}
 
 	adminAccountID := claims.AccountID
 	adminRole := claims.Role
 
+	fmt.Println(adminAccountID)
+	fmt.Println(adminRole)
+
 	// Verificar que el rol es de administrador antes de proceder
-	if adminRole != 1 { // Supongamos que 1 es el rol de administrador
-		return models.Response{
-			Status:  "error",
-			Message: "Unauthorized: insufficient permissions",
-			Errors:  map[string]string{"authorization": "User does not have admin privileges"},
-		}, nil
+	if adminRole != entities.SuperUsuario {
+		return models.UserData{}, fmt.Errorf("unauthorized: insufficient permissions")
 	}
 
 	// Hashear la contraseña del nuevo usuario
 	hashedPassword, err := password.HashPassword(request.Password)
 	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to hash password",
-			Errors:  map[string]string{"password": err.Error()},
-		}, err
+		return models.UserData{}, fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	registerUser := entities.RegisterUserByAdmin{
-		AdminData: entities.AdminData{
-			AccountAdminID: adminAccountID,
-			RolAdmmin:      adminRole,
-			AdminPassword:  request.AdminPassword,
-		},
+	// Datos del administrador
+	adminData := entities.AdminData{
+		AccountID:     adminAccountID,
+		RoleAdmin:     adminRole,
+		PasswordAdmin: request.AdminPassword,
+	}
+
+	// Crear la estructura del usuario a registrar
+	registerUser := entities.SuperUser{
 		User: entities.User{
 			Name:      request.Name,
 			Lastname1: request.Lastname1,
@@ -67,41 +62,29 @@ func (u *usecase) RegisterUser(ctx context.Context, request models.RegisterUserB
 			AccountID: uuid.New(),
 			Email:     request.Email,
 			Password:  hashedPassword,
-			Rol:       request.Rol,
+			Rol:       entities.SuperUsuario,
 		},
-		DocumentID: request.Curp,
+		Curp: request.Curp,
 	}
 
 	// Intentar registrar el usuario en una transacción
-	userResponse, err := u.repo.RegisterUserTransaction(ctx, registerUser)
+	userResponse, err := u.repo.RegisterSuperUserTransaction(ctx, adminData, registerUser)
 	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to register user",
-			Errors:  map[string]string{"register": err.Error()},
-		}, err
+		return models.UserData{}, fmt.Errorf("failed to register user: %w", err)
 	}
 
-	// Retornar la respuesta exitosa
-	return models.Response{
-		Status:  "success",
-		Message: "User registered successfully",
-		Data: models.UserData{
-			Name:  userResponse.Name,
-			Email: userResponse.Email,
-		},
+	// Retornar los datos del usuario registrado
+	return models.UserData{
+		Name:  userResponse.Name,
+		Email: userResponse.Email,
 	}, nil
 }
 
-func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoctorByAdminRequest) (models.Response, error) {
+func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoctorByAdminRequest) (models.UserData, error) {
 	// Extraer los claims del contexto para obtener AccountID y RolAdmin
 	claims := auth.ExtractClaims(ctx)
 	if claims == nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Unauthorized: no claims found in context",
-			Errors:  map[string]string{"authorization": "No claims found in context"},
-		}, nil
+		return models.UserData{}, fmt.Errorf("unauthorized: no claims found in context")
 	}
 
 	adminAccountID := claims.AccountID
@@ -109,39 +92,27 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 
 	// Verificar que el rol es de administrador antes de proceder
 	if adminRole != 1 { // Supongamos que 1 es el rol de administrador
-		return models.Response{
-			Status:  "error",
-			Message: "Unauthorized: insufficient permissions",
-			Errors:  map[string]string{"authorization": "User does not have admin privileges"},
-		}, nil
+		return models.UserData{}, fmt.Errorf("unauthorized: insufficient permissions")
 	}
 
 	// Verificar que el rol proporcionado es de doctor (Rol = 2)
 	if request.Rol != 2 {
-		return models.Response{
-			Status:  "error",
-			Message: "Invalid role for doctor",
-			Errors:  map[string]string{"role": "Invalid role, expected role ID 2 for doctor"},
-		}, nil
+		return models.UserData{}, fmt.Errorf("invalid role for doctor, expected role ID 2 for doctor")
 	}
 
 	// Hashear la contraseña del nuevo doctor
 	hashedPassword, err := password.HashPassword(request.Password)
 	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to hash password",
-			Errors:  map[string]string{"password": err.Error()},
-		}, err
+		return models.UserData{}, fmt.Errorf("failed to hash password: %w", err)
+	}
+
+	adminData := entities.AdminData{
+		AccountID: adminAccountID,
+		RoleAdmin: adminRole,
 	}
 
 	// Crear la estructura del doctor a registrar
-	registerDoctor := entities.RegisterDoctorByAdmin{
-		AdminData: entities.AdminData{
-			AccountAdminID: adminAccountID,
-			RolAdmmin:      adminRole,
-			AdminPassword:  request.AdminPassword,
-		},
+	registerDoctor := entities.DoctorUser{
 		User: entities.User{
 			Name:      request.Name,
 			Lastname1: request.Lastname1,
@@ -151,407 +122,84 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 			AccountID: uuid.New(), // Generar un nuevo UUID para el doctor
 			Email:     request.Email,
 			Password:  hashedPassword,
-			Rol:       request.Rol,
+			Rol:       entities.Doctor,
 		},
-		DocumentID:  request.MedicalLicense, // Asignar el número de licencia médica
-		SpecialtyID: request.Specialty,      // Asignar el ID de la especialidad médica
+		MedicalLicense: request.MedicalLicense,                  // Asignar el número de licencia médica
+		SpecialtyID:    entities.Specialties(request.Specialty), // Asignar el ID de la especialidad médica
 	}
 
 	// Intentar registrar al doctor en una transacción
-	doctorResponse, err := u.repo.RegisterDoctorTransaction(ctx, registerDoctor)
+	doctorResponse, err := u.repo.RegisterDoctorTransaction(ctx, adminData, registerDoctor)
 	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to register doctor",
-			Errors:  map[string]string{"register": err.Error()},
-		}, err
+		return models.UserData{}, fmt.Errorf("failed to register doctor: %w", err)
 	}
 
-	// Retornar la respuesta exitosa con los datos del doctor
-	return models.Response{
-		Status:  "success",
-		Message: "Doctor registered successfully",
-		Data: models.UserData{
-			Name:  doctorResponse.Name,
-			Email: doctorResponse.Email,
-		},
+	// Retornar los datos del doctor registrado
+	return models.UserData{
+		Name:  doctorResponse.Name,
+		Email: doctorResponse.Email,
 	}, nil
 }
 
-func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.Response, error) {
-	// Definir el rol para el paciente
-	rol := 3
-
+func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.UserData, error) {
 	// Hashear la contraseña del nuevo paciente
 	hashedPassword, err := password.HashPassword(request.Password)
 	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to hash password",
-			Errors:  map[string]string{"password": err.Error()},
-		}, err
+		return models.UserData{}, fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	// Crear la entidad PatientUser con los datos de la solicitud
 	registerPatient := entities.PatientUser{
-		Name:      request.Name,
-		Lastname1: request.Lastname1,
-		Lastname2: request.Lastname2,
-		AccountID: uuid.New(), // Asignar un nuevo UUID
-		Email:     request.Email,
-		Password:  hashedPassword,
-		Rol:       rol,
-		Curp:      request.Curp, // Asignar el CURP al paciente
+		User: entities.User{
+			Name:      request.Name,
+			Lastname1: request.Lastname1,
+			Lastname2: request.Lastname2,
+		},
+		Account: entities.Account{
+			AccountID: uuid.New(), // Asignar un nuevo UUID
+			Email:     request.Email,
+			Password:  hashedPassword,
+			Rol:       entities.Patient,
+		},
+		Curp: request.Curp, // Asignar el CURP al paciente
 	}
 
-	// Intentar registrar el paciente en una transacción
+	// Intentar registrar al paciente en una transacción
 	patientResponse, err := u.repo.RegisterPatientTransaction(ctx, registerPatient)
 	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to register patient",
-			Errors:  map[string]string{"register": err.Error()},
-		}, err
+		return models.UserData{}, fmt.Errorf("failed to register patient: %w", err)
 	}
 
-	// Retornar la respuesta exitosa
-	return models.Response{
-		Status:  "success",
-		Message: "Patient registered successfully",
-		Data: models.UserData{
-			Name:  patientResponse.Name,
-			Email: patientResponse.Email,
-		},
+	// Retornar los datos del paciente registrado
+	return models.UserData{
+		Name:  patientResponse.Name,
+		Email: patientResponse.Email,
 	}, nil
 }
 
-func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (models.Response, error) {
-	loginUser := entities.LoginUser{
+func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (models.LoginResponse, error) {
+	// Crear la entidad de login
+	loginUser := entities.Account{
 		Email:    request.Email,
 		Password: request.Password,
 	}
 
+	// Llamar al repositorio para autenticar el usuario
 	loginResponse, err := u.repo.LoginUser(ctx, loginUser)
 	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to login user",
-			Errors:  map[string]string{"register": err.Error()},
-		}, err
+		return models.LoginResponse{}, err
 	}
 
-	token, err := auth.GenerateJWT(loginResponse.AccountID, loginResponse.Role)
+	// Generar el token JWT si el login fue exitoso
+	token, err := auth.GenerateJWT(loginResponse.AccountID, int(loginResponse.Rol))
 	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to generate token",
-			Errors:  map[string]string{"token": err.Error()},
-		}, err
+		return models.LoginResponse{}, err
 	}
 
-	return models.Response{
-		Status:  "success",
-		Message: "User registered successfully",
-		Data: models.LoginResponse{
-			AccountID: loginResponse.AccountID,
-			Role:      loginResponse.Role,
-			Token:     token,
-		},
-	}, nil
-
-}
-
-func (u *usecase) GetAllUsers(ctx context.Context) (models.Response, error) {
-	// Llama al repositorio para obtener la lista de usuarios (superusuarios, doctores y pacientes)
-	users, err := u.repo.GetAllUsers(ctx)
-	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to retrieve users",
-			Errors:  map[string]string{"get_users": err.Error()},
-		}, err
-	}
-
-	// Crear la respuesta
-	return models.Response{
-		Status:  "success",
-		Message: "Users retrieved successfully",
-		Data:    users,
-	}, nil
-}
-
-func (u *usecase) GetUserByID(ctx context.Context, userID int) (models.Response, error) {
-	// Llama al repositorio para obtener el usuario por ID
-	userEntity, err := u.repo.GetUserByID(ctx, userID)
-	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to retrieve user",
-			Errors:  map[string]string{"get_user": err.Error()},
-		}, err
-	}
-
-	userData := models.User{
-		ID:        userEntity.ID,
-		Name:      userEntity.Name,
-		Lastname1: userEntity.Lastname1,
-		Lastname2: userEntity.Lastname2,
-		Email:     userEntity.Email,
-		Curp:      userEntity.Curp,
-		AccountID: userEntity.AccountID,
-	}
-
-	return models.Response{
-		Status:  "success",
-		Message: "User retrieved successfully",
-		Data:    userData,
-	}, nil
-}
-
-func (u *usecase) GetUsers(ctx context.Context) ([]models.UsersRequest, error) {
-	users, err := u.repo.GetUsers(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	var response []models.UsersRequest
-	for _, user := range users {
-		var createdAtStr string
-		if !user.Created_At.IsZero() {
-			createdAtStr = user.Created_At.Format("2006-01-02 15:04:05")
-		}
-
-		response = append(response, models.UsersRequest{
-			ID:         user.ID,
-			Name:       user.Name,
-			Lastname1:  user.Lastname1,
-			Lastname2:  user.Lastname2,
-			Email:      user.Email,
-			Curp:       user.Curp,
-			Created_At: createdAtStr,
-		})
-	}
-
-	return response, nil
-}
-
-func (u *usecase) GetDoctorByID(ctx context.Context, userID int) (models.Response, error) {
-	doctorEntity, err := u.repo.GetDoctorByID(ctx, userID)
-	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to retrieve doctor",
-			Errors:  map[string]string{"get_doctor": err.Error()},
-		}, err
-	}
-
-	doctorData := models.Doctors{
-		ID:             doctorEntity.ID,
-		Name:           doctorEntity.Name,
-		Lastname1:      doctorEntity.Lastname1,
-		Lastname2:      doctorEntity.Lastname2,
-		Email:          doctorEntity.Email,
-		MedicalLicense: doctorEntity.MedicalLicense,
-		Specialty:      doctorEntity.Specialty,
-		AccountID:      doctorEntity.AccountID,
-	}
-
-	return models.Response{
-		Status:  "success",
-		Message: "Doctor retrieved successfully",
-		Data:    doctorData,
-	}, nil
-}
-
-func (u *usecase) GetDoctors(ctx context.Context) ([]models.Doctors, error) {
-	doctors, err := u.repo.GetDoctors(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	var response []models.Doctors
-	for _, doctor := range doctors {
-		response = append(response, models.Doctors{
-			ID:             doctor.ID,
-			Name:           doctor.Name,
-			Lastname1:      doctor.Lastname1,
-			Lastname2:      doctor.Lastname2,
-			Email:          doctor.Email,
-			MedicalLicense: doctor.MedicalLicense,
-			Specialty:      doctor.Specialty,
-			AccountID:      doctor.AccountID,
-		})
-	}
-
-	return response, nil
-}
-
-func (u *usecase) UpdateUser(ctx context.Context, userUpdate models.UpdateUser) (models.Response, error) {
-	claims := auth.ExtractClaims(ctx)
-	if claims == nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Unauthorized: no claims found in context",
-			Errors:  map[string]string{"authorization": "No claims found in context"},
-		}, nil
-	}
-
-	adminAccountID := claims.AccountID
-	adminRole := claims.Role
-
-	if adminRole != 1 {
-		return models.Response{
-			Status:  "error",
-			Message: "Unauthorized: insufficient permissions",
-			Errors:  map[string]string{"authorization": "User does not have admin privileges"},
-		}, nil
-	}
-
-	updateUser := entities.UpdateUser{
-		AdminData: entities.AdminData{
-			AccountAdminID: adminAccountID,
-			RolAdmmin:      adminRole,
-			AdminPassword:  userUpdate.AdminPassword,
-		},
-		AccountID: userUpdate.AccountID,
-		Name:      userUpdate.Name,
-		Lastname1: userUpdate.Lastname1,
-		Lastname2: userUpdate.Lastname2,
-		Email:     userUpdate.Email,
-		Password:  userUpdate.Password,
-		Curp:      userUpdate.Curp,
-	}
-
-	message, err := u.repo.UpdateUser(ctx, updateUser)
-	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to update user",
-			Errors:  map[string]string{"update": err.Error()},
-		}, err
-	}
-
-	return models.Response{
-		Status:  "success",
-		Message: message,
-	}, nil
-}
-
-func (u *usecase) UpdateDoctor(ctx context.Context, doctorUpdate models.UpdateDoctor) (models.Response, error) {
-	claims := auth.ExtractClaims(ctx)
-	if claims == nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Unauthorized: no claims found in context",
-			Errors:  map[string]string{"authorization": "No claims found in context"},
-		}, nil
-	}
-
-	adminAccountID := claims.AccountID
-	adminRole := claims.Role
-
-	if adminRole != 1 {
-		return models.Response{
-			Status:  "error",
-			Message: "Unauthorized: insufficient permissions",
-			Errors:  map[string]string{"authorization": "User does not have admin privileges"},
-		}, nil
-	}
-
-	updateDoctorEntity := entities.UpdateDoctor{
-		AdminData: entities.AdminData{
-			AccountAdminID: adminAccountID,
-			RolAdmmin:      adminRole,
-			AdminPassword:  doctorUpdate.AdminPassword,
-		},
-		AccountID:      doctorUpdate.AccountID,
-		Name:           doctorUpdate.Name,
-		Lastname1:      doctorUpdate.Lastname1,
-		Lastname2:      doctorUpdate.Lastname2,
-		Email:          doctorUpdate.Email,
-		Password:       doctorUpdate.Password,
-		MedicalLicense: doctorUpdate.MedicalLicense,
-		SpecialtyID:    doctorUpdate.SpecialtyID,
-	}
-
-	message, err := u.repo.UpdateDoctor(ctx, updateDoctorEntity)
-	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to update doctor",
-			Errors:  map[string]string{"update": err.Error()},
-		}, err
-	}
-
-	return models.Response{
-		Status:  "success",
-		Message: message,
-	}, nil
-}
-
-func (u *usecase) DeleteUser(ctx context.Context, accountID string) (models.Response, error) {
-	message, err := u.repo.DeleteUser(ctx, accountID)
-	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to delete user",
-			Errors:  map[string]string{"delete": err.Error()},
-		}, err
-	}
-
-	return models.Response{
-		Status:  "success",
-		Message: message,
-	}, nil
-}
-
-// DeleteDoctor elimina un doctor y su cuenta asociada de la base de datos.
-func (u *usecase) DeleteDoctor(ctx context.Context, accountID string) (models.Response, error) {
-	message, err := u.repo.DeleteDoctor(ctx, accountID)
-	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to delete doctor",
-			Errors:  map[string]string{"delete": err.Error()},
-		}, err
-	}
-
-	return models.Response{
-		Status:  "success",
-		Message: message,
-	}, nil
-}
-
-// SoftDeleteUser marca un usuario como eliminado sin borrar su información.
-func (u *usecase) SoftDeleteUser(ctx context.Context, accountID string) (models.Response, error) {
-	message, err := u.repo.SoftDeleteUser(ctx, accountID)
-	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to soft delete user",
-			Errors:  map[string]string{"soft_delete": err.Error()},
-		}, err
-	}
-
-	return models.Response{
-		Status:  "success",
-		Message: message,
-	}, nil
-}
-
-// SoftDeleteDoctor marca un doctor como eliminado sin borrar su información.
-func (u *usecase) SoftDeleteDoctor(ctx context.Context, accountID string) (models.Response, error) {
-	message, err := u.repo.SoftDeleteDoctor(ctx, accountID)
-	if err != nil {
-		return models.Response{
-			Status:  "error",
-			Message: "Failed to soft delete doctor",
-			Errors:  map[string]string{"soft_delete": err.Error()},
-		}, err
-	}
-
-	return models.Response{
-		Status:  "success",
-		Message: message,
+	// Retornar los datos crudos (LoginResponse) al handler
+	return models.LoginResponse{
+		AccountID: loginResponse.AccountID,
+		Role:      int(loginResponse.Rol),
+		Token:     token,
 	}, nil
 }

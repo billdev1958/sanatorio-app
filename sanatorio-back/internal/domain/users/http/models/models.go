@@ -61,19 +61,30 @@ type LoginResponse struct {
 	Token     string    `json:"token"`
 }
 
-// Objeto user
-type User struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	Lastname1 string    `json:"lastname1"`
-	Lastname2 string    `json:"lastname2"`
-	Email     string    `json:"email"`
-	Curp      string    `json:"curp"`
-	AccountID uuid.UUID `json:"account_id"`
+// Get users
+type UserRequest struct {
+	AccountID  uuid.UUID `json:"account_id"`
+	ID         int       `json:"id"`
+	Name       string    `json:"name"`
+	Lastname1  string    `json:"lastname1"`
+	Lastname2  string    `json:"lastname2"`
+	Email      string    `json:"email"`
+	Curp       string    `json:"curp"`
+	Created_At string    `json:"created_at"`
 }
 
-// Get users
-type UsersRequest struct {
+type DoctorRequest struct {
+	ID             int       `json:"id"`
+	Name           string    `json:"name"`
+	Lastname1      string    `json:"lastname1"`
+	Lastname2      string    `json:"lastname2"`
+	Email          string    `json:"email"`
+	MedicalLicense string    `json:"medical_license"`
+	SpecialtyID    int       `json:"specialty"`
+	AccountID      uuid.UUID `json:"account_id"`
+}
+
+type PatientRequest struct {
 	AccountID  string `json:"account_id"`
 	ID         int    `json:"id"`
 	Name       string `json:"name"`
@@ -82,17 +93,6 @@ type UsersRequest struct {
 	Email      string `json:"email"`
 	Curp       string `json:"curp"`
 	Created_At string `json:"created_at"`
-}
-
-type Doctors struct {
-	ID             int       `json:"id"`
-	Name           string    `json:"name"`
-	Lastname1      string    `json:"lastname1"`
-	Lastname2      string    `json:"lastname2"`
-	Email          string    `json:"email"`
-	MedicalLicense string    `json:"medical_license"`
-	Specialty      int       `json:"specialty"`
-	AccountID      uuid.UUID `json:"account_id"`
 }
 
 // Updates

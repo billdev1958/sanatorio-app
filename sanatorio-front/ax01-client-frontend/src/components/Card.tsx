@@ -1,19 +1,34 @@
-interface MinimalistCardProps {
-  image: string;
-  title: string;
-  content: string;
-}
+import { Link } from 'react-router-dom';
 
-const MinimalistCard = ({ image, title, content }: MinimalistCardProps) => {
-    return (
-      <div className="minimalist-card">
-        <img src={image} alt={title} className="card-image" />
-        <div className="card-content">
-          <h2>{title}</h2>
-          <p>{content}</p>
-        </div>
+type CardProps = {
+  title: string;
+  email: string;
+  extraInfo?: JSX.Element;
+  id: number;
+  role: number;
+  onDelete: (id: number) => void;
+};
+
+const Card = ({ title, email, extraInfo, id, role, onDelete }: CardProps) => {
+  return (
+    <div className="card">
+      <h2 className="cardTitle">{title}</h2>
+      <p className="cardEmail">{email}</p>
+
+      {extraInfo}
+
+      <div className="cardActions">
+        {/* Diferentes rutas dependiendo del rol */}
+        <Link to={`/${role === 2 ? 'doctors' : role === 3 ? 'patients' : 'users'}/view/${id}`} className="cardButton">
+          Ver
+        </Link>
+        <Link to={`/${role === 2 ? 'doctor' : role === 3 ? 'patient' : 'user'}/update/${id}`} className="cardButton">
+          Editar
+        </Link>
+        <button className="cardButton" onClick={() => onDelete(id)}>Eliminar</button>
       </div>
-    );
-  }
-  
-  export default MinimalistCard;
+    </div>
+  );
+};
+
+export default Card;

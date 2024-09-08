@@ -6,33 +6,30 @@ import (
 	"sanatorioApp/internal/domain/users/entities"
 	password "sanatorioApp/pkg/pass"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
-func (pr *userRepository) LoginUser(ctx context.Context, lu entities.LoginUser) (entities.LoginResponse, error) {
+func (pr *userRepository) LoginUser(ctx context.Context, lu entities.Account) (entities.Account, error) {
+	var account entities.Account
 
-	var accountID uuid.UUID
-	var role int
-	var hashedPassword string
-
+	// Asegúrate de que estás recuperando el UUID y el rol correctamente
 	query := "SELECT id, rol, password FROM account WHERE email = $1"
-	err := pr.storage.DbPool.QueryRow(ctx, query, lu.Email).Scan(&accountID, &role, &hashedPassword)
+	err := pr.storage.DbPool.QueryRow(ctx, query, lu.Email).Scan(&account.AccountID, &account.Rol, &account.Password)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return entities.LoginResponse{}, fmt.Errorf("user not found")
+			return account, fmt.Errorf("user not found")
 		}
-		return entities.LoginResponse{}, fmt.Errorf("error querying user: %w", err)
+		return account, fmt.Errorf("error querying user: %w", err)
 	}
 
-	if !password.CheckPasswordHash(lu.Password, hashedPassword) {
-		return entities.LoginResponse{}, fmt.Errorf("invalid password")
+	// Verificar si la contraseña es válida
+	if !password.CheckPasswordHash(lu.Password, account.Password) {
+		return account, fmt.Errorf("invalid password")
 	}
 
-	response := entities.LoginResponse{
-		AccountID: accountID,
-		Role:      role,
-	}
+	// Limpiar la contraseña del objeto antes de devolverlo por seguridad
+	account.Password = ""
 
-	return response, nil
+	// Si la autenticación es exitosa, retornar la cuenta
+	return account, nil
 }

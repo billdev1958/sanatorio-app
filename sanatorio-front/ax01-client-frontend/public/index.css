@@ -1068,80 +1068,146 @@ body {
   outline: none;
 }
 
-/*admin card
-*/
+/* card.css */
+
+/* Estilos para el contenedor de la página */
 .usersMainPage {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
-.pageTitle {
-  margin-bottom: 20px;
-  font-size: 2rem;
+/* Contenedor que agrupa las tarjetas */
+.userList {
+  display: flex;
+  justify-content: space-between; /* Distribuir espacio uniformemente */
+  flex-wrap: wrap; /* Permitir que las tarjetas se envuelvan a la siguiente fila si es necesario */
+  gap: 20px; /* Espacio entre tarjetas */
+  max-width: 1200px; /* Limitar el ancho máximo para centrar las tarjetas */
+  width: 100%; /* Asegurar que el contenedor se ajuste al ancho completo */
+  padding: 20px;
+}
+
+/* Tarjeta individual */
+.card {
+  flex: 1;
+  min-width: 280px; /* Ancho mínimo de las tarjetas */
+  max-width: 350px; /* Ancho máximo de las tarjetas */
+}
+
+/* Estilos para pantallas pequeñas */
+@media (max-width: 768px) {
+  .userList {
+    flex-direction: column; /* Orientación en columna para pantallas pequeñas */
+    align-items: center; /* Centrar las tarjetas en el eje vertical */
+  }
+
+  .card {
+    max-width: 100%; /* Las tarjetas ocuparán el 100% del ancho del contenedor en pantallas pequeñas */
+    margin-bottom: 20px; /* Espacio entre tarjetas en columna */
+  }
+}
+
+
+/* Estructura principal de la tarjeta */
+.card {
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra ligera estilo Apple */
+  padding: 20px;
+  margin: 20px;
+  max-width: 400px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animación para interacción */
+}
+
+/* Efecto hover para dar sensación de profundidad */
+.card:hover {
+  transform: translateY(-5px); /* Efecto de elevar la tarjeta al hacer hover */
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Título de la tarjeta (nombre del usuario) */
+.cardTitle {
+  font-size: 1.6em;
+  font-weight: 600;
+  margin-bottom: 10px;
   color: #333;
   text-align: center;
-}
-.userList {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Distribuye las tarjetas en columnas */
-  gap: 20px; /* Espacio entre las tarjetas */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* Fuente tipo Apple */
 }
 
-/* Estilo para la tarjeta de usuario */
-.userCard {
-  background-color: #ffffff;
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+/* Estilo del email */
+.cardEmail {
+  font-size: 1.2em;
+  margin-bottom: 15px;
+  color: #666;
   text-align: center;
 }
 
-.userCard:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  transform: translateY(-5px);
-}
-
-.userCardName {
-  font-size: 1.5rem;
-  color: #1d1d1f;
+/* Información adicional, como CURP, licencia médica, etc. */
+.cardExtraInfo {
+  font-size: 1em;
   margin-bottom: 10px;
+  color: #888;
+  text-align: center;
 }
 
-.userCardEmail, .userCardCurp {
-  font-size: 1rem;
-  color: #6e6e73;
-  margin-bottom: 10px;
+/* Contenedor de los botones de acción */
+.cardActions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
 }
 
-.userCardActions {
-  margin-top: 20px;
-}
-
-.userCardButton {
-  display: inline-block;
-  padding: 10px 20px;
-  margin: 0 10px;
-  font-size: 1rem;
-  color: #ffffff;
-  background-color: #007aff;
+/* Botones de acción de la tarjeta */
+.cardButton {
+  background-color: #007bff;
+  color: white;
   border: none;
+  padding: 10px 15px;
   border-radius: 8px;
+  cursor: pointer;
   text-decoration: none;
+  font-size: 1em;
   transition: background-color 0.3s ease;
 }
 
-.userCardButton:hover {
-  background-color: #005bb5;
+/* Efecto hover en los botones */
+.cardButton:hover {
+  background-color: #0056b3;
 }
 
-/* Estilo cuando no hay usuarios */
-.noUsers {
-  font-size: 1.2rem;
-  color: #999;
+/* Efecto activo en los botones */
+.cardButton:active {
+  background-color: #003f7f;
+}
+
+/* Estilo para el CURP, licencia médica, o especialidad */
+.cardCurp, .cardMedicalLicense, .cardSpecialty {
+  font-size: 1em;
+  margin: 5px 0;
+  color: #555;
   text-align: center;
 }
+
+/* Diseño responsivo para pantallas pequeñas */
+@media (max-width: 600px) {
+  .card {
+    max-width: 100%;
+    margin: 10px;
+  }
+
+  .cardTitle {
+    font-size: 1.4em;
+  }
+
+  .cardButton {
+    padding: 8px 12px;
+    font-size: 0.9em;
+  }
+}
+
 
 /*FilterNav*/
 /* Contenedor de filtros */
@@ -1493,4 +1559,190 @@ h4 {
   font-size: 0.875em;
   margin-top: 4px;
 }
+
+/*
+Menu main
+*/
+/* Estilos para el contenedor del submenú de opciones de usuarios */
+.userOptionsMenu {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+/* Estilo para cada botón del submenú de usuarios */
+.userOptionButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 5px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+.userOptionButton:hover {
+  background-color: #0056b3;
+}
+
+.userOptionButton:active {
+  background-color: #003f7f;
+}
+
+/*Patientspage and cards*/
+/* Contenedor principal para la página de pacientes */
+.patientsMainPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Estilo del título principal */
+.pageTitle {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Estilo para el contenedor de filtros */
+.filters {
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 20px;
+}
+
+/* Contenedor que agrupa las tarjetas de pacientes */
+.patientList {
+  display: flex;
+  justify-content: space-between; /* Distribuir espacio uniformemente */
+  flex-wrap: wrap; /* Permitir que las tarjetas se envuelvan a la siguiente fila si es necesario */
+  gap: 20px; /* Espacio entre las tarjetas */
+  width: 100%;
+  max-width: 1200px; /* Limitar el ancho máximo para centrar las tarjetas */
+}
+
+/* Tarjeta individual de paciente */
+.patientCard {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  padding: 20px;
+  width: 100%;
+  max-width: 300px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efecto hover para la tarjeta */
+.patientCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Nombre del paciente */
+.patientCardName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Email del paciente */
+.patientCardEmail {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: #555;
+  text-align: center;
+}
+
+/* CURP del paciente */
+.patientCardCurp {
+  font-size: 1rem;
+  margin-bottom: 15px;
+  color: #888;
+  text-align: center;
+}
+
+/* Acciones dentro de la tarjeta */
+.patientCardActions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+/* Botones dentro de la tarjeta */
+.patientCardButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover en los botones */
+.patientCardButton:hover {
+  background-color: #0056b3;
+}
+
+/* Contenedor del botón para agregar pacientes */
+.addButtonContainer {
+  margin-top: 30px;
+  text-align: center;
+}
+
+/* Estilo del botón para agregar pacientes */
+.addButton {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover del botón de agregar pacientes */
+.addButton:hover {
+  background-color: #218838;
+}
+
+/* Menú desplegable de agregar pacientes */
+.addMenu {
+  margin-top: 10px;
+}
+
+/* Botones dentro del menú desplegable */
+.addMenuItem {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: inline-block;
+}
+
+/* Hover en los botones del menú */
+.addMenuItem:hover {
+  background-color: #0056b3;
+}
+
+/* Estilo para el mensaje de "No se encontraron pacientes" */
+.noPatients {
+  font-size: 1.2rem;
+  color: #888;
+  text-align: center;
+}
+
+
 /*# sourceMappingURL=index.css.map */

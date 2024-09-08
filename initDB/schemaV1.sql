@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS super_user (
     deleted_at TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS patient_user (
+CREATE TABLE IF NOT EXISTS patient (
     id SERIAL PRIMARY KEY,
     account_id UUID NOT NULL,
     curp VARCHAR(18) NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS office (
     deleted_at TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS doctor_user (
+CREATE TABLE IF NOT EXISTS doctor(
     id SERIAL PRIMARY KEY,
     account_id UUID NOT NULL,
     specialty_id INT NOT NULL,

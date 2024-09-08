@@ -7,21 +7,21 @@ import (
 
 type Usecase interface {
 	//REGISTER
-	RegisterUser(ctx context.Context, request models.RegisterUserByAdminRequest) (models.Response, error)
-	RegisterDoctor(ctx context.Context, request models.RegisterDoctorByAdminRequest) (models.Response, error)
-	RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.Response, error)
+	RegisterSuperUser(ctx context.Context, request models.RegisterUserByAdminRequest) (models.UserData, error)
+	RegisterDoctor(ctx context.Context, request models.RegisterDoctorByAdminRequest) (models.UserData, error)
+	RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.UserData, error)
 
-	LoginUser(ctx context.Context, lu models.LoginUser) (models.Response, error)
+	LoginUser(ctx context.Context, lu models.LoginUser) (models.LoginResponse, error)
 	// GET
-	GetUsers(ctx context.Context) ([]models.UsersRequest, error)
-	GetDoctors(ctx context.Context) ([]models.Doctors, error)
-	GetDoctorByID(ctx context.Context, userID int) (models.Response, error)
-	GetUserByID(ctx context.Context, userID int) (models.Response, error)
-	GetAllUsers(ctx context.Context) (models.Response, error)
+	GetSuperAdmins(ctx context.Context) ([]models.UserRequest, error)
+	GetSuperAdminByID(ctx context.Context, superUserID int) (models.UserRequest, error)
+
+	GetDoctors(ctx context.Context) ([]models.DoctorRequest, error)
+	GetDoctorByID(ctx context.Context, doctorID int) (models.DoctorRequest, error)
 
 	// EDIT
-	UpdateUser(ctx context.Context, userUpdate models.UpdateUser) (models.Response, error)
-	UpdateDoctor(ctx context.Context, du models.UpdateDoctor) (models.Response, error)
+	UpdateUser(ctx context.Context, userUpdate models.UpdateUser) (string, error)
+	UpdateDoctor(ctx context.Context, du models.UpdateDoctor) (string, error)
 
 	// deletes
 	DeleteUser(ctx context.Context, accountID string) (models.Response, error)

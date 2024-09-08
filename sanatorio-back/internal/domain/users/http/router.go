@@ -10,7 +10,7 @@ func (h *handler) UserRoutes(mux *http.ServeMux) {
 	mux.Handle("/v1/login", CORS(http.HandlerFunc(h.LoginUser)))
 	// Registros
 	mux.HandleFunc("POST /v1/patients", h.RegisterPatient)
-	mux.Handle("POST /v1/users", CORS(auth.AuthMiddleware(http.HandlerFunc(h.RegisterUser))))
+	mux.Handle("POST /v1/users", CORS(auth.AuthMiddleware(http.HandlerFunc(h.RegisterSuperUser))))
 	mux.Handle("POST /v1/doctors", CORS(auth.AuthMiddleware(http.HandlerFunc(h.RegisterDoctor))))
 
 	// Updates
@@ -18,7 +18,6 @@ func (h *handler) UserRoutes(mux *http.ServeMux) {
 	mux.Handle("PUT /v1/doctors", CORS(auth.AuthMiddleware(http.HandlerFunc(h.UpdateDoctor))))
 
 	// Get
-	mux.Handle("GET /v1/users/all", CORS(auth.AuthMiddleware(http.HandlerFunc(h.GetAllUsers))))
 	mux.Handle("GET /v1/users", CORS(auth.AuthMiddleware(http.HandlerFunc(h.GetUsers))))
 	mux.Handle("GET /v1/doctors", CORS(auth.AuthMiddleware(http.HandlerFunc(h.GetDoctors))))
 	mux.Handle("GET /v1/user/{userId}", CORS(auth.AuthMiddleware(http.HandlerFunc(h.GetUserByID))))
