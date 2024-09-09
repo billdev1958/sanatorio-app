@@ -24,8 +24,8 @@ type Usecase interface {
 	UpdateDoctor(ctx context.Context, du models.UpdateDoctor) (string, error)
 
 	// deletes
-	DeleteUser(ctx context.Context, accountID string) (models.Response, error)
-	DeleteDoctor(ctx context.Context, accountID string) (models.Response, error)
-	SoftDeleteUser(ctx context.Context, accountID string) (models.Response, error)
-	SoftDeleteDoctor(ctx context.Context, accountID string) (models.Response, error)
+	DeleteUser(ctx context.Context, accountID string) (string, error)
+	DeleteDoctor(ctx context.Context, accountID string) (string, error)
+	SoftDeleteUser(ctx context.Context, accountID string) (string, error)
+	SoftDeleteDoctor(ctx context.Context, accountID string) (string, error)
 }

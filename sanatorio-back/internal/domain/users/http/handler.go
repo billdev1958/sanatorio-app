@@ -29,14 +29,21 @@ func (h *handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Llamar al caso de uso para manejar el login
-	response, err := h.uc.LoginUser(r.Context(), request)
+	loginResponse, err := h.uc.LoginUser(r.Context(), request)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(map[string]string{"error": "Authentication failed"})
 		return
 	}
 
-	// Si el login fue exitoso, devolver el token y la información del usuario
+	// Preparar el formato de respuesta con el token y la información del usuario
+	response := models.Response{
+		Status:  "success",
+		Message: "User logged in successfully",
+		Data:    loginResponse, // Aquí pasamos los datos brutos
+	}
+
+	// Enviar la respuesta final al cliente
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
