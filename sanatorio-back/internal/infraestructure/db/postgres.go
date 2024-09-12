@@ -118,7 +118,7 @@ func (storage *PgxStorage) SeedAdminUser(ctx context.Context) (err error) {
 }
 
 func (storage *PgxStorage) SeedSpecialties(ctx context.Context) (err error) {
-	specialtiesValues := [4]string{"Cardiologo", "Dermatologo", "Pediatra", "Ginecologia"}
+	specialtiesValues := [5]string{"Medicina General", "Cardiologo", "Dermatologo", "Pediatra", "Ginecologia"}
 
 	var count int
 	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM cat_specialty").Scan(&count)

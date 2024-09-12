@@ -115,6 +115,7 @@ func (app *App) Run() error {
 	return server.ListenAndServe()
 }
 
+// funcion para inicializar la db
 func setupDatabase(dsn string) (*pgxpool.Pool, error) {
 	dbPool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
@@ -124,6 +125,7 @@ func setupDatabase(dsn string) (*pgxpool.Pool, error) {
 	return dbPool, nil
 }
 
+// funcion para generar registros a la db
 func seedDatabase(dbPool *pgxpool.Pool) error {
 	storage := postgres.NewPgxStorage(dbPool)
 

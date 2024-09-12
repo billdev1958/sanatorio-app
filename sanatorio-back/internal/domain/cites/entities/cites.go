@@ -1,4 +1,4 @@
-package cites
+package entities
 
 import (
 	"time"
@@ -7,61 +7,59 @@ import (
 )
 
 type Appointment struct {
-	ID               uuid.UUID  `json:"id"`
-	DoctorAccountID  uuid.UUID  `json:"doctor_account_id"`
-	PatientAccountID uuid.UUID  `json:"patient_account_id"`
-	OfficeID         int        `json:"office_id"`
-	TimeStart        time.Time  `json:"time_start"`
-	TimeEnd          time.Time  `json:"time_end"`
-	ScheduleID       int        `json:"schedule_id"`
-	StatusID         int        `json:"status_id"`
-	CreatedAt        time.Time  `json:"created_at"`
-	UpdatedAt        time.Time  `json:"updated_at"`
-	DeletedAt        *time.Time `json:"deleted_at,omitempty"`
+	ID               uuid.UUID
+	PatientAccountID uuid.UUID
+	OfficeID         int
+	Date             time.Time
+	ScheduleID       int
+	StatusID         int
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+	DeletedAt        *time.Time
 }
 
 type Office struct {
-	ID              int        `json:"id"`
-	Name            string     `json:"name"`
-	SpecialtyID     int        `json:"specialty_id"`
-	StatusID        int        `json:"status_id"`
-	DoctorAccountID uuid.UUID  `json:"doctor_account_id"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at"`
-	DeletedAt       *time.Time `json:"deleted_at,omitempty"`
+	ID              int
+	Name            string
+	SpecialtyID     int
+	StatusID        int
+	DoctorAccountID uuid.UUID
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	DeletedAt       *time.Time
 }
 
 type OfficeStatus struct {
-	ID        int        `json:"id"`
-	Name      string     `json:"name"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	ID        int
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
 }
 
 type AppointmentStatus struct {
-	ID        int        `json:"id"`
-	Name      string     `json:"name"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	ID        int
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
 }
 
 type Schedule struct {
-	ID        int        `json:"id"`
-	OfficeID  int        `json:"office_id"`
-	DayOfWeek int        `json:"day_of_week"`
-	TimeStart time.Time  `json:"time_start"`
-	TimeEnd   time.Time  `json:"time_end"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	ID        int
+	OfficeID  int
+	DayOfWeek int
+	TimeStart time.Duration
+	TimeEnd   time.Duration
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
 }
 
 type Specialty struct {
-	ID        int        `json:"id"`
-	Name      string     `json:"name"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	ID        int
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
 }
