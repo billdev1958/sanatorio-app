@@ -1,37 +1,32 @@
-services:
-  db:
-    image: postgres:16.4
-    volumes:
-      - ./initDB:/docker-entrypoint-initdb.d
-      - db_data:/var/lib/postgresql/data
-    restart: always
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: university_db
+# Sanatorio-app
 
-  app:
-    build:
-      context: ./sanatorio-back
-      dockerfile: Dockerfile
-    depends_on:
-      - db
-    env_file:
-      - ./sanatorio-back/.env
-    restart: always
-    ports:  # Cambio de expose a ports para acceso externo si es necesario
-      - "8080:8080"
+## Requisitos
 
-  nginx:
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - app
+- [Docker](https://www.docker.com/get-started)
+- Git
 
-volumes:
-  db_data:
+## Instrucciones para iniciar el proyecto
+
+1. **Instalar Docker:**
+
+   Si no tienes Docker instalado en tu ordenador, puedes instalarlo siguiendo las instrucciones de la [documentación oficial de Docker](https://docs.docker.com/get-docker/).
+
+2. **Clonar la rama `dev` del repositorio:**
+
+   Abre la terminal y clona el repositorio con el siguiente comando:
+
+   `git clone -b dev https://github.com/usuario/sanatorio-app.git`
+
+3. **Navegar a la carpeta del proyecto:**
+
+   Una vez clonado el repositorio, ingresa en la carpeta del proyecto:
+
+   `cd sanatorio-app`
+
+4. **Iniciar los contenedores con Docker Compose:**
+
+   En la misma carpeta del proyecto, inicia los servicios de la base de datos y el backend ejecutando:
+
+   `docker compose up`
+
+   Esto iniciará la base de datos en el puerto 5432 y el backend en el puerto 8080.
