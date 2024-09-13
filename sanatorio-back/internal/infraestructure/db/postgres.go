@@ -46,7 +46,7 @@ func (storage *PgxStorage) SeedRoles(ctx context.Context) (err error) {
 }
 
 func (storage *PgxStorage) SeedOfficeStatus(ctx context.Context) (err error) {
-	statusValues := [2]string{"Disponible", "No disponible"}
+	statusValues := [3]string{"Disponible", "No disponible", "No asignado"}
 
 	var count int
 	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM office_status").Scan(&count)

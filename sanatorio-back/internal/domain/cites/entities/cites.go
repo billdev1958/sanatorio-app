@@ -6,6 +6,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type OfficeStatusType int
+
+const (
+	_ OfficeStatusType = iota
+	OfficeStatusAvailable
+	OfficeStatusUnavailable
+	OfficeStatusUnassigned
+)
+
 type Appointment struct {
 	ID               uuid.UUID
 	PatientAccountID uuid.UUID

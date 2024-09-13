@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS office (
     name VARCHAR(60) NOT NULL,
     specialty_id INTEGER NOT NULL,
     status_id INTEGER NOT NULL,
-    doctor_account_id UUID NOT NULL,
+    doctor_account_id UUID,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -99,7 +99,8 @@ CREATE TABLE IF NOT EXISTS schedule (
     time_end TIME NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
-    deleted_at TIMESTAMP
+    deleted_at TIMESTAMP,
+    CONSTRAINT unique_office_schedule UNIQUE (office_id, day_of_week, time_start, time_end)
 );
 
 CREATE TABLE IF NOT EXISTS appointment (

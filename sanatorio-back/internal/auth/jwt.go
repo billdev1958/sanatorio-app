@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// TODO AGREGAR A ENV
 var secretKey []byte
 
 func init() {
