@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS cat_rol (
+CREATE TABLE IF NOT EXISTS role (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL,
@@ -11,25 +11,18 @@ CREATE TABLE IF NOT EXISTS account (
     user_id INT NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    rol INT NOT NULL,
+    role_id INT NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     password_change_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    lastname1 VARCHAR(255) NOT NULL,
-    lastname2 VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP,
-    deleted_at TIMESTAMP
-);
-
 CREATE TABLE IF NOT EXISTS super_user (
     id SERIAL PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name1 VARCHAR(255) NOT NULL,
+    last_name2 VARCHAR(255) NOT NULL,
     account_id UUID NOT NULL,
     curp VARCHAR(18) NOT NULL,
     created_at TIMESTAMP NOT NULL,
@@ -39,14 +32,46 @@ CREATE TABLE IF NOT EXISTS super_user (
 
 CREATE TABLE IF NOT EXISTS patient (
     id SERIAL PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name1 VARCHAR(255) NOT NULL,
+    last_name2 VARCHAR(255) NOT NULL,
+    record_id UUID UNIQUE,
     account_id UUID NOT NULL,
     curp VARCHAR(18) NOT NULL,
+    sex CHAR(1) NOT NULL,
+    phone VARCHAR(10),
+    address VARCHAR(50),
+    occupation VARCHAR(20),
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS cat_specialty (
+CREATE TABLE IF NOT EXISTS medical_history (
+    id SERIAL PRIMARY KEY,
+    patient_id INT REFERENCES patient(id) ON DELETE CASCADE,
+    family_history TEXT,
+    personal_pathological_history TEXT,
+    personal_non_pathological_history TEXT,
+    immunizations TEXT,
+    allergies TEXT
+);
+
+CREATE TABLE IF NOT EXISTS evolution_note (
+    id SERIAL PRIMARY KEY,
+    consultation_id INT REFERENCES consultation(id) ON DELETE CASCADE,
+    follow_up_notes TEXT,
+    condition_changes TEXT,
+    diagnosis_evolution TEXT,
+    treatment_adjustments TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS incapacity (
+    -- Define incapacity fields here
+);
+
+CREATE TABLE IF NOT EXISTS specialty (
     id SERIAL PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
     created_at TIMESTAMP NOT NULL,
@@ -62,7 +87,7 @@ CREATE TABLE IF NOT EXISTS appointment_status (
     deleted_at TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS office_status(
+CREATE TABLE IF NOT EXISTS office_status (
     id SERIAL PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
     created_at TIMESTAMP NOT NULL,
@@ -75,15 +100,18 @@ CREATE TABLE IF NOT EXISTS office (
     name VARCHAR(60) NOT NULL,
     specialty_id INTEGER NOT NULL,
     status_id INTEGER NOT NULL,
-    doctor_account_id UUID,
+    doctor_account_id UUID NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS doctor(
+CREATE TABLE IF NOT EXISTS doctor (
     id SERIAL PRIMARY KEY,
     account_id UUID NOT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name1 VARCHAR(255) NOT NULL,
+    last_name2 VARCHAR(255) NOT NULL,
     specialty_id INT NOT NULL,
     medical_license VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL,
@@ -93,14 +121,13 @@ CREATE TABLE IF NOT EXISTS doctor(
 
 CREATE TABLE IF NOT EXISTS schedule (
     id SERIAL PRIMARY KEY,
-    office_id INTEGER NOT NULL, 
+    office_id INTEGER NOT NULL,
     day_of_week INT NOT NULL,
     time_start TIME NOT NULL,
     time_end TIME NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
-    deleted_at TIMESTAMP,
-    CONSTRAINT unique_office_schedule UNIQUE (office_id, day_of_week, time_start, time_end)
+    deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS appointment (
@@ -117,27 +144,45 @@ CREATE TABLE IF NOT EXISTS appointment (
     deleted_at TIMESTAMP,
     CONSTRAINT chk_time_validity CHECK (time_start < time_end)
 );
+
+CREATE TABLE IF NOT EXISTS consultation (
+    id SERIAL PRIMARY KEY,
+    patient_id UUID NOT NULL,
+    date DATE NOT NULL,
+    time TIME NOT NULL,
+    reason TEXT NOT NULL,
+    symptoms TEXT NOT NULL,
+    doctor_notes TEXT,
+    requested_tests TEXT,
+    created_at TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS attachment (
+    id SERIAL PRIMARY KEY,
+    consultation_id INT REFERENCES consultation(id) ON DELETE CASCADE,
+    patient_id INT REFERENCES patient(id) ON DELETE CASCADE,
+    file_path VARCHAR NOT NULL,
+    file_name VARCHAR NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Foreign keys --
 
 ALTER TABLE account
-ADD CONSTRAINT fk_rol_account
-FOREIGN KEY (rol) REFERENCES cat_rol(id);
-
-ALTER TABLE users
-ADD CONSTRAINT fk_account_id_users
-FOREIGN KEY (user_id) REFERENCES account(id);
+ADD CONSTRAINT fk_role_account
+FOREIGN KEY (role_id) REFERENCES role(id);
 
 ALTER TABLE super_user
-ADD CONSTRAINT fk_account_id_super_user
+ADD CONSTRAINT fk_account_super_user
 FOREIGN KEY (account_id) REFERENCES account(id);
 
-ALTER TABLE patient_user
-ADD CONSTRAINT fk_account_id_patient_user
+ALTER TABLE patient
+ADD CONSTRAINT fk_account_patient
 FOREIGN KEY (account_id) REFERENCES account(id);
 
 ALTER TABLE office
 ADD CONSTRAINT fk_specialty_office
-FOREIGN KEY (specialty_id) REFERENCES cat_specialty(id);
+FOREIGN KEY (specialty_id) REFERENCES specialty(id);
 
 ALTER TABLE office
 ADD CONSTRAINT fk_status_office
@@ -145,19 +190,15 @@ FOREIGN KEY (status_id) REFERENCES office_status(id);
 
 ALTER TABLE office
 ADD CONSTRAINT fk_doctor_office
-FOREIGN KEY (doctor_account_id) REFERENCES doctor_user(account_id);
+FOREIGN KEY (doctor_account_id) REFERENCES doctor(account_id);
 
-ALTER TABLE doctor_user
-ADD CONSTRAINT fk_account_id_doctor_user
+ALTER TABLE doctor
+ADD CONSTRAINT fk_account_doctor
 FOREIGN KEY (account_id) REFERENCES account(id);
 
-ALTER TABLE doctor_user
-ADD CONSTRAINT fk_cat_id_specialty
-FOREIGN KEY (id_specialty) REFERENCES cat_specialty(id);
-
-ALTER TABLE schedule
-ADD CONSTRAINT fk_doctor_schedule
-FOREIGN KEY (doctor_account_id) REFERENCES doctor_user(account_id);
+ALTER TABLE doctor
+ADD CONSTRAINT fk_specialty_doctor
+FOREIGN KEY (specialty_id) REFERENCES specialty(id);
 
 ALTER TABLE schedule
 ADD CONSTRAINT fk_office_schedule
@@ -169,11 +210,11 @@ FOREIGN KEY (schedule_id) REFERENCES schedule(id);
 
 ALTER TABLE appointment
 ADD CONSTRAINT fk_doctor_appointment
-FOREIGN KEY (doctor_account_id) REFERENCES doctor_user(account_id);
+FOREIGN KEY (doctor_account_id) REFERENCES doctor(account_id);
 
 ALTER TABLE appointment
 ADD CONSTRAINT fk_patient_appointment
-FOREIGN KEY (patient_account_id) REFERENCES patient_user(account_id);
+FOREIGN KEY (patient_account_id) REFERENCES patient(account_id);
 
 ALTER TABLE appointment
 ADD CONSTRAINT fk_office_appointment
@@ -183,9 +224,9 @@ ALTER TABLE appointment
 ADD CONSTRAINT fk_status_appointment
 FOREIGN KEY (status_id) REFERENCES appointment_status(id);
 
--- Función de validación --
+-- Validation function --
 
-CREATE OR REPLACE FUNCTION validate_office_status() 
+CREATE OR REPLACE FUNCTION validate_office_status()
 RETURNS TRIGGER AS $$
 BEGIN
     IF (SELECT status_id FROM office WHERE id = NEW.office_id) != 1 THEN
@@ -195,7 +236,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger para validar el estado de la oficina antes de insertar o actualizar en la tabla schedule --
+-- Trigger to validate office status before inserting or updating schedule --
 
 CREATE TRIGGER trigger_validate_office_status
 BEFORE INSERT OR UPDATE ON schedule
