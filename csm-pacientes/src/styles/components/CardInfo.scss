@@ -1,0 +1,30 @@
+.card-info {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: white;
+  }
+  
+  .card-logo {
+    width: 100px;
+    margin-right: 1.5rem;
+  }
+  
+  .card-details {
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .card-details h2 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .card-details p {
+    margin: 0.25rem 0;
+    font-size: 1rem;
+  }
+  
