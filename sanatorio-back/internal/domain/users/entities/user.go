@@ -1,8 +1,12 @@
 package entities
 
-import "github.com/google/uuid"
+import (
+	"time"
 
-type Rol int
+	"github.com/google/uuid"
+)
+
+type Roles int
 
 const (
 	_ = iota
@@ -20,114 +24,53 @@ const (
 	Psiquiatria
 )
 
-type User struct {
-	ID        int
-	Name      string
-	Lastname1 string
-	Lastname2 string
+type AdminData struct {
+	AccountID     uuid.UUID
+	RoleAdmin     int
+	PasswordAdmin string
 }
 
 type Account struct {
-	AccountID uuid.UUID
-	UserID    int
-	Email     string
-	Password  string
-	Rol       int
+	AccountID           uuid.UUID
+	UserID              int
+	Email               string
+	Password            string
+	Rol                 Roles
+	Created_At          time.Time
+	Updated_At          time.Time
+	Password_Changed_At time.Time
 }
 
-type Users struct {
-	User
-	Email string
-	Rol   int
-	Curp  string
-}
-
-type Doctors struct {
-	User
-	Email          string
-	Rol            int
-	MedicalLicense string
-	Specialty      int
+type User struct {
+	ID         int
+	Name       string
+	Lastname1  string
+	Lastname2  string
+	Created_At time.Time
+	Updated_At time.Time
 }
 
 type SuperUser struct {
-	ID int
 	User
 	Account
-	Curp string
+	Curp       string
+	Created_At time.Time
+	Updated_At time.Time
 }
 
 type DoctorUser struct {
-	ID int
 	User
 	Account
 	MedicalLicense string
+	SpecialtyID    Specialties
+	Created_At     time.Time
+	Updated_At     time.Time
 }
 
 type PatientUser struct {
-	Name      string
-	Lastname1 string
-	Lastname2 string
-	AccountID uuid.UUID
-	Email     string
-	Password  string
-	Rol       int
-	Curp      string
-}
-
-type UserResponse struct {
-	Name  string
-	Email string
-}
-
-type AdminData struct {
-	AccountAdminID uuid.UUID
-	RolAdmmin      int
-	AdminPassword  string
-}
-
-type RegisterUserByAdmin struct {
-	AdminData
 	User
 	Account
-	DocumentID string
-}
-
-type RegisterDoctorByAdmin struct {
-	AdminData
-	User
-	Account
-	SpecialtyID int
-	DocumentID  string
-}
-
-type LoginUser struct {
-	Email    string
-	Password string
-}
-
-type LoginResponse struct {
-	AccountID uuid.UUID
-	Role      int
-}
-
-type UpdateUser struct {
-	AccountID uuid.UUID
-	Name      string
-	Lastname1 string
-	Lastname2 string
-	Email     string
-	Password  string
-	Curp      string
-}
-
-type UpdateDoctor struct {
-	AccountID      uuid.UUID
-	Name           string
-	Lastname1      string
-	Lastname2      string
-	Email          string
-	Password       string
-	SpecialtyID    int
-	MedicalLicense string
+	Curp       string
+	Created_At time.Time
+	Updated_At time.Time
 }

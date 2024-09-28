@@ -3,37 +3,41 @@ package user
 import (
 	"context"
 	"sanatorioApp/internal/domain/users/entities"
-
-	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 )
 
 type Repository interface {
-	// Login
-	LoginUser(ctx context.Context, lu entities.LoginUser) (entities.LoginResponse, error)
+	Autenticador
+	RegisterU
+	GetU
+	UpdateU
+	DeleteU
+}
 
-	// Registros
-	RegisterUserTransaction(ctx context.Context, ru entities.RegisterUserByAdmin) (entities.UserResponse, error)
-	RegisterDoctorTransaction(ctx context.Context, rd entities.RegisterDoctorByAdmin) (response entities.UserResponse, err error)
-	RegisterPatientTransaction(ctx context.Context, rp entities.PatientUser) (response entities.UserResponse, err error)
-	RegisterUser(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin) (userID int, name string, err error)
-	RegisterAccount(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin, userID int) (string, error)
-	RegisterTypeUser(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin) error
-	RegisterTypeDoctor(ctx context.Context, tx pgx.Tx, ru entities.RegisterDoctorByAdmin) error
+type Autenticador interface {
+	LoginUser(ctx context.Context, lu entities.Account) (entities.Account, error)
+}
 
-	// GetUsers
-	GetUsers(ctx context.Context) ([]entities.Users, error)
-	GetDoctors(ctx context.Context) ([]entities.Doctors, error)
-	GetDoctorByID(ctx context.Context, accountID string) (entities.Doctors, error)
-	GetUserByID(ctx context.Context, accountID string) (entities.Users, error)
+type RegisterU interface {
+	RegisterSuperUserTransaction(ctx context.Context, ad entities.AdminData, su entities.SuperUser) (entities.SuperUser, error)
+	RegisterDoctorTransaction(ctx context.Context, ad entities.AdminData, du entities.DoctorUser) (entities.DoctorUser, error)
+	RegisterPatientTransaction(ctx context.Context, pu entities.PatientUser) (entities.PatientUser, error)
+}
 
-	// Edit Users
-	UpdateUser(ctx context.Context, userUpdate entities.UpdateUser) (string, error)
-	UpdateDoctor(ctx context.Context, du entities.UpdateDoctor) (string, error)
+type GetU interface {
+	GetSuperAdmins(ctx context.Context) ([]entities.SuperUser, error)
+	GetSuperUserByID(ctx context.Context, userID int) (entities.SuperUser, error)
+	GetDoctors(ctx context.Context) ([]entities.DoctorUser, error)
+	GetDoctorByID(ctx context.Context, userID int) (entities.DoctorUser, error)
+	GetPatients(ctx context.Context) ([]entities.PatientUser, error)
+}
 
-	CheckAdminPassword(ctx context.Context, tx pgx.Tx, accountID uuid.UUID, pass string) (bool, error)
+type UpdateU interface {
+	UpdateSuperUser(ctx context.Context, ad entities.AdminData, userUpdate entities.SuperUser) (string, error)
+	UpdateDoctor(ctx context.Context, ad entities.AdminData, doctorUpdate entities.DoctorUser) (string, error)
+	UpdatePatient(ctx context.Context, ad entities.AdminData, patientUpdate entities.PatientUser) (string, error)
+}
 
-	// Delete and soft delete
+type DeleteU interface {
 	DeleteUser(ctx context.Context, accountID string) (string, error)
 	DeleteDoctor(ctx context.Context, accountID string) (string, error)
 	SoftDeleteUser(ctx context.Context, accountID string) (string, error)

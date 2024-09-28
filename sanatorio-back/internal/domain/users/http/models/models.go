@@ -1,6 +1,8 @@
 package models
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type Response struct {
 	Status  string      `json:"status"`
@@ -14,40 +16,31 @@ type UserData struct {
 	Email string `json:"email"`
 }
 
-// Admin for obtions admin
-type AdminData struct {
-	AccountAdminID uuid.UUID `json:"account_admin_id"`
-	RolAdmmin      int       `json:"rol_admin"`
-	AdminPassword  string    `json:"admin_password"`
-}
-
 // Registers
 type RegisterUserByAdminRequest struct {
-	AdminData
-	Name      string    `json:"name"`
-	Lastname1 string    `json:"lastname1"`
-	Lastname2 string    `json:"lastname2"`
-	AccountID uuid.UUID `json:"account_id"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	Rol       int       `json:"rol"`
-	Curp      string    `json:"curp"`
+	Name          string `json:"name"`
+	Lastname1     string `json:"lastname1"`
+	Lastname2     string `json:"lastname2"`
+	Email         string `json:"email"`
+	Password      string `json:"password"`
+	Rol           int    `json:"rol"`
+	Curp          string `json:"curp"`
+	AdminPassword string `json:"admin_password"`
 }
 
 type RegisterDoctorByAdminRequest struct {
-	AdminData
-	Name           string    `json:"name"`
-	Lastname1      string    `json:"lastname1"`
-	Lastname2      string    `json:"lastname2"`
-	AccountID      uuid.UUID `json:"account_id"`
-	Email          string    `json:"email"`
-	Password       string    `json:"password"`
-	Rol            int       `json:"rol"`
-	MedicalLicense string    `json:"medical_license"`
-	Specialty      int       `json:"specialty"`
+	Name           string `json:"name"`
+	Lastname1      string `json:"lastname1"`
+	Lastname2      string `json:"lastname2"`
+	Email          string `json:"email"`
+	Password       string `json:"password"`
+	Rol            int    `json:"rol"`
+	MedicalLicense string `json:"medical_license"`
+	Specialty      int    `json:"specialty"`
+	AdminPassword  string `json:"admin_password"`
 }
 
-type RegisterPatient struct {
+type RegisterPatientRequest struct {
 	Name      string `json:"name"`
 	Lastname1 string `json:"lastname1"`
 	Lastname2 string `json:"lastname2"`
@@ -68,39 +61,50 @@ type LoginResponse struct {
 	Token     string    `json:"token"`
 }
 
-// Objeto user
-type User struct {
-	ID        int    `json:"id"`
-	Name      string `json:"name"`
-	Lastname1 string `json:"lastname1"`
-	Lastname2 string `json:"lastname2"`
-	Email     string
-	Curp      string
-}
-
 // Get users
-type Users struct {
-	User
-	Email string `json:"email"`
-	Curp  string `json:"curp"`
+type UserRequest struct {
+	AccountID  uuid.UUID `json:"account_id"`
+	ID         int       `json:"id"`
+	Name       string    `json:"name"`
+	Lastname1  string    `json:"lastname1"`
+	Lastname2  string    `json:"lastname2"`
+	Email      string    `json:"email"`
+	Curp       string    `json:"curp"`
+	Created_At string    `json:"created_at"`
 }
 
-type Doctors struct {
-	User
-	Email          string `json:"email"`
-	MedicalLicense string `json:"medical_license"`
-	Specialty      int    `json:"specialty"`
+type DoctorRequest struct {
+	ID             int       `json:"id"`
+	Name           string    `json:"name"`
+	Lastname1      string    `json:"lastname1"`
+	Lastname2      string    `json:"lastname2"`
+	Email          string    `json:"email"`
+	MedicalLicense string    `json:"medical_license"`
+	SpecialtyID    int       `json:"specialty"`
+	AccountID      uuid.UUID `json:"account_id"`
+}
+
+type PatientRequest struct {
+	AccountID  string `json:"account_id"`
+	ID         int    `json:"id"`
+	Name       string `json:"name"`
+	Lastname1  string `json:"lastname1"`
+	Lastname2  string `json:"lastname2"`
+	Email      string `json:"email"`
+	Curp       string `json:"curp"`
+	Created_At string `json:"created_at"`
 }
 
 // Updates
 type UpdateUser struct {
-	AccountID uuid.UUID `json:"account_id"`
-	Name      string    `json:"name,omitempty"`
-	Lastname1 string    `json:"lastname1,omitempty"`
-	Lastname2 string    `json:"lastname2,omitempty"`
-	Email     string    `json:"email,omitempty"`
-	Password  string    `json:"password,omitempty"`
-	Curp      string    `json:"curp,omitempty"`
+	AccountID     uuid.UUID `json:"account_id"`
+	Name          string    `json:"name,omitempty"`
+	Lastname1     string    `json:"lastname1,omitempty"`
+	Lastname2     string    `json:"lastname2,omitempty"`
+	Email         string    `json:"email,omitempty"`
+	Password      string    `json:"password,omitempty"`
+	Curp          string    `json:"curp,omitempty"`
+	AdminPassword string    `json:"admin_password"`
 }
 
 type UpdateDoctor struct {
@@ -112,4 +116,5 @@ type UpdateDoctor struct {
 	Password       string    `json:"password,omitempty"`
 	SpecialtyID    int       `json:"specialty_id,omitempty"`
 	MedicalLicense string    `json:"medical_license,omitempty"`
+	AdminPassword  string    `json:"admin_password"`
 }

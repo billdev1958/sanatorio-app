@@ -4,13 +4,20 @@ import (
 	"context"
 	"fmt"
 	"log"
+	user "sanatorioApp/internal/domain/users"
 	"sanatorioApp/internal/domain/users/entities"
-	"time"
-
-	"github.com/jackc/pgx/v5"
+	postgres "sanatorioApp/internal/infraestructure/db"
 )
 
-func (ur *userRepository) RegisterUserTransaction(ctx context.Context, ru entities.RegisterUserByAdmin) (response entities.UserResponse, err error) {
+type userRepository struct {
+	storage *postgres.PgxStorage
+}
+
+func NewUserRepository(storage *postgres.PgxStorage) user.Repository {
+	return &userRepository{storage: storage}
+}
+
+func (ur *userRepository) RegisterSuperUserTransaction(ctx context.Context, ad entities.AdminData, su entities.SuperUser) (entities.SuperUser, error) {
 	// Iniciar la transacción
 	ctxTx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -18,7 +25,7 @@ func (ur *userRepository) RegisterUserTransaction(ctx context.Context, ru entiti
 	tx, err := ur.storage.DbPool.Begin(ctxTx)
 	if err != nil {
 		log.Printf("error beginning transaction: %v", err)
-		return response, fmt.Errorf("begin transaction: %w", err)
+		return su, fmt.Errorf("begin transaction: %w", err)
 	}
 	defer func() {
 		if err != nil {
@@ -34,47 +41,35 @@ func (ur *userRepository) RegisterUserTransaction(ctx context.Context, ru entiti
 	}()
 
 	// Verificar la contraseña del administrador antes de proceder
-	isValid, err := ur.CheckAdminPassword(ctxTx, tx, ru.AccountAdminID, ru.AdminPassword)
+	isValid, err := ur.CheckAdminPassword(ctxTx, tx, ad.AccountID, ad.PasswordAdmin)
 	if err != nil {
-		return response, fmt.Errorf("failed to authenticate admin: %w", err)
+		return su, fmt.Errorf("failed to authenticate admin: %w", err)
 	}
 	if !isValid {
-		return response, fmt.Errorf("failed to authenticate admin: invalid password")
+		return su, fmt.Errorf("failed to authenticate admin: invalid password")
 	}
 
 	// Registrar el usuario y obtener el userID generado
-	userID, name, err := ur.RegisterUser(ctxTx, tx, ru)
+	userID, err := ur.registerUser(ctxTx, tx, su.User)
 	if err != nil {
-		return response, fmt.Errorf("failed to register user: %w", err)
+		return su, fmt.Errorf("failed to register user: %w", err)
 	}
 
 	// Registrar la cuenta utilizando el userID generado
-	email, err := ur.RegisterAccount(ctxTx, tx, ru, userID)
+	err = ur.registerAccount(ctxTx, tx, su.Account, userID)
 	if err != nil {
-		return response, fmt.Errorf("failed to register account: %w", err)
+		return su, fmt.Errorf("failed to register account: %w", err)
 	}
 
-	// Manejar el tipo de usuario según el rol
-	switch ru.Rol {
-	case entities.SuperUsuario, entities.Patient:
-		err = ur.RegisterTypeUser(ctxTx, tx, ru)
-		if err != nil {
-			return response, fmt.Errorf("failed to register user type: %w", err)
-		}
-	default:
-		return response, fmt.Errorf("unknown role: %d", ru.Rol)
+	_, err = ur.registerSuperAdmin(ctxTx, tx, su)
+	if err != nil {
+		return su, fmt.Errorf("failed to register super_usuario: %w", err)
 	}
 
-	// Construir la respuesta
-	response = entities.UserResponse{
-		Name:  name,
-		Email: email,
-	}
-
-	return response, nil
+	return su, nil
 }
 
-func (ur *userRepository) RegisterDoctorTransaction(ctx context.Context, rd entities.RegisterDoctorByAdmin) (response entities.UserResponse, err error) {
+func (ur *userRepository) RegisterDoctorTransaction(ctx context.Context, ad entities.AdminData, du entities.DoctorUser) (entities.DoctorUser, error) {
 	// Iniciar la transacción
 	ctxTx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -82,85 +77,46 @@ func (ur *userRepository) RegisterDoctorTransaction(ctx context.Context, rd enti
 	tx, err := ur.storage.DbPool.Begin(ctxTx)
 	if err != nil {
 		log.Printf("error beginning transaction: %v", err)
-		return response, fmt.Errorf("begin transaction: %w", err)
+		return du, fmt.Errorf("begin transaction: %w", err)
 	}
+
 	defer func() {
 		if err != nil {
 			if rbErr := tx.Rollback(ctxTx); rbErr != nil {
 				log.Printf("error rolling back transaction: %v", rbErr)
 			}
 		} else {
-			err = tx.Commit(ctxTx)
-			if err != nil {
+			if err = tx.Commit(ctxTx); err != nil {
 				log.Printf("error committing transaction: %v", err)
 			}
 		}
 	}()
 
 	// Verificar la contraseña del administrador antes de proceder
-	isValid, err := ur.CheckAdminPassword(ctxTx, tx, rd.AccountAdminID, rd.AdminPassword)
+	isValid, err := ur.CheckAdminPassword(ctxTx, tx, ad.AccountID, ad.PasswordAdmin)
 	if err != nil {
-		return response, fmt.Errorf("failed to authenticate admin: %w", err)
+		return du, fmt.Errorf("failed to authenticate admin: %w", err)
 	}
 	if !isValid {
-		return response, fmt.Errorf("failed to authenticate admin: invalid password")
+		return du, fmt.Errorf("authentication failed: invalid credentials")
 	}
 
 	// Registrar el usuario y obtener el userID generado
-	userID, name, err := ur.RegisterdDoctor(ctxTx, tx, rd)
+	userID, err := ur.registerUser(ctxTx, tx, du.User)
 	if err != nil {
-		return response, fmt.Errorf("failed to register user: %w", err)
+		return du, fmt.Errorf("failed to register doctor user: %w", err)
 	}
 
 	// Registrar la cuenta utilizando el userID generado
-	email, err := ur.RegisterAccountDoctor(ctxTx, tx, rd, userID)
+	err = ur.registerAccount(ctxTx, tx, du.Account, userID)
 	if err != nil {
-		return response, fmt.Errorf("failed to register account: %w", err)
+		return du, fmt.Errorf("failed to register account: %w", err)
 	}
 
-	err = ur.RegisterTypeDoctor(ctxTx, tx, rd)
+	err = ur.registerDoctor(ctxTx, tx, du)
 	if err != nil {
-		return response, fmt.Errorf("failed to register user type: %w", err)
+		return du, fmt.Errorf("failed to register user type: %w", err)
 	}
 
-	// Construir la respuesta
-	response = entities.UserResponse{
-		Name:  name,
-		Email: email,
-	}
-
-	return response, nil
-}
-
-// Función para registrar el doctor en su tabla correspondiente
-func (pr *userRepository) RegisterTypeDoctor(ctx context.Context, tx pgx.Tx, rd entities.RegisterDoctorByAdmin) error {
-	query := "INSERT INTO doctor_user (account_id, specialty_id, medical_license, created_at) VALUES ($1, $2, $3, $4)"
-	_, err := tx.Exec(ctx, query, rd.AccountID, rd.SpecialtyID, rd.DocumentID, time.Now())
-	if err != nil {
-		return fmt.Errorf("insert into table: %w", err)
-	}
-	return nil
-}
-
-// Función para registrar el tipo de usuario en la tabla correspondiente
-func (pr *userRepository) RegisterTypeUser(ctx context.Context, tx pgx.Tx, ru entities.RegisterUserByAdmin) error {
-	var query string
-	var values []interface{}
-
-	if ru.Rol == entities.SuperUsuario {
-		query = "INSERT INTO super_user (account_id, curp, created_at) VALUES ($1, $2, NOW())"
-		values = []interface{}{ru.AccountID, ru.DocumentID}
-	} else if ru.Rol == entities.Patient {
-		query = "INSERT INTO patient_user (account_id, curp, created_at) VALUES ($1, $2, NOW())"
-		values = []interface{}{ru.AccountID, ru.DocumentID}
-	} else {
-		return fmt.Errorf("unknown role: %d", ru.Rol)
-	}
-
-	_, err := tx.Exec(ctx, query, values...)
-	if err != nil {
-		return fmt.Errorf("insert into table: %w", err)
-	}
-
-	return nil
+	return du, nil
 }
