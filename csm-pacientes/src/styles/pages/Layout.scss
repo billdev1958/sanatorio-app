@@ -1,0 +1,41 @@
+/* Contenedor principal que maneja el layout de la app */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%; /* Asegura que no haya desbordamiento */
+}
+
+/* Contenedor principal del layout (lateral y contenido) */
+.main-layout {
+  display: flex;
+  flex-grow: 1;
+  height: 100%;
+  width: 100%; 
+  overflow-x: hidden; /* Evita el desbordamiento horizontal si es necesario */
+}
+
+/* Estilos para el contenido principal */
+.content-area {
+  flex-grow: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  transition: margin-left 0.3s ease; /* Transición suave para el desplazamiento */
+  margin-left: 250px; /* El espacio dejado por el menú lateral en pantallas grandes */
+  width: 100%;
+}
+
+/* En pantallas pequeñas, el contenido no se desplaza cuando el menú lateral está oculto */
+@media (max-width: 768px) {
+  .content-area {
+    margin-left: 0;
+    width: 100%; /* Asegura que ocupe todo el ancho disponible */
+    padding: 1rem 0.5rem; /* Ajusta el padding para pantallas pequeñas */
+  }
+}
+
+/* Cuando el menú lateral está cerrado en pantallas grandes */
+.content-area.menu-closed {
+  margin-left: 0; /* Sin margen cuando el menú está cerrado */
+  width: 100%; /* Asegura que el contenido ocupe todo el ancho */
+}
