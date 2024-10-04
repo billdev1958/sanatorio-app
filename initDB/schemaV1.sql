@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS patient (
     id UUID PRIMARY KEY,
     medical_history_id VARCHAR(12) NOT NULL, -- id de la tabla medical_history
     legacy_id INTEGER,
-    account_id UUID NOT NULL,
+    account_id UUID NOT NULL UNIQUE,
     first_name VARCHAR(50) NOT NULL,
     last_name1 VARCHAR(50) NOT NULL,
     last_name2 VARCHAR(50) NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS medical_history_relation (
 
 CREATE TABLE IF NOT EXISTS medical_history (
     -- Para un futuras probabilidades de escalabilidad el identificador de expediente cambiara a UUID por ahora sera el personalizado
-    id VARCHAR(12) NOT NULL,
+    id VARCHAR(12) PRIMARY KEY NOT NULL,
     date_of_record DATE NOT NULL, -- 'Fecha'
     time_of_record TIME NOT NULL, -- 'Hora'
     patient_name VARCHAR(50) NOT NULL, -- 'Nombre'
