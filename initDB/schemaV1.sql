@@ -256,7 +256,7 @@ CREATE TABLE IF NOT EXISTS schedule (
 
 CREATE TABLE IF NOT EXISTS appointment (
     id UUID PRIMARY KEY,
-    doctor_account_id UUID NOT NULL,
+    doctor_id UUID NOT NULL,
     patient_account_id UUID NOT NULL,
     office_id INTEGER NOT NULL,
     time_start TIMESTAMP NOT NULL,
