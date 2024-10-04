@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS user_roles (
 );
 
 -- ====================================
--- Tablas relacionadas con pacientes, médicos y beneficiarios
+-- Tablas relacionadas con pacientes, médicos, beneficiarios y super-usuarios
 -- ====================================
 
 -- Tabla de pacientes
@@ -119,7 +119,21 @@ CREATE TABLE IF NOT EXISTS beneficiary (
     first_name VARCHAR(50) NOT NULL,
     last_name1 VARCHAR(50) NOT NULL,
     last_name2 VARCHAR(50) NOT NULL,
+    curp CHAR(18) NOT NULL,
     sex CHAR(1) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+
+-- Tabla de super usuarios
+CREATE TABLE IF NOT EXISTS super_user (
+    id UUID PRIMARY KEY,
+    account_id UUID NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name1 VARCHAR(50) NOT NULL,
+    last_name2 VARCHAR(50) NOT NULL,
+    curp CHAR(18) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -346,11 +360,6 @@ ALTER TABLE affiliation_patient
 ADD CONSTRAINT fk_affiliation_dependency_id
 FOREIGN KEY (dependency_id) REFERENCES cat_dependencies(id);
 
--- Foreign keys para la tabla super_user
-ALTER TABLE super_user
-ADD CONSTRAINT fk_account_super_user
-FOREIGN KEY (account_id) REFERENCES account(id);
-
 -- Foreign keys para la tabla patient
 ALTER TABLE patient
 ADD CONSTRAINT fk_account_patient
@@ -452,6 +461,11 @@ FOREIGN KEY (role_id) REFERENCES role(id);
 ALTER TABLE consultation
 ADD CONSTRAINT fk_patient_consultation
 FOREIGN KEY (patient_id) REFERENCES patient(id);
+
+-- Foreign keys para la tabla super_user
+ALTER TABLE super_user
+ADD CONSTRAINT fk_account_super_user
+FOREIGN KEY (account_id) REFERENCES account(id);
 
 -- ====================================
 -- Funciones y triggers
