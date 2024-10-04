@@ -1,3 +1,4 @@
+-- Tabla de roles
 CREATE TABLE IF NOT EXISTS role (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -6,11 +7,40 @@ CREATE TABLE IF NOT EXISTS role (
     deleted_at TIMESTAMP
 );
 
+-- Tabla de permisos
+CREATE TABLE IF NOT EXISTS permissions (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(60) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+
+-- Tabla intermedia para rol y permiso (relación muchos a muchos)
+CREATE TABLE IF NOT EXISTS role_permission(
+    id_role INTEGER NOT NULL,
+    id_permission INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP,
+    PRIMARY KEY (id_role, id_permission) -- Clave primaria compuesta
+);
+
+-- Tabla para asociar roles a usuarios
+CREATE TABLE IF NOT EXISTS user_roles(
+    id SERIAL PRIMARY KEY, 
+    account_id UUID NOT NULL, -- Relación con la cuenta/usuario
+    role_id INTEGER NOT NULL,    -- Relación con roles
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP,
+    UNIQUE (account_id, role_id) -- Clave única para evitar duplicados
+);
+
 CREATE TABLE IF NOT EXISTS account (
     id UUID PRIMARY KEY,
-    user_id INT,
     telefono VARCHAR(10) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(75) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -20,10 +50,10 @@ CREATE TABLE IF NOT EXISTS account (
 );
 
 CREATE TABLE IF NOT EXISTS super_user (
-    id SERIAL PRIMARY KEY,
-    first_name VARCHAR(255) NOT NULL,
-    last_name1 VARCHAR(255) NOT NULL,
-    last_name2 VARCHAR(255) NOT NULL,
+    id UUID PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name1 VARCHAR(50) NOT NULL,
+    last_name2 VARCHAR(50) NOT NULL,
     account_id UUID NOT NULL,
     curp CHAR(18) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -32,14 +62,15 @@ CREATE TABLE IF NOT EXISTS super_user (
 );
 
 CREATE TABLE IF NOT EXISTS patient (
-    id SERIAL PRIMARY KEY,
-    record_id UUID NOT NULL, -- id de la tabla medical_history
+    id UUID PRIMARY KEY,
+    medical_history_id VARCHAR(12) NOT NULL, -- id de la tabla medical_history
+    legacy_id INTEGER,
     account_id UUID NOT NULL,
-    first_name VARCHAR(255) NOT NULL,
-    last_name1 VARCHAR(255) NOT NULL,
-    last_name2 VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name1 VARCHAR(50) NOT NULL,
+    last_name2 VARCHAR(50) NOT NULL,
     curp CHAR(18) NOT NULL,
-    sex CHAR(1) NOT NULL
+    sex CHAR(1) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -47,18 +78,32 @@ CREATE TABLE IF NOT EXISTS patient (
 
 --beneficiarios
 CREATE TABLE IF NOT EXISTS beneficiary (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     account_holder UUID NOT NULL, -- id de la cuenta principal
-    first_name VARCHAR(255) NOT NULL,
-    last_name1 VARCHAR(255) NOT NULL,
-    last_name2 VARCHAR(255) NOT NULL,
-    record_id UUID NOT NULL, -- id de la tabla medical_history
-    sex CHAR(1) NOT NULL
+    medical_history_id VARCHAR(12) NOT NULL, -- id de la tabla medical_history
+    first_name VARCHAR(50) NOT NULL,
+    last_name1 VARCHAR(50) NOT NULL,
+    last_name2 VARCHAR(50) NOT NULL,
+    sex CHAR(1) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS medical_history_relation (
+    id UUID PRIMARY KEY,
+    medical_history_id VARCHAR(12) NOT NULL,
+    patient_id UUID,
+    beneficiary_id UUID,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    CHECK (patient_id IS NOT NULL OR beneficiary_id IS NOT NULL)
+);
+
 
 CREATE TABLE IF NOT EXISTS medical_history (
     -- Para un futuras probabilidades de escalabilidad el identificador de expediente cambiara a UUID por ahora sera el personalizado
-    id VARCHAR(12) NOT NULL
+    id VARCHAR(12) NOT NULL,
     date_of_record DATE NOT NULL, -- 'Fecha'
     time_of_record TIME NOT NULL, -- 'Hora'
     patient_name VARCHAR(50) NOT NULL, -- 'Nombre'
@@ -171,20 +216,28 @@ CREATE TABLE IF NOT EXISTS office (
     name VARCHAR(60) NOT NULL,
     specialty_id INTEGER NOT NULL,
     status_id INTEGER NOT NULL,
-    doctor_account_id UUID NOT NULL,
+    doctor_id UUID NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS specialty (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(75) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS doctor (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     account_id UUID NOT NULL,
-    first_name VARCHAR(255) NOT NULL,
-    last_name1 VARCHAR(255) NOT NULL,
-    last_name2 VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name1 VARCHAR(50) NOT NULL,
+    last_name2 VARCHAR(50) NOT NULL,
     specialty_id INT NOT NULL,
-    medical_license VARCHAR(255) NOT NULL,
+    medical_license VARCHAR(25) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -231,7 +284,7 @@ CREATE TABLE IF NOT EXISTS consultation (
 CREATE TABLE IF NOT EXISTS attachment (
     id SERIAL PRIMARY KEY,
     consultation_id INT REFERENCES consultation(id) ON DELETE CASCADE,
-    patient_id INT REFERENCES patient(id) ON DELETE CASCADE,
+    patient_id UUID REFERENCES patient(id) ON DELETE CASCADE,
     file_path VARCHAR NOT NULL,
     file_name VARCHAR NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -261,7 +314,7 @@ FOREIGN KEY (status_id) REFERENCES office_status(id);
 
 ALTER TABLE office
 ADD CONSTRAINT fk_doctor_office
-FOREIGN KEY (doctor_account_id) REFERENCES doctor(account_id);
+FOREIGN KEY (doctor_id) REFERENCES doctor(id);
 
 ALTER TABLE doctor
 ADD CONSTRAINT fk_account_doctor
@@ -281,7 +334,7 @@ FOREIGN KEY (schedule_id) REFERENCES schedule(id);
 
 ALTER TABLE appointment
 ADD CONSTRAINT fk_doctor_appointment
-FOREIGN KEY (doctor_account_id) REFERENCES doctor(account_id);
+FOREIGN KEY (doctor_id) REFERENCES doctor(id);
 
 ALTER TABLE appointment
 ADD CONSTRAINT fk_patient_appointment
@@ -302,6 +355,48 @@ FOREIGN KEY (account_holder) REFERENCES account(id);
 ALTER TABLE consultation
 ADD CONSTRAINT fk_patient_consultation
 FOREIGN KEY (patient_id) REFERENCES patient(id);
+
+
+-- Roles foreing keys 
+ALTER TABLE role_permission
+    ADD CONSTRAINT fk_role_permission_role
+    FOREIGN KEY (id_role) REFERENCES role(id);
+
+ALTER TABLE role_permission
+    ADD CONSTRAINT fk_role_permission_permission
+    FOREIGN KEY (id_permission) REFERENCES permissions(id);
+
+ALTER TABLE user_roles
+    ADD CONSTRAINT fk_user_roles_account
+    FOREIGN KEY (account_id) REFERENCES account(id);
+
+ALTER TABLE user_roles
+    ADD CONSTRAINT fk_user_roles_role
+    FOREIGN KEY (role_id) REFERENCES role(id);
+
+ALTER TABLE patient
+ADD CONSTRAINT fk_record_patient
+FOREIGN KEY (medical_history_id) REFERENCES medical_history(id);
+
+ALTER TABLE beneficiary
+ADD CONSTRAINT fk_record_beneficiary
+FOREIGN KEY (medical_history_id) REFERENCES medical_history(id);
+
+-- Foreign keys for medical_history_relation
+
+ALTER TABLE medical_history_relation
+ADD CONSTRAINT fk_medical_history_relation_medical_history
+FOREIGN KEY (medical_history_id) REFERENCES medical_history(id);
+
+ALTER TABLE medical_history_relation
+ADD CONSTRAINT fk_medical_history_relation_patient
+FOREIGN KEY (patient_id) REFERENCES patient(id);
+
+ALTER TABLE medical_history_relation
+ADD CONSTRAINT fk_medical_history_relation_beneficiary
+FOREIGN KEY (beneficiary_id) REFERENCES beneficiary(id);
+
+
 
 -- Validation function --
 
