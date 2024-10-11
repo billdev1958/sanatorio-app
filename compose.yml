@@ -12,18 +12,6 @@ services:
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: university_db
 
-  app:
-    build:
-      context: ./sanatorio-back
-      dockerfile: Dockerfile
-    depends_on:
-      - db
-    env_file:
-      - ./sanatorio-back/.env
-    restart: always
-    ports:
-      - "8080:8080"
-
 
 volumes:
   db_data:

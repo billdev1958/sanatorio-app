@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS role_permission (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
-    PRIMARY KEY (id_role, id_permission) -- Clave primaria compuesta
+    PRIMARY KEY (role_id, permission_id) -- Clave primaria compuesta
 );
 
 -- Tabla para asociar roles a usuarios
@@ -347,19 +347,10 @@ CREATE TABLE IF NOT EXISTS incapacity (
 -- Claves foráneas
 -- ====================================
 
-
-ALTER TABLE role_permission
-ADD CONSTRAINT fk_role_permission_role
-FOREIGN KEY (role_id) REFERENCES role(id);
-
-ALTER TABLE role_permission
-ADD CONSTRAINT fk_role_permission_permission
-FOREIGN KEY (permission_id) REFERENCES permissions(id);
-
 -- Foreign keys para la tabla account
 ALTER TABLE account
 ADD CONSTRAINT fk_role_account
-FOREIGN KEY (role_id) REFERENCES role(id);
+FOREIGN KEY (role_id) REFERENCES cat_role(id);
 
 ALTER TABLE account 
 ADD CONSTRAINT fk_dependency_id
@@ -451,11 +442,11 @@ FOREIGN KEY (beneficiary_id) REFERENCES beneficiary(id);
 -- Foreign keys para la tabla role_permission
 ALTER TABLE role_permission
 ADD CONSTRAINT fk_role_permission_role
-FOREIGN KEY (id_role) REFERENCES role(id);
+FOREIGN KEY (role_id) REFERENCES cat_role(id);
 
 ALTER TABLE role_permission
 ADD CONSTRAINT fk_role_permission_permission
-FOREIGN KEY (id_permission) REFERENCES permissions(id);
+FOREIGN KEY (permission_id) REFERENCES permissions(id);
 
 -- Foreign keys para la tabla user_roles
 ALTER TABLE user_roles
@@ -464,7 +455,7 @@ FOREIGN KEY (account_id) REFERENCES account(id);
 
 ALTER TABLE user_roles
 ADD CONSTRAINT fk_user_roles_role
-FOREIGN KEY (role_id) REFERENCES role(id);
+FOREIGN KEY (role_id) REFERENCES cat_role(id);
 
 -- Foreign keys para la tabla consultation
 ALTER TABLE consultation
