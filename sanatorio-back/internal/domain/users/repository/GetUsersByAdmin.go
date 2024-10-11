@@ -1,14 +1,6 @@
 package repository
 
-import (
-	"context"
-	"fmt"
-	"sanatorioApp/internal/domain/users/entities"
-
-	"github.com/jackc/pgx/v5"
-)
-
-func (ur *userRepository) GetSuperUserByID(ctx context.Context, superUserID int) (entities.SuperUser, error) {
+/*func (ur *userRepository) GetSuperUserByID(ctx context.Context, superUserID int) (entities.SuperUser, error) {
 	var user entities.SuperUser
 
 	query := `
@@ -44,7 +36,7 @@ func (ur *userRepository) GetSuperAdmins(ctx context.Context) ([]entities.SuperU
 	var users []entities.SuperUser
 
 	query := `
-		SELECT u.id, u.name, u.lastname1, u.lastname2, a.email, a.rol, 
+		SELECT u.id, u.name, u.lastname1, u.lastname2, a.email, a.rol,
 		       su.curp, su.created_at
 		FROM users u
 		INNER JOIN account a ON u.id = a.user_id
@@ -149,7 +141,7 @@ func (ur *userRepository) GetPatients(ctx context.Context) ([]entities.PatientUs
 	var users []entities.PatientUser
 
 	query := `
-		SELECT u.id, u.name, u.lastname1, u.lastname2, a.email, a.rol, 
+		SELECT u.id, u.name, u.lastname1, u.lastname2, a.email, a.rol,
 		       su.curp, su.created_at
 		FROM users u
 		INNER JOIN account a ON u.id = a.user_id
@@ -183,3 +175,4 @@ func (ur *userRepository) GetPatients(ctx context.Context) ([]entities.PatientUs
 
 	return users, nil
 }
+*/

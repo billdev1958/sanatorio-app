@@ -4,12 +4,22 @@ import (
 	"context"
 	"fmt"
 	"log"
+	user "sanatorioApp/internal/domain/users"
 	"sanatorioApp/internal/domain/users/entities"
+	postgres "sanatorioApp/internal/infraestructure/db"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
+
+type userRepository struct {
+	storage *postgres.PgxStorage
+}
+
+func NewUserRepository(storage *postgres.PgxStorage) user.Repository {
+	return &userRepository{storage: storage}
+}
 
 // Función para registrar un usuario
 func (ur *userRepository) RegisterPatientTransaction(ctx context.Context, pu entities.PatientUser) (entities.PatientUser, error) {
@@ -54,29 +64,6 @@ func (ur *userRepository) RegisterPatientTransaction(ctx context.Context, pu ent
 	}
 
 	return pu, nil
-}
-
-// Funciones auxiliares para registrar usuarios
-func (pr *userRepository) registerSuperAdmin(ctx context.Context, tx pgx.Tx, su entities.SuperUser) (entities.SuperUser, error) {
-	// Verificar que los campos obligatorios estén presentes
-	if su.AccountID == uuid.Nil || su.Curp == "" {
-		return su, fmt.Errorf("invalid input: missing required fields")
-	}
-
-	if su.Account.Rol != entities.SuperUsuario {
-		return su, fmt.Errorf("invalid rol: required type super_usuario")
-	}
-
-	// Preparar la consulta para insertar el tipo de doctor
-	query := "INSERT INTO super_user (account_id, curp, created_at) VALUES ($1, $2, $3)"
-
-	// Ejecutar la consulta dentro de la transacción
-	_, err := tx.Exec(ctx, query, su.AccountID, su.Curp, time.Now())
-	if err != nil {
-		return su, fmt.Errorf("insert into super_user table: %w", err)
-	}
-
-	return su, nil
 }
 
 func (pr *userRepository) registerDoctor(ctx context.Context, tx pgx.Tx, du entities.DoctorUser) error {

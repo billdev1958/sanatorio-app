@@ -19,7 +19,7 @@ func NewPgxStorage(dbPool *pgxpool.Pool) *PgxStorage {
 }
 
 func (storage *PgxStorage) SeedRoles(ctx context.Context) (err error) {
-	rolesValues := [3]string{"Super Usuario", "Doctor", "Paciente"}
+	rolesValues := [4]string{"SuperAdmin", "Admin", "Doctor", "Patient"}
 
 	var count int
 
@@ -42,6 +42,98 @@ func (storage *PgxStorage) SeedRoles(ctx context.Context) (err error) {
 	}
 
 	fmt.Println("Valores insertados correctamente en cat_rol")
+	return nil
+}
+
+func (storage *PgxStorage) SeedPermissions(ctx context.Context) (err error) {
+	permissionsValues := [16]string{"CreateUsers", "ViewUsers", "EditUsers", "DeleteUsers", "CreateSchedule", "ViewSchedule", "EditSchedule", "DeleteSchedule", "CreateAppointment", "ViewAppointment", "EditAppointment", "DeleteAppointment", "CreateMedicalHistory", "ViewMedicalHistory", "EditMedicalHistory", "DeleteMedicalHistory"}
+
+	var count int
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM permissions").Scan(&count)
+	if err != nil {
+		return fmt.Errorf("count permissions: %w", err)
+	}
+	if count > 0 {
+		fmt.Println("La tabla permissions ya contiene datos")
+		return nil
+	}
+
+	query := "INSERT INTO permissions (name)"
+	for _, value := range permissionsValues {
+		_, err = storage.DbPool.Exec(ctx, query, value)
+		if err != nil {
+			return fmt.Errorf("insert permissions: %w", err)
+		}
+	}
+
+	fmt.Println("Valores insertados correctamente en permissions")
+	return nil
+
+}
+
+func (storage *PgxStorage) SeedRolePermissions(ctx context.Context) (err error) {
+	// superAdmin = 1
+	superAdminPermissions := []int{
+		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+	}
+
+	adminPermissions := []int{
+		1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+	}
+
+	doctorPermissions := []int{
+		10, 11, 12, 13, 14, 15, 16,
+	}
+
+	patientPermissions := []int{
+		9, 10, 11, 12, 14,
+	}
+
+	var count int
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM role_permissions").Scan(&count)
+	if err != nil {
+		return fmt.Errorf("count role_permissions %w: ", err)
+	}
+
+	if count > 0 {
+		fmt.Println("La tabla role_permissions ya contiene datos")
+		return nil
+	}
+
+	err = insertPermissions(ctx, storage, 1, superAdminPermissions)
+	if err != nil {
+		return err
+	}
+
+	err = insertPermissions(ctx, storage, 2, adminPermissions)
+	if err != nil {
+		return err
+	}
+
+	err = insertPermissions(ctx, storage, 3, doctorPermissions)
+	if err != nil {
+		return err
+	}
+
+	err = insertPermissions(ctx, storage, 4, patientPermissions)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("permisos insertados correctamente en la tabla role_permissions")
+
+	return nil
+}
+
+func insertPermissions(ctx context.Context, storage *PgxStorage, roleID int, permissions []int) error {
+	query := "INSERT INTO role_permissions (role_id, permission_id) VALUES($1, $2)"
+
+	for _, permission := range permissions {
+		_, err := storage.DbPool.Exec(ctx, query, roleID, permission)
+		if err != nil {
+			return fmt.Errorf("error inserting role %d, permission %d: %w", roleID, permission, err)
+		}
+	}
 	return nil
 }
 

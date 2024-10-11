@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS account (
 -- ====================================
 
 -- Tabla de roles
-CREATE TABLE IF NOT EXISTS role (
+CREATE TABLE IF NOT EXISTS cat_role (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -58,8 +58,8 @@ CREATE TABLE IF NOT EXISTS permissions (
 
 -- Tabla intermedia para rol y permiso (relación muchos a muchos)
 CREATE TABLE IF NOT EXISTS role_permission (
-    id_role INTEGER NOT NULL,
-    id_permission INTEGER NOT NULL,
+    role_id INTEGER NOT NULL,
+    permission_id INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
@@ -346,6 +346,15 @@ CREATE TABLE IF NOT EXISTS incapacity (
 -- ====================================
 -- Claves foráneas
 -- ====================================
+
+
+ALTER TABLE role_permission
+ADD CONSTRAINT fk_role_permission_role
+FOREIGN KEY (role_id) REFERENCES role(id);
+
+ALTER TABLE role_permission
+ADD CONSTRAINT fk_role_permission_permission
+FOREIGN KEY (permission_id) REFERENCES permissions(id);
 
 -- Foreign keys para la tabla account
 ALTER TABLE account

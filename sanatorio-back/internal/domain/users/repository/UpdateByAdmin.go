@@ -1,15 +1,6 @@
 package repository
 
-import (
-	"context"
-	"fmt"
-	"sanatorioApp/internal/domain/users/entities"
-	"strings"
-
-	"github.com/jackc/pgx/v5"
-)
-
-func (ur *userRepository) UpdateSuperUser(ctx context.Context, ad entities.AdminData, userUpdate entities.SuperUser) (string, error) {
+/*func (ur *userRepository) UpdateSuperUser(ctx context.Context, ad entities.AdminData, userUpdate entities.SuperUser) (string, error) {
 	// Iniciar la transacción
 	tx, err := ur.storage.DbPool.Begin(ctx)
 	if err != nil {
@@ -284,3 +275,4 @@ func (ur *userRepository) UpdatePatient(ctx context.Context, ad entities.AdminDa
 
 	return fmt.Sprintf("User %s updated successfully", updatedName), nil
 }
+*/

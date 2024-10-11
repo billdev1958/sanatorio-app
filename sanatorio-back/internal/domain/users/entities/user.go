@@ -6,15 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type Roles int
-
-const (
-	_ = iota
-	SuperUsuario
-	Doctor
-	Patient
-)
-
 type Specialties int
 
 const (
@@ -24,53 +15,64 @@ const (
 	Psiquiatria
 )
 
-type AdminData struct {
-	AccountID     uuid.UUID
-	RoleAdmin     int
-	PasswordAdmin string
-}
-
 type Account struct {
 	AccountID           uuid.UUID
+	AfiliationID        int
 	UserID              int
+	PhoneNumber         string
 	Email               string
 	Password            string
 	Rol                 Roles
 	Created_At          time.Time
 	Updated_At          time.Time
 	Password_Changed_At time.Time
+	Deleted_At          time.Time
 }
 
-type User struct {
-	ID         int
-	Name       string
-	Lastname1  string
+// UsersTypes
+type SuperAdminUser struct {
+	Account
+	FirstName  string
+	LastName1  string
 	Lastname2  string
+	Curp       string
+	Sex        byte
 	Created_At time.Time
 	Updated_At time.Time
 }
 
-type SuperUser struct {
-	User
+type AdminUser struct {
 	Account
+	FirstName  string
+	LastName1  string
+	Lastname2  string
 	Curp       string
+	Sex        byte
 	Created_At time.Time
 	Updated_At time.Time
 }
 
 type DoctorUser struct {
-	User
 	Account
 	MedicalLicense string
 	SpecialtyID    Specialties
+	FirstName      string
+	LastName1      string
+	Lastname2      string
+	Sex            byte
 	Created_At     time.Time
 	Updated_At     time.Time
 }
 
 type PatientUser struct {
-	User
+	ID               uuid.UUID
+	MedicalHistoryID string
 	Account
+	FirstName  string
+	LastName1  string
+	Lastname2  string
 	Curp       string
+	Sex        byte
 	Created_At time.Time
 	Updated_At time.Time
 }
