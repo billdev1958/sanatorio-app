@@ -21,6 +21,7 @@ func NewUserRepository(storage *postgres.PgxStorage) user.Repository {
 	return &userRepository{storage: storage}
 }
 
+// TODO corregir registro
 // Función para registrar un usuario
 func (ur *userRepository) RegisterPatientTransaction(ctx context.Context, pu entities.PatientUser) (entities.PatientUser, error) {
 	// Iniciar la transacción
@@ -45,17 +46,11 @@ func (ur *userRepository) RegisterPatientTransaction(ctx context.Context, pu ent
 		}
 	}()
 
-	// Registrar el usuario y obtener el userID generado
-	userID, err := ur.registerUser(ctxTx, tx, pu.User)
-	if err != nil {
-		return pu, fmt.Errorf("failed to register user: %w", err)
-	}
-
 	// Registrar la cuenta utilizando el userID generado
-	err = ur.registerAccount(ctxTx, tx, pu.Account, userID)
+	/*err = ur.registerAccount(ctxTx, tx, pu.Account, userID)
 	if err != nil {
 		return pu, fmt.Errorf("failed to register account: %w", err)
-	}
+	}*/
 
 	// Registrar al paciente en su tabla correspondiente (ignorar valores no necesarios)
 	err = ur.registerPatient(ctxTx, tx, pu)
@@ -64,24 +59,6 @@ func (ur *userRepository) RegisterPatientTransaction(ctx context.Context, pu ent
 	}
 
 	return pu, nil
-}
-
-func (pr *userRepository) registerDoctor(ctx context.Context, tx pgx.Tx, du entities.DoctorUser) error {
-	// Verificar que los campos obligatorios estén presentes
-	if du.AccountID == uuid.Nil || du.SpecialtyID == 0 || du.MedicalLicense == "" {
-		return fmt.Errorf("invalid input: missing required fields")
-	}
-
-	// Preparar la consulta para insertar el tipo de doctor
-	query := "INSERT INTO doctor_user (account_id, specialty_id, medical_license, created_at) VALUES ($1, $2, $3, $4)"
-
-	// Ejecutar la consulta dentro de la transacción
-	_, err := tx.Exec(ctx, query, du.AccountID, du.SpecialtyID, du.MedicalLicense, time.Now())
-	if err != nil {
-		return fmt.Errorf("insert into doctor_user table: %w", err)
-	}
-
-	return nil
 }
 
 func (pr *userRepository) registerPatient(ctx context.Context, tx pgx.Tx, pt entities.PatientUser) error {
@@ -116,14 +93,4 @@ func (pr *userRepository) registerAccount(ctx context.Context, tx pgx.Tx, ru ent
 		return fmt.Errorf("insert account: %w", err)
 	}
 	return nil
-}
-
-func (pr *userRepository) registerUser(ctx context.Context, tx pgx.Tx, ru entities.User) (int, error) {
-	var userID int
-	query := "INSERT INTO users (name, lastname1, lastname2, created_at) VALUES ($1, $2, $3, $4) RETURNING id"
-	err := tx.QueryRow(ctx, query, ru.Name, ru.Lastname1, ru.Lastname2, time.Now()).Scan(&userID)
-	if err != nil {
-		return 0, fmt.Errorf("insert user: %w", err)
-	}
-	return userID, nil
 }

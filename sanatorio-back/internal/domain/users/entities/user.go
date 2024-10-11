@@ -29,36 +29,14 @@ type Account struct {
 	Deleted_At          time.Time
 }
 
-// UsersTypes
-type SuperAdminUser struct {
-	Account
-	FirstName  string
-	LastName1  string
-	Lastname2  string
-	Curp       string
-	Sex        byte
-	Created_At time.Time
-	Updated_At time.Time
-}
-
-type AdminUser struct {
-	Account
-	FirstName  string
-	LastName1  string
-	Lastname2  string
-	Curp       string
-	Sex        byte
-	Created_At time.Time
-	Updated_At time.Time
-}
-
 type DoctorUser struct {
+	ID uuid.UUID
 	Account
 	MedicalLicense string
 	SpecialtyID    Specialties
 	FirstName      string
 	LastName1      string
-	Lastname2      string
+	LastName2      string
 	Sex            byte
 	Created_At     time.Time
 	Updated_At     time.Time
@@ -67,10 +45,11 @@ type DoctorUser struct {
 type PatientUser struct {
 	ID               uuid.UUID
 	MedicalHistoryID string
+	LegacyID         string
 	Account
 	FirstName  string
 	LastName1  string
-	Lastname2  string
+	LastName2  string
 	Curp       string
 	Sex        byte
 	Created_At time.Time

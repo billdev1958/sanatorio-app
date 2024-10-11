@@ -3,10 +3,8 @@ package postgres
 import (
 	"context"
 	"fmt"
-	password "sanatorioApp/pkg/pass"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -23,17 +21,17 @@ func (storage *PgxStorage) SeedRoles(ctx context.Context) (err error) {
 
 	var count int
 
-	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM cat_rol").Scan(&count)
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM cat_role").Scan(&count)
 	if err != nil {
 		return fmt.Errorf("count roles: %w", err)
 	}
 
 	if count > 0 {
-		fmt.Println("La tabla cat_rol ya contiene datos")
+		fmt.Println("La tabla cat_role ya contiene datos")
 		return nil
 	}
 
-	query := "INSERT INTO cat_rol (name, created_at) VALUES($1, $2)"
+	query := "INSERT INTO cat_role (name, created_at) VALUES($1, $2)"
 	for _, value := range rolesValues {
 		_, err = storage.DbPool.Exec(ctx, query, value, time.Now())
 		if err != nil {
@@ -41,7 +39,7 @@ func (storage *PgxStorage) SeedRoles(ctx context.Context) (err error) {
 		}
 	}
 
-	fmt.Println("Valores insertados correctamente en cat_rol")
+	fmt.Println("Valores insertados correctamente en cat_role")
 	return nil
 }
 
@@ -58,7 +56,7 @@ func (storage *PgxStorage) SeedPermissions(ctx context.Context) (err error) {
 		return nil
 	}
 
-	query := "INSERT INTO permissions (name)"
+	query := "INSERT INTO permissions (name) VALUES ($1)"
 	for _, value := range permissionsValues {
 		_, err = storage.DbPool.Exec(ctx, query, value)
 		if err != nil {
@@ -90,13 +88,13 @@ func (storage *PgxStorage) SeedRolePermissions(ctx context.Context) (err error) 
 	}
 
 	var count int
-	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM role_permissions").Scan(&count)
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM role_permission").Scan(&count)
 	if err != nil {
 		return fmt.Errorf("count role_permissions %w: ", err)
 	}
 
 	if count > 0 {
-		fmt.Println("La tabla role_permissions ya contiene datos")
+		fmt.Println("La tabla role_permission ya contiene datos")
 		return nil
 	}
 
@@ -120,13 +118,13 @@ func (storage *PgxStorage) SeedRolePermissions(ctx context.Context) (err error) 
 		return err
 	}
 
-	fmt.Println("permisos insertados correctamente en la tabla role_permissions")
+	fmt.Println("permisos insertados correctamente en la tabla role_permission")
 
 	return nil
 }
 
 func insertPermissions(ctx context.Context, storage *PgxStorage, roleID int, permissions []int) error {
-	query := "INSERT INTO role_permissions (role_id, permission_id) VALUES($1, $2)"
+	query := "INSERT INTO role_permission (role_id, permission_id) VALUES($1, $2)"
 
 	for _, permission := range permissions {
 		_, err := storage.DbPool.Exec(ctx, query, roleID, permission)
@@ -161,7 +159,7 @@ func (storage *PgxStorage) SeedOfficeStatus(ctx context.Context) (err error) {
 	return nil
 }
 
-func (storage *PgxStorage) SeedAdminUser(ctx context.Context) (err error) {
+/*func (storage *PgxStorage) SeedAdminUser(ctx context.Context) (err error) {
 	// Verificar si ya existe un usuario con el correo electrónico especificado
 	var count int
 	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM account WHERE email = $1", "bilxd1958@gmail.com").Scan(&count)
@@ -207,23 +205,23 @@ func (storage *PgxStorage) SeedAdminUser(ctx context.Context) (err error) {
 
 	fmt.Println("Usuario administrador insertado correctamente")
 	return nil
-}
+}*/
 
 func (storage *PgxStorage) SeedSpecialties(ctx context.Context) (err error) {
 	specialtiesValues := [5]string{"Medicina General", "Cardiologo", "Dermatologo", "Pediatra", "Ginecologia"}
 
 	var count int
-	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM cat_specialty").Scan(&count)
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM specialty").Scan(&count)
 	if err != nil {
 		return fmt.Errorf("count specialties: %w", err)
 	}
 
 	if count > 0 {
-		fmt.Println("La tabla cat_specialty ya contiene datos")
+		fmt.Println("La tabla specialty ya contiene datos")
 		return nil
 	}
 
-	query := "INSERT INTO cat_specialty (name, created_at) VALUES($1, $2)"
+	query := "INSERT INTO specialty (name, created_at) VALUES($1, $2)"
 	for _, value := range specialtiesValues {
 		_, err = storage.DbPool.Exec(ctx, query, value, time.Now())
 		if err != nil {
@@ -231,7 +229,7 @@ func (storage *PgxStorage) SeedSpecialties(ctx context.Context) (err error) {
 		}
 	}
 
-	fmt.Println("Especialidades insertadas correctamente en cat_specialty")
+	fmt.Println("Especialidades insertadas correctamente en specialty")
 	return nil
 }
 
