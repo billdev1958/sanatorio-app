@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS affiliation_patient (
 CREATE TABLE IF NOT EXISTS account (
     id UUID PRIMARY KEY,
     affiliation_id INTEGER NOT NULL,
-    telefono VARCHAR(10) NOT NULL,
+    phone VARCHAR(10) NOT NULL,
     email VARCHAR(75) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role_id INT NOT NULL,
