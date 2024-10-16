@@ -18,7 +18,6 @@ const (
 type Account struct {
 	AccountID           uuid.UUID
 	AfiliationID        int
-	UserID              int
 	PhoneNumber         string
 	Email               string
 	Password            string
@@ -30,8 +29,7 @@ type Account struct {
 }
 
 type DoctorUser struct {
-	ID uuid.UUID
-	Account
+	AccountID      uuid.UUID
 	MedicalLicense string
 	SpecialtyID    Specialties
 	FirstName      string
@@ -43,15 +41,14 @@ type DoctorUser struct {
 }
 
 type PatientUser struct {
-	ID               uuid.UUID
+	AccountID        uuid.UUID
 	MedicalHistoryID string
 	LegacyID         string
-	Account
-	FirstName  string
-	LastName1  string
-	LastName2  string
-	Curp       string
-	Sex        byte
-	Created_At time.Time
-	Updated_At time.Time
+	FirstName        string
+	LastName1        string
+	LastName2        string
+	Curp             string
+	Sex              byte
+	Created_At       time.Time
+	Updated_At       time.Time
 }

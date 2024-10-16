@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS affiliation_patient (
 CREATE TABLE IF NOT EXISTS account (
     id UUID PRIMARY KEY,
     affiliation_id INTEGER NOT NULL,
-    telefono VARCHAR(10) NOT NULL,
+    phone VARCHAR(10) NOT NULL,
     email VARCHAR(75) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role_id INT NOT NULL,
@@ -83,10 +83,9 @@ CREATE TABLE IF NOT EXISTS user_roles (
 
 -- Tabla de pacientes
 CREATE TABLE IF NOT EXISTS patient (
-    id UUID PRIMARY KEY,
+    account_id UUID NOT NULL PRIMARY KEY UNIQUE,
     medical_history_id VARCHAR(12) NOT NULL, -- id de la tabla medical_history
     legacy_id INTEGER,
-    account_id UUID NOT NULL UNIQUE,
     first_name VARCHAR(50) NOT NULL,
     last_name1 VARCHAR(50) NOT NULL,
     last_name2 VARCHAR(50) NOT NULL,
@@ -99,8 +98,7 @@ CREATE TABLE IF NOT EXISTS patient (
 
 -- Tabla de médicos
 CREATE TABLE IF NOT EXISTS doctor (
-    id UUID PRIMARY KEY,
-    account_id UUID NOT NULL,
+    account_id UUID NOT NULL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name1 VARCHAR(50) NOT NULL,
     last_name2 VARCHAR(50) NOT NULL,
@@ -126,10 +124,22 @@ CREATE TABLE IF NOT EXISTS beneficiary (
     deleted_at TIMESTAMP
 );
 
--- Tabla de super usuarios
-CREATE TABLE IF NOT EXISTS super_user (
-    id UUID PRIMARY KEY,
-    account_id UUID NOT NULL,
+-- Tabla de recepcionista
+CREATE TABLE IF NOT EXISTS recepcionista (
+    account_id UUID NOT NULL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name1 VARCHAR(50) NOT NULL,
+    last_name2 VARCHAR(50) NOT NULL,
+    curp CHAR(18) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+
+
+-- Tabla de super admin
+CREATE TABLE IF NOT EXISTS super_admin (
+    account_id UUID NOT NULL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name1 VARCHAR(50) NOT NULL,
     last_name2 VARCHAR(50) NOT NULL,
@@ -309,39 +319,40 @@ CREATE TABLE IF NOT EXISTS services (
 
 -- Tabla de notas de evolución
 CREATE TABLE IF NOT EXISTS evolution_note (
-    folio SERIAL PRIMARY KEY,
-    fecha DATE NOT NULL,
-    nombre VARCHAR(50) NOT NULL,
-    curp CHAR(18) NOT NULL,
-    dependencia VARCHAR(15),
-    afiliacion VARCHAR(15),
-    edad VARCHAR(3) NOT NULL,
-    peso VARCHAR(6) NOT NULL,
-    estatura VARCHAR(6) NOT NULL,
-    fc VARCHAR(6) NOT NULL,
-    fr VARCHAR(6) NOT NULL,
-    ta VARCHAR(6) NOT NULL,
-    temperatura VARCHAR(6) NOT NULL,
-    spo2 VARCHAR(6) NOT NULL,
-    glucosa VARCHAR(6) NOT NULL,
-    notas VARCHAR(6) NOT NULL
+    folio SERIAL PRIMARY KEY, -- folio
+    date DATE NOT NULL, -- fecha
+    name VARCHAR(50) NOT NULL, -- nombre
+    curp CHAR(18) NOT NULL, -- curp
+    department VARCHAR(15), -- dependencia
+    affiliation VARCHAR(15), -- afiliacion
+    age VARCHAR(3) NOT NULL, -- edad
+    weight VARCHAR(6) NOT NULL, -- peso
+    height VARCHAR(6) NOT NULL, -- estatura
+    heart_rate VARCHAR(6) NOT NULL, -- fc
+    respiratory_rate VARCHAR(6) NOT NULL, -- fr
+    blood_pressure VARCHAR(6) NOT NULL, -- ta
+    temperature VARCHAR(6) NOT NULL, -- temperatura
+    spo2 VARCHAR(6) NOT NULL, -- spo2
+    glucose VARCHAR(6) NOT NULL, -- glucosa
+    notes VARCHAR(6) NOT NULL -- notas
 );
 
 -- Tabla de incapacidades
 CREATE TABLE IF NOT EXISTS incapacity (
-    folio SERIAL PRIMARY KEY,
-    fecha DATE NOT NULL,
-    nombre VARCHAR(50) NOT NULL,
-    curp CHAR(18) NOT NULL,
-    dependencia VARCHAR(15),
-    adscrito VARCHAR(15),
-    totaldias VARCHAR(3) NOT NULL,
-    inicio DATE NOT NULL,
-    fin DATE NOT NULL,
-    medico VARCHAR(50) NOT NULL,
-    servicio VARCHAR(20) NOT NULL,
-    clave VARCHAR(10) NOT NULL
+    folio SERIAL PRIMARY KEY, -- folio
+    date DATE NOT NULL, -- fecha
+    name VARCHAR(50) NOT NULL, -- nombre
+    curp CHAR(18) NOT NULL, -- curp
+    department VARCHAR(15), -- dependencia
+    assigned_to VARCHAR(15), -- adscrito
+    total_days VARCHAR(3) NOT NULL, -- totaldias
+    start DATE NOT NULL, -- inicio
+    end DATE NOT NULL, -- fin
+    doctor VARCHAR(50) NOT NULL, -- medico
+    service VARCHAR(20) NOT NULL, -- servicio
+    key_code VARCHAR(10) NOT NULL -- clave
 );
+
 
 -- ====================================
 -- Claves foráneas
@@ -420,7 +431,7 @@ FOREIGN KEY (status_id) REFERENCES appointment_status(id);
 -- Foreign keys para la tabla beneficiary
 ALTER TABLE beneficiary
 ADD CONSTRAINT fk_account_holder_beneficiary
-FOREIGN KEY (account_holder) REFERENCES account(id);
+FOREIGN KEY (account_holder) REFERENCES patient(account_id);
 
 ALTER TABLE beneficiary
 ADD CONSTRAINT fk_record_beneficiary

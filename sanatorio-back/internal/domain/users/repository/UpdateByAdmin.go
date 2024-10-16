@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (ur *userRepository) UpdatePatient(ctx context.Context, patientUpdate entities.PatientUser) (string, error) {
+func (ur *userRepository) UpdatePatient(ctx context.Context, patientAccount entities.Account, patientUpdate entities.PatientUser) (string, error) {
 	// Iniciar la transacción
 	tx, err := ur.storage.DbPool.Begin(ctx)
 	if err != nil {
@@ -59,14 +59,14 @@ func (ur *userRepository) UpdatePatient(ctx context.Context, patientUpdate entit
 	}
 
 	// Actualizar la cuenta si es necesario
-	if patientUpdate.Password != "" {
+	if patientAccount.Password != "" {
 		accountSetClauses := []string{"updated_at = NOW()"}
 		accountArgs := []interface{}{}
 		accountIndex := 1
 
-		if patientUpdate.Password != "" {
+		if patientAccount.Password != "" {
 			accountSetClauses = append(accountSetClauses, fmt.Sprintf("password = $%d", accountIndex))
-			accountArgs = append(accountArgs, patientUpdate.Password)
+			accountArgs = append(accountArgs, patientAccount.Password)
 			accountIndex++
 		}
 

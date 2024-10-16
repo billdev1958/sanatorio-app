@@ -18,7 +18,7 @@ type Autenticador interface {
 }
 
 type RegisterU interface {
-	RegisterPatientTransaction(ctx context.Context, pu entities.PatientUser) (entities.PatientUser, error)
+	RegisterPatientTransaction(ctx context.Context, account entities.Account, pu entities.PatientUser) (entities.PatientUser, error)
 }
 
 type GetU interface {
@@ -26,7 +26,7 @@ type GetU interface {
 }
 
 type UpdateU interface {
-	UpdatePatient(ctx context.Context, patientUpdate entities.PatientUser) (string, error)
+	UpdatePatient(ctx context.Context, patientAccount entities.Account, patientUpdate entities.PatientUser) (string, error)
 }
 
 type DeleteU interface {
