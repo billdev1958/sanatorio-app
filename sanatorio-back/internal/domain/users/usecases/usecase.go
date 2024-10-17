@@ -3,11 +3,15 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"log"
 	"sanatorioApp/internal/auth"
 	user "sanatorioApp/internal/domain/users"
 	"sanatorioApp/internal/domain/users/entities"
 	"sanatorioApp/internal/domain/users/http/models"
 	password "sanatorioApp/pkg/pass"
+	"strconv"
+
+	"math/rand"
 
 	"github.com/google/uuid"
 )
@@ -27,18 +31,34 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 		return models.UserData{}, fmt.Errorf("failed to hash password: %w", err)
 	}
 
+	patientMedicalHistory := patient{
+		FirstName: request.Name,
+		LastName1: request.Lastname1,
+		LastName2: request.Lastname2,
+		LegacyID:  rand.Intn(900000) + 100000,
+	}
+
+	medicalHistoryID, err := createMedicalHistoryID(patientMedicalHistory)
+	if err != nil {
+		log.Printf("Error creating medical history ID: %v", err)
+		return models.UserData{}, err // Manejar el error devolviendo un valor vacío o adecuado
+	}
+
 	registerAccount := entities.Account{
 		ID:       uuid.New(), // Asignar un nuevo UUID
 		Email:    request.Email,
 		Password: hashedPassword,
 		Rol:      entities.Patient,
 	}
+
 	// Crear la entidad PatientUser con los datos de la solicitud
 	registerPatient := entities.PatientUser{
-		FirstName: request.Name,
-		LastName1: request.Lastname1,
-		LastName2: request.Lastname2,
-		Curp:      request.Curp, // Asignar el CURP al paciente
+		MedicalHistoryID: medicalHistoryID,
+		FirstName:        request.Name,
+		LastName1:        request.Lastname1,
+		LastName2:        request.Lastname2,
+		Curp:             request.Curp, // Asignar el CURP al paciente
+		Sex:              request.Sex,
 	}
 
 	// Intentar registrar al paciente en una transacción
@@ -78,4 +98,28 @@ func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (mode
 		Role:      int(loginResponse.Rol),
 		Token:     token,
 	}, nil
+}
+
+func getInitials(s string) string {
+	return string(s[0])
+}
+
+type patient struct {
+	LegacyID  int
+	FirstName string
+	LastName1 string
+	LastName2 string
+	Sex       string
+	Rol       int
+}
+
+func createMedicalHistoryID(p patient) (medicalHistoryID string, err error) {
+	nameDigit := getInitials(p.FirstName)
+	last1Digit := getInitials(p.LastName1)
+	last2Digit := getInitials(p.LastName2)
+	rol := entities.Patient
+
+	medicalHistoryID = nameDigit + last1Digit + last2Digit + p.Sex + strconv.Itoa(rol) + fmt.Sprintf("-%06d", p.LegacyID)
+
+	return medicalHistoryID, nil
 }
