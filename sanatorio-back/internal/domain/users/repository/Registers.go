@@ -82,7 +82,7 @@ func (pr *userRepository) registerPatient(ctx context.Context, tx pgx.Tx, accoun
 func (pr *userRepository) registerAccount(ctx context.Context, tx pgx.Tx, ru entities.Account) (uuid.UUID, error) {
 	var accountID uuid.UUID
 	query := "INSERT INTO account (id, affiliation_id, phone, email, password, rol, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
-	err := tx.QueryRow(ctx, query, ru.AfiliationID, ru.AccountID, ru.PhoneNumber, ru.Email, ru.Password, ru.Rol).Scan(&accountID)
+	err := tx.QueryRow(ctx, query, ru.AfiliationID, ru.ID, ru.PhoneNumber, ru.Email, ru.Password, ru.Rol).Scan(&accountID)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("insert account: %w", err)
 	}

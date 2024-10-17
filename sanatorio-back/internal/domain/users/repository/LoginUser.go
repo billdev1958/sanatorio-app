@@ -14,7 +14,7 @@ func (pr *userRepository) LoginUser(ctx context.Context, lu entities.Account) (e
 
 	// Asegúrate de que estás recuperando el UUID y el rol correctamente
 	query := "SELECT id, rol, password FROM account WHERE email = $1"
-	err := pr.storage.DbPool.QueryRow(ctx, query, lu.Email).Scan(&account.AccountID, &account.Rol, &account.Password)
+	err := pr.storage.DbPool.QueryRow(ctx, query, lu.Email).Scan(&account.ID, &account.Rol, &account.Password)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return account, fmt.Errorf("user not found")

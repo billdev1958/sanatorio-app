@@ -20,12 +20,10 @@ func (ur *userRepository) GetDoctorByID(ctx context.Context, doctorID int) (enti
 	`
 
 	err := ur.storage.DbPool.QueryRow(ctx, query, doctorID).Scan(
-		&doctor.ID,
+		&doctor.AccountID,
 		&doctor.FirstName,
 		&doctor.LastName1,
 		&doctor.LastName2,
-		&doctor.Email,
-		&doctor.Rol,
 		&doctor.MedicalLicense,
 		&doctor.SpecialtyID,
 		&doctor.AccountID,

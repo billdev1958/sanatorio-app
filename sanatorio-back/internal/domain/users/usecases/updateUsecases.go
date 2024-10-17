@@ -14,18 +14,19 @@ func (u *usecase) UpdateUser(ctx context.Context, userUpdate models.UpdateUser) 
 		return "", fmt.Errorf("unauthorized: no claims found in context")
 	}
 
+	updateAccount := entities.Account{
+		Email:    userUpdate.Email,
+		Password: userUpdate.Password,
+	}
+
 	updateUser := entities.PatientUser{
 		FirstName: userUpdate.Name,
 		LastName1: userUpdate.Lastname1,
 		LastName2: userUpdate.Lastname2,
-		Account: entities.Account{
-			Email:    userUpdate.Email,
-			Password: userUpdate.Password,
-		},
-		Curp: userUpdate.Curp,
+		Curp:      userUpdate.Curp,
 	}
 
-	message, err := u.repo.UpdatePatient(ctx, updateUser)
+	message, err := u.repo.UpdatePatient(ctx, updateAccount, updateUser)
 	if err != nil {
 		return "", fmt.Errorf("failed to update user: %w", err)
 	}

@@ -16,7 +16,7 @@ const (
 )
 
 type Account struct {
-	AccountID           uuid.UUID
+	ID                  uuid.UUID
 	AfiliationID        int
 	PhoneNumber         string
 	Email               string

@@ -27,31 +27,29 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 		return models.UserData{}, fmt.Errorf("failed to hash password: %w", err)
 	}
 
+	registerAccount := entities.Account{
+		ID:       uuid.New(), // Asignar un nuevo UUID
+		Email:    request.Email,
+		Password: hashedPassword,
+		Rol:      entities.Patient,
+	}
 	// Crear la entidad PatientUser con los datos de la solicitud
 	registerPatient := entities.PatientUser{
 		FirstName: request.Name,
 		LastName1: request.Lastname1,
 		LastName2: request.Lastname2,
-
-		Account: entities.Account{
-			AccountID: uuid.New(), // Asignar un nuevo UUID
-			Email:     request.Email,
-			Password:  hashedPassword,
-			Rol:       entities.Patient,
-		},
-		Curp: request.Curp, // Asignar el CURP al paciente
+		Curp:      request.Curp, // Asignar el CURP al paciente
 	}
 
 	// Intentar registrar al paciente en una transacción
-	patientResponse, err := u.repo.RegisterPatientTransaction(ctx, registerPatient)
+	patientResponse, err := u.repo.RegisterPatientTransaction(ctx, registerAccount, registerPatient)
 	if err != nil {
 		return models.UserData{}, fmt.Errorf("failed to register patient: %w", err)
 	}
 
 	// Retornar los datos del paciente registrado
 	return models.UserData{
-		Name:  patientResponse.FirstName,
-		Email: patientResponse.Email,
+		Name: patientResponse.FirstName,
 	}, nil
 }
 
@@ -69,14 +67,14 @@ func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (mode
 	}
 
 	// Generar el token JWT si el login fue exitoso
-	token, err := auth.GenerateJWT(loginResponse.AccountID, int(loginResponse.Rol))
+	token, err := auth.GenerateJWT(loginResponse.ID, int(loginResponse.Rol))
 	if err != nil {
 		return models.LoginResponse{}, err
 	}
 
 	// Retornar los datos crudos (LoginResponse) al handler
 	return models.LoginResponse{
-		AccountID: loginResponse.AccountID,
+		AccountID: loginResponse.ID,
 		Role:      int(loginResponse.Rol),
 		Token:     token,
 	}, nil

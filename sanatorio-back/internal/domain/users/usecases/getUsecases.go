@@ -14,11 +14,10 @@ func (u *usecase) GetDoctorByID(ctx context.Context, userID int) (models.DoctorR
 
 	// Crear el objeto DoctorRequest con los datos del doctor
 	doctorData := models.DoctorRequest{
-		ID:             doctorEntity.ID,
+		ID:             doctorEntity.AccountID,
 		Name:           doctorEntity.FirstName,
 		Lastname1:      doctorEntity.LastName1,
 		Lastname2:      doctorEntity.LastName2,
-		Email:          doctorEntity.Email,
 		MedicalLicense: doctorEntity.MedicalLicense,
 		SpecialtyID:    int(doctorEntity.SpecialtyID),
 		AccountID:      doctorEntity.AccountID,

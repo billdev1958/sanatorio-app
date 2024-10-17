@@ -136,7 +136,6 @@ CREATE TABLE IF NOT EXISTS recepcionista (
     deleted_at TIMESTAMP
 );
 
-
 -- Tabla de super admin
 CREATE TABLE IF NOT EXISTS super_admin (
     account_id UUID NOT NULL PRIMARY KEY,
@@ -346,13 +345,12 @@ CREATE TABLE IF NOT EXISTS incapacity (
     department VARCHAR(15), -- dependencia
     assigned_to VARCHAR(15), -- adscrito
     total_days VARCHAR(3) NOT NULL, -- totaldias
-    start DATE NOT NULL, -- inicio
-    end DATE NOT NULL, -- fin
+    start_incapacity DATE NOT NULL, -- inicio
+    end_incapacity DATE NOT NULL, -- fin
     doctor VARCHAR(50) NOT NULL, -- medico
     service VARCHAR(20) NOT NULL, -- servicio
     key_code VARCHAR(10) NOT NULL -- clave
 );
-
 
 -- ====================================
 -- Claves foráneas
@@ -398,9 +396,10 @@ ALTER TABLE office
 ADD CONSTRAINT fk_status_office
 FOREIGN KEY (status_id) REFERENCES office_status(id);
 
+-- **Corrección aplicada aquí**
 ALTER TABLE office
 ADD CONSTRAINT fk_doctor_office
-FOREIGN KEY (doctor_id) REFERENCES doctor(id);
+FOREIGN KEY (doctor_id) REFERENCES doctor(account_id);
 
 -- Foreign keys para la tabla schedule
 ALTER TABLE schedule
@@ -412,9 +411,10 @@ ALTER TABLE appointment
 ADD CONSTRAINT fk_schedule_appointment
 FOREIGN KEY (schedule_id) REFERENCES schedule(id);
 
+-- **Corrección aplicada aquí**
 ALTER TABLE appointment
 ADD CONSTRAINT fk_doctor_appointment
-FOREIGN KEY (doctor_id) REFERENCES doctor(id);
+FOREIGN KEY (doctor_id) REFERENCES doctor(account_id);
 
 ALTER TABLE appointment
 ADD CONSTRAINT fk_patient_appointment
@@ -442,9 +442,10 @@ ALTER TABLE medical_history_relation
 ADD CONSTRAINT fk_medical_history_relation_medical_history
 FOREIGN KEY (medical_history_id) REFERENCES medical_history(id);
 
+-- **Corrección aplicada aquí**
 ALTER TABLE medical_history_relation
 ADD CONSTRAINT fk_medical_history_relation_patient
-FOREIGN KEY (patient_id) REFERENCES patient(id);
+FOREIGN KEY (patient_id) REFERENCES patient(account_id);
 
 ALTER TABLE medical_history_relation
 ADD CONSTRAINT fk_medical_history_relation_beneficiary
@@ -469,13 +470,15 @@ ADD CONSTRAINT fk_user_roles_role
 FOREIGN KEY (role_id) REFERENCES cat_role(id);
 
 -- Foreign keys para la tabla consultation
+-- **Corrección aplicada aquí**
 ALTER TABLE consultation
 ADD CONSTRAINT fk_patient_consultation
-FOREIGN KEY (patient_id) REFERENCES patient(id);
+FOREIGN KEY (patient_id) REFERENCES patient(account_id);
 
--- Foreign keys para la tabla super_user
-ALTER TABLE super_user
-ADD CONSTRAINT fk_account_super_user
+-- Foreign keys para la tabla super_admin
+-- **Corrección aplicada aquí**
+ALTER TABLE super_admin
+ADD CONSTRAINT fk_account_super_admin
 FOREIGN KEY (account_id) REFERENCES account(id);
 
 -- ====================================
