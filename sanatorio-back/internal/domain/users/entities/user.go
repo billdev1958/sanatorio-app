@@ -48,7 +48,7 @@ type PatientUser struct {
 	LastName1        string
 	LastName2        string
 	Curp             string
-	Sex              byte
+	Sex              string
 	Created_At       time.Time
 	Updated_At       time.Time
 }

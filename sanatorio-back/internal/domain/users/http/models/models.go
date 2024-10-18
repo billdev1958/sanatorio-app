@@ -22,7 +22,7 @@ type RegisterPatientRequest struct {
 	Lastname1   string `json:"lastname1"`
 	Lastname2   string `json:"lastname2"`
 	Curp        string `json:"curp"`
-	Sex         byte   `json:"sex"`
+	Sex         string `json:"sex"`
 	PhoneNumber string `json:"phone"`
 	Email       string `json:"email"`
 	Password    string `json:"password"`

@@ -57,20 +57,30 @@ func (ur *userRepository) RegisterPatientTransaction(ctx context.Context, accoun
 		return pu, fmt.Errorf("failed to register patient: %w", err)
 	}
 
+	queryUserRole := `
+		INSERT INTO user_roles (account_id, role_id) 
+		VALUES ($1, $2)`
+	_, err = tx.Exec(ctxTx, queryUserRole, accountID, entities.Patient)
+	if err != nil {
+		return pu, fmt.Errorf("failed to assign patient role in user_roles: %w", err)
+	}
+
 	return pu, nil
 }
 
 func (pr *userRepository) registerPatient(ctx context.Context, tx pgx.Tx, accountID uuid.UUID, pt entities.PatientUser) error {
+	pt.AccountID = accountID
+
 	// Verificar que los campos obligatorios estén presentes
 	if pt.AccountID == uuid.Nil || pt.Curp == "" {
 		return fmt.Errorf("invalid input: missing required fields")
 	}
 
 	// Preparar la consulta para insertar el tipo de doctor
-	query := "INSERT INTO patient_user (account_id, medical_history_id, firstname, lastname1, lastname2, curp) VALUES ($1, $2, $3, $4, $5, $6)"
+	query := "INSERT INTO patient (account_id, medical_history_id, first_name, last_name1, last_name2, curp, sex) VALUES ($1, $2, $3, $4, $5, $6, $7)"
 
 	// Ejecutar la consulta dentro de la transacción
-	_, err := tx.Exec(ctx, query, accountID, pt.MedicalHistoryID, pt.FirstName, pt.LastName1, pt.LastName2, pt.Curp)
+	_, err := tx.Exec(ctx, query, accountID, pt.MedicalHistoryID, pt.FirstName, pt.LastName1, pt.LastName2, pt.Curp, pt.Sex)
 	if err != nil {
 		return fmt.Errorf("insert into patient table: %w", err)
 	}
@@ -78,11 +88,10 @@ func (pr *userRepository) registerPatient(ctx context.Context, tx pgx.Tx, accoun
 	return nil
 }
 
-// Función para registrar la cuenta utilizando el userID generado
 func (pr *userRepository) registerAccount(ctx context.Context, tx pgx.Tx, ru entities.Account) (uuid.UUID, error) {
 	var accountID uuid.UUID
-	query := "INSERT INTO account (id, affiliation_id, phone, email, password, rol, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
-	err := tx.QueryRow(ctx, query, ru.AfiliationID, ru.ID, ru.PhoneNumber, ru.Email, ru.Password, ru.Rol).Scan(&accountID)
+	query := "INSERT INTO account (id, affiliation_id, phone, email, password, role_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
+	err := tx.QueryRow(ctx, query, ru.ID, ru.AfiliationID, ru.PhoneNumber, ru.Email, ru.Password, ru.Rol).Scan(&accountID)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("insert account: %w", err)
 	}
