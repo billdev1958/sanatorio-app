@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS cat_dependencies(
 -- Tabla de cuentas de usuario
 CREATE TABLE IF NOT EXISTS account (
     id UUID PRIMARY KEY,
-    affiliation_id INTEGER NOT NULL,
+    dependency_id INTEGER NOT NULL,
     phone VARCHAR(10) NOT NULL,
     email VARCHAR(75) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
