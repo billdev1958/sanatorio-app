@@ -184,8 +184,8 @@ func (storage *PgxStorage) SeedAdminUser(ctx context.Context) (err error) {
 
 	// Insertar cuenta en la tabla account
 	queryAccount := `
-		INSERT INTO account (id, affiliation_id, phone, email, password, role_id, created_at) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7)`
+		INSERT INTO account (id, affiliation_id, phone, email, password, role_id) 
+		VALUES ($1, $2, $3, $4, $5, $6)`
 	_, err = storage.DbPool.Exec(ctx, queryAccount, accountID, 1, "1234567890", "bilxd1958@gmail.com", hashedPassword, 1) // 1 es el ID del rol de administrador
 	if err != nil {
 		return fmt.Errorf("insert account: %w", err)
@@ -193,8 +193,8 @@ func (storage *PgxStorage) SeedAdminUser(ctx context.Context) (err error) {
 
 	// Insertar en la tabla super_admin
 	querySuperAdmin := `
-		INSERT INTO super_admin (account_id, first_name, last_name1, last_name2, curp, created_at) 
-		VALUES ($1, $2, $3, $4, $5, $6)`
+		INSERT INTO super_admin (account_id, first_name, last_name1, last_name2, curp) 
+		VALUES ($1, $2, $3, $4, $5)`
 	_, err = storage.DbPool.Exec(ctx, querySuperAdmin, accountID, "Billy", "Rivera", "Salinas", "RISB010314HMCVLLA0")
 	if err != nil {
 		return fmt.Errorf("insert super_admin: %w", err)
@@ -203,7 +203,7 @@ func (storage *PgxStorage) SeedAdminUser(ctx context.Context) (err error) {
 	// Insertar en la tabla user_roles para asignar el rol de administrador al usuario
 	queryUserRole := `
 		INSERT INTO user_roles (account_id, role_id) 
-		VALUES ($1, $2, $3)`
+		VALUES ($1, $2)`
 	_, err = storage.DbPool.Exec(ctx, queryUserRole, accountID, 1) // 1 es el ID del rol de administrador
 	if err != nil {
 		return fmt.Errorf("insert user_roles: %w", err)
@@ -268,8 +268,8 @@ func (storage *PgxStorage) SeedAppointmentStatus(ctx context.Context) (err error
 	return nil
 }
 
-func (storage *PgxStorage) SeedAffiliation(ctx context.Context) (err error) {
-	affiliationValues := [4]string{"Administrativo", "FAAPA", "SUTES", "Estudiante"}
+func (storage *PgxStorage) SeedDependencies(ctx context.Context) (err error) {
+	dependenciesValues := [4]string{"Administrativo", "FAAPA", "SUTES", "Estudiante"}
 
 	var count int
 	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM cat_dependencies").Scan(&count)
@@ -283,7 +283,7 @@ func (storage *PgxStorage) SeedAffiliation(ctx context.Context) (err error) {
 	}
 
 	query := "INSERT INTO cat_dependencies (name) VALUES($1)"
-	for _, value := range affiliationValues {
+	for _, value := range dependenciesValues {
 		_, err = storage.DbPool.Exec(ctx, query, value)
 		if err != nil {
 			return fmt.Errorf("insert cat_dependencies status: %w", err)

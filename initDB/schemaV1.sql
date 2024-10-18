@@ -11,15 +11,6 @@ CREATE TABLE IF NOT EXISTS cat_dependencies(
     deleted_at TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS affiliation_patient (
-    id SERIAL PRIMARY KEY,
-    dependency_id INTEGER,
-    name VARCHAR(50),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    deleted_at TIMESTAMP
-);
-
 -- Tabla de cuentas de usuario
 CREATE TABLE IF NOT EXISTS account (
     id UUID PRIMARY KEY,
@@ -363,11 +354,7 @@ FOREIGN KEY (role_id) REFERENCES cat_role(id);
 
 ALTER TABLE account 
 ADD CONSTRAINT fk_dependency_id
-FOREIGN KEY (affiliation_id) REFERENCES affiliation_patient(id);
-
-ALTER TABLE affiliation_patient
-ADD CONSTRAINT fk_affiliation_dependency_id
-FOREIGN KEY (dependency_id) REFERENCES cat_dependencies(id);
+FOREIGN KEY (dependency_id) REFERENCES cat_dependencies(id);  -- Relaciona las cuentas directamente con las dependencias
 
 -- Foreign keys para la tabla patient
 ALTER TABLE patient
