@@ -25,6 +25,9 @@ func NewUsecase(repo user.Repository) user.Usecase {
 }
 
 func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.UserData, error) {
+
+	log.Printf("Usecase - Received AfiliationID: %d", request.AfiliationID)
+
 	// Hashear la contraseña del nuevo paciente
 	hashedPassword, err := password.HashPassword(request.Password)
 	if err != nil {
@@ -45,10 +48,11 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 	}
 
 	registerAccount := entities.Account{
-		ID:       uuid.New(), // Asignar un nuevo UUID
-		Email:    request.Email,
-		Password: hashedPassword,
-		Rol:      entities.Patient,
+		ID:           uuid.New(), // Asignar un nuevo UUID
+		AfiliationID: request.AfiliationID,
+		Email:        request.Email,
+		Password:     hashedPassword,
+		Rol:          entities.Patient,
 	}
 
 	// Crear la entidad PatientUser con los datos de la solicitud

@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"sanatorioApp/internal/domain/users/http/models"
 )
@@ -14,6 +15,8 @@ func (h *handler) RegisterPatient(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
+
+	log.Printf("Decoded request: %+v", request)
 
 	// Llamar al caso de uso para manejar el registro
 	patientData, err := h.uc.RegisterPatient(r.Context(), request)

@@ -51,6 +51,11 @@ func (ur *userRepository) RegisterPatientTransaction(ctx context.Context, accoun
 		return pu, fmt.Errorf("failed to register account: %w", err)
 	}
 
+	err = ur.registerMedicalHistory(ctxTx, tx, pu.MedicalHistoryID, pu)
+	if err != nil {
+		return pu, fmt.Errorf("failed to register medical history: %w", err)
+	}
+
 	// Registrar al paciente en su tabla correspondiente (ignorar valores no necesarios)
 	err = ur.registerPatient(ctxTx, tx, accountID, pu)
 	if err != nil {
@@ -89,11 +94,23 @@ func (pr *userRepository) registerPatient(ctx context.Context, tx pgx.Tx, accoun
 }
 
 func (pr *userRepository) registerAccount(ctx context.Context, tx pgx.Tx, ru entities.Account) (uuid.UUID, error) {
+
+	log.Printf("Repository - Inserting account with ID: %s, dependency_id: %d, phone: %s, email: %s, role_id: %d", ru.ID, ru.AfiliationID, ru.PhoneNumber, ru.Email, ru.Rol)
+
 	var accountID uuid.UUID
-	query := "INSERT INTO account (id, affiliation_id, phone, email, password, role_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
+	query := "INSERT INTO account (id, dependency_id, phone, email, password, role_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
 	err := tx.QueryRow(ctx, query, ru.ID, ru.AfiliationID, ru.PhoneNumber, ru.Email, ru.Password, ru.Rol).Scan(&accountID)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("insert account: %w", err)
 	}
 	return accountID, nil
+}
+
+func (pr *userRepository) registerMedicalHistory(ctx context.Context, tx pgx.Tx, medicalHistoryID string, pt entities.PatientUser) error {
+	query := "INSERT INTO medical_history (id, patient_name, curp, gender) VALUES ($1, $2, $3, $4)"
+	_, err := tx.Exec(ctx, query, medicalHistoryID, pt.FirstName, pt.Curp, pt.Sex)
+	if err != nil {
+		return fmt.Errorf("insert into medical_history table: %w", err)
+	}
+	return nil
 }
