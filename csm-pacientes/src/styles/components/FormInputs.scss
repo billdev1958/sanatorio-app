@@ -1,0 +1,152 @@
+/* Contenedor general del formulario */
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: #f5f5f5;
+}
+
+/* Tarjeta del formulario */
+.form-card {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Logo del formulario */
+.form-logo {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.form-logo img {
+    width: 150px;
+    height: auto;
+}
+
+/* Formulario */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* Grupo de entrada (input y select) */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    background-color: #f1f1f1;
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+}
+
+/* Estilos para los inputs */
+input {
+    border: none;
+    outline: none;
+    background: none;
+    width: 100%;
+    font-size: 1rem;
+    background-color: #f1f1f1;
+    padding: 0.75rem 0;
+    color: #333;
+    border-radius: 5px;
+}
+
+/* Estilos para los select */
+.select-wrapper {
+    position: relative;
+}
+
+select {
+    border: 1px solid #ddd; /* Aquí se añade el borde para los select */
+    outline: none;
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.75rem 1.25rem; /* Añadimos padding a la derecha */
+    border-radius: 5px;
+    background-color: #f1f1f1;
+    color: #333;
+    cursor: pointer;
+    appearance: none; /* Elimina las flechas predeterminadas del select */
+}
+
+.select-wrapper::after {
+    content: "▼"; /* Simula una flecha */
+    position: absolute;
+    top: 60%; 
+    right: 15px;
+    transform: translateY(-50%);
+    font-size: 12px;
+    pointer-events: none; 
+    color: #333;
+}
+
+select:focus {
+    border-color: #1e5631;
+    outline: none;
+    box-shadow: 0 0 5px rgba(30, 86, 49, 0.3); 
+}
+
+select option {
+    background-color: #fff;
+    color: #333;
+}
+
+/* Botón del formulario */
+.form-button {
+    background-color: #1e5631;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.form-button:hover {
+    background-color: #174827;
+}
+
+/* Enlaces */
+.form-links {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.form-links p {
+    margin: 0.5rem 0;
+}
+
+.form-links a {
+    color: #1e5631;
+    text-decoration: none;
+}
+
+.form-links a:hover {
+    text-decoration: underline;
+}
+
+/* Diseño responsivo */
+@media (max-width: 480px) {
+    .form-card {
+      padding: 1.5rem;
+    }
+
+    .form-button {
+      font-size: 0.9rem;
+    }
+}

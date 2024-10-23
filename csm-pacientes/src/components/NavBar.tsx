@@ -13,14 +13,16 @@ const NavBar = (props: { toggleMenu: () => void }) => {
 
         <div class="navbar-logos">
           <img src={logo1} alt="Logo 1" class="navbar-logo-img" />
+          <div>
+            <p>UNIVERSIDAD AUTONOMA DEL ESTADO DE MEXICO</p>
+            <hr></hr>
+            <p>UAEM</p>
+            <p>CLINICA MULTIDISCIPLINARIA DE SALUD</p>
+          </div>
         </div>
 
-        <div class="navbar-menu">
-          <a href="#home">Home</a>
-          <a href="#about">About</a>
-          <a href="#contact">Contact</a>
-        </div>
-        <button class="navbar-button">Registrate</button>
+
+        {/*<button class="navbar-button">Registrate</button>*/}
       </nav>
       <div class="marco-dorado"></div>
     </>

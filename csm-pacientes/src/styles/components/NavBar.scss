@@ -1,124 +1,92 @@
 .navbar {
   background-color: var(--color-primary);
-  padding: 0.3rem 1rem; /* Reduce el padding para un navbar más delgado */
+  padding: 0.3rem 1rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* Centra los elementos */
   align-items: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: fixed; /* Fija el navbar en la parte superior */
+  position: sticky; /* Fija el navbar en la parte superior */
   top: 0;
   left: 0;
-  right: 0; /* Asegura que ocupe todo el ancho sin desbordarse */
+  right: 0;
   width: 100%; /* Asegura que ocupe todo el ancho de la pantalla */
-  z-index: 1000; /* Asegura que esté por encima de otros elementos */
-  height: 60px; /* Fija la altura del navbar */
-  overflow: hidden; /* Evita desbordamientos horizontales */
+  z-index: 1000;
+  height: 80px; /* Fija la altura del navbar */
+  overflow: hidden;
 }
 
-/* Contenedor para el logo centrado */
+/* Contenedor para el logo y textos */
 .navbar-logos {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%); /* Centra el logo horizontalmente */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centra el logo y los textos */
+  gap: 1rem;
+  width: 100%; /* Ocupa todo el ancho para centrar el contenido */
+}
+
+/* Ajuste de alineación de textos debajo del logo */
+.navbar-logos div {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Alinea los textos debajo del logo */
+  text-align: center; /* Centra el texto */
+}
+
+/* Estilo para el primer párrafo */
+.navbar-logos div p:first-of-type {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Línea debajo del primer párrafo */
+.navbar-logos div hr {
+  width: 100%;
+  border: none;
+  border-top: 2px solid var(--color-secondary); /* Línea en color secundario */
+  margin: 0.2rem 0;
+}
+
+/* Estilo para los párrafos adicionales */
+.navbar-logos div p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #fff;
 }
 
 .navbar-logo-img {
-  width: 50px; /* Reduce el tamaño del logo para que sea más compacto */
+  width: 50px; /* Tamaño del logo */
   height: auto;
-  padding: 0.1rem 0; /* Ajusta el padding para que no ocupe mucho espacio */
-}
-
-/* Opciones de menú a la derecha */
-.navbar-menu {
-  display: flex;
-  gap: 0.8rem; /* Reduce el espacio entre los elementos del menú */
-  margin-left: auto; /* Mueve el menú a la derecha */
-  white-space: nowrap; /* Evita que el texto se divida en varias líneas */
-}
-
-.navbar-menu a {
-  color: #fff;
-  text-decoration: none;
-  font-family: var(--font-secondary, 'Cabin', sans-serif);
-  font-size: 0.85rem; /* Reduce ligeramente el tamaño del texto */
-  transition: color 0.3s ease;
-}
-
-.navbar-menu a:hover {
-  color: var(--color-secondary);
-}
-
-/* Botón de Sign Up */
-.navbar-button {
-  padding: 0.3rem 0.6rem; /* Reduce el tamaño del botón */
-  border: 2px solid #fff;
-  background-color: transparent;
-  color: #fff;
-  font-family: var(--font-secondary, 'Cabin', sans-serif);
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  margin-left: 1rem; /* Separa el botón del menú */
-  font-size: 0.85rem; /* Reduce ligeramente el tamaño del texto */
-}
-
-.navbar-button:hover {
-  background-color: #fff;
-  color: var(--color-primary);
+  padding: 0.1rem 0;
 }
 
 /* Estilos para el marco dorado */
 .marco-dorado {
-  height: 0.3rem; /* Reduce el tamaño del marco dorado */
+  height: 0.3rem;
   background-color: var(--color-secondary);
   margin-bottom: 0.5rem;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
-  .navbar-menu {
-    flex-direction: column;
-    display: none;
+  /* Oculta los textos y deja solo el logo */
+  .navbar-logos div {
+    display: none; /* Oculta los textos */
   }
 
-  .navbar-menu.active {
-    display: flex;
+  /* Centra el logo en pantallas pequeñas */
+  .navbar-logos {
+    justify-content: center;
+    width: 100%; /* Asegura que el logo ocupe todo el ancho disponible */
   }
 
   .navbar-logo-img {
-    width: 40px; /* Ajuste el tamaño del logo en pantallas pequeñas */
-  }
-
-  .navbar-button {
-    font-size: 0.75rem; /* Ajuste de texto en pantallas pequeñas */
+    width: 60px; /* Aumenta el tamaño del logo para pantallas pequeñas */
+    height: auto;
   }
 }
 
-/* Estilos del menú hamburguesa */
-.menu-hamburguesa {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 35px; /* Reduce el ancho del botón de hamburguesa */
-  height: 35px; /* Reduce el alto del botón de hamburguesa */
-  background-color: transparent;
-  border: none;
-  padding: 0;
-  margin-right: auto;
-  position: relative;
-  z-index: 1001;
-}
-
-/* Imagen del menú hamburguesa */
-.menu-hamburguesa img {
-  width: 100%;
-  height: auto;
-  max-width: 25px; /* Ajusta el tamaño máximo del SVG */
-  max-height: 25px; /* Ajusta la altura máxima del SVG */
-  transition: transform 0.3s ease;
-}
-
-/* Efecto de rotación cuando el menú está abierto */
-.menu-hamburguesa.open img {
-  transform: rotate(90deg);
+.navbar {
+  z-index: 1000;
+  /* otros estilos */
 }

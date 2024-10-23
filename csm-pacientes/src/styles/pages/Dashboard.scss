@@ -1,0 +1,75 @@
+
+/* Sección de Bienvenida */
+.welcome-section {
+    text-align: center;
+    padding: 3rem 2rem; 
+    background: linear-gradient(135deg, #284C34 10%, #3C6E47 50%, #9C8414 100%); /* Fondo con gradiente elegante */
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    color: #ffffff; 
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1); 
+  }
+  
+  .welcome-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem; /* Espacio entre logo y texto */
+  }
+  
+  .clinic-logo {
+    width: 100px; /* Tamaño del logo */
+    margin-bottom: 1rem;
+  }
+  
+  .welcome-content h1 {
+    color: #fff; 
+    font-size: 2rem; 
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  .welcome-content p {
+    color: #f0f0f0; 
+    font-size: 1.1rem;
+    max-width: 600px; /* Limitar el ancho del texto para mejorar la lectura */
+    line-height: 1.6;
+  }
+  
+  /* Sección de Widgets dentro del Dashboard */
+  .dashboard-widgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+  
+  /* Responsividad para pantallas medianas */
+  @media (max-width: 1024px) {
+    .dashboard-widgets {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+  }
+  
+  /* Responsividad para pantallas pequeñas */
+  @media (max-width: 768px) {
+    .dashboard-widgets {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  
+    .welcome-section {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+  
+    .welcome-content h1 {
+      font-size: 1.6rem; 
+    }
+  
+    .clinic-logo {
+      width: 90px;
+    }
+  }
+  
