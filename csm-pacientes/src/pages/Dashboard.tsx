@@ -41,7 +41,7 @@ const Dashboard: Component = () => {
           icon="fas fa-history" 
           title="Historial Médico" 
           description="Consulta tu historial médico y mantén un registro actualizado." 
-          link="/historial-medico" 
+          link="/medicalhistory" 
           buttonText="Ver Historial" 
         />
       </section>

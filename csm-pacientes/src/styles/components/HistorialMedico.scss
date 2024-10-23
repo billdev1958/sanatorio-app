@@ -1,0 +1,90 @@
+/* src/components/HistorialMedicoForm.css */
+
+:root {
+    --color-primary: #284C34;
+    --color-secondary: #9C8414;
+    --color-box: #E9E9E9;
+    --color-text: #000000;
+    --font-size-default: 16px;
+  }
+  
+  .historial-medico-form {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: var(--color-box);
+    border-radius: 12px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .sidebar {
+    background: var(--color-primary);
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .title-box h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+  
+  .patient-info h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .patient-info p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .info-panel {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+  }
+  
+  .info-panel h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--color-secondary);
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+  
+  .info-panel p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    color: var(--color-text);
+  }
+  
+  .info-panel strong {
+    font-weight: 600;
+  }
+  
+  /* Estilos Responsivos */
+  @media (max-width: 768px) {
+    .historial-medico-form {
+      grid-template-columns: 1fr;
+    }
+  
+    .sidebar {
+      text-align: center;
+    }
+  }
+  
