@@ -1,8 +1,8 @@
-export interface LoginUser{
-    Email: string;
-    Password: string;
-}
-
+export interface LoginUser {
+    email: string;
+    password: string;
+  }
+  
 export interface RegisterUser {
     AfiliationID: number;
     Name: string;

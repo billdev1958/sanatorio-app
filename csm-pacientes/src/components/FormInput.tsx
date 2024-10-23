@@ -5,6 +5,8 @@ interface FormInputProps {
   name: string;
   placeholder: string;
   required?: boolean;
+  value: string; // Agrega la propiedad value
+  onInput: (e: InputEvent) => void; // Agrega el manejador onInput
 }
 
 const FormInput: Component<FormInputProps> = (props) => {
@@ -15,6 +17,8 @@ const FormInput: Component<FormInputProps> = (props) => {
         name={props.name}
         placeholder={props.placeholder}
         required={props.required}
+        value={props.value} // Conecta el valor del input
+        onInput={props.onInput} // Maneja el evento onInput
       />
     </div>
   );

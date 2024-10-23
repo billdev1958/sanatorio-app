@@ -1,3 +1,5 @@
+import home from '../assets/home-outline.svg';
+
 import historiaClinicaIcon from '../assets/historiaclinica.png';
 import cita from '../assets/citaicon.png';
 import notaEvolucionIcon from '../assets/notaevolucion.png';
@@ -6,14 +8,30 @@ import incapacidadIcon from '../assets/incapacidad.png';
 import fileIcon from '../assets/file.png';
 import laboratorioIcon from '../assets/laboratorio.png';
 import logoutIcon from '../assets/logout.png';
-import { A } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
+import { useLoginService } from '../services/LoginService';
 
 const LateralMenu = (props: { open: boolean; toggleMenu: () => void }) => {
+  const { logout } = useLoginService(); // Traemos el método logout del servicio de login
+  const navigate = useNavigate();
+
+  // Función para manejar el logout
+  const handleLogout = () => {
+    logout(); // Llama a la función de logout del servicio
+    navigate("/login", { replace: true }); // Redirige al usuario a la página de login
+  };
+
   return (
     <>
       {/* Menú lateral */}
       <div class={`lateral-menu ${props.open ? 'open' : ''}`}>
         <ul>
+        <li>
+            <A href="/" activeClass="active" class="menu-link">
+              <img src={home} alt="inicio" />
+              <span>Inicio</span>
+            </A>
+          </li>
           <li>
             <A href="/medicalhistory" activeClass="active" class="menu-link">
               <img src={historiaClinicaIcon} alt="Historia Clínica" />
@@ -57,10 +75,11 @@ const LateralMenu = (props: { open: boolean; toggleMenu: () => void }) => {
             </A>
           </li>
           <li>
-            <A href="/logout" activeClass="active" class="menu-link">
+            {/* Utilizamos un botón para manejar el logout */}
+            <button onClick={handleLogout} class="menu-link logout-button">
               <img src={logoutIcon} alt="Cerrar sesión" />
               <span>Cerrar sesión</span>
-            </A>
+            </button>
           </li>
         </ul>
       </div>
