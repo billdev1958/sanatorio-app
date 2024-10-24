@@ -24,6 +24,15 @@ services:
     ports:
       - "8080:8080"
 
+  frontend:
+    build:
+      context: ./csm-pacientes
+      dockerfile: Dockerfile
+    depends_on:
+      - app
+    restart: always
+    ports:
+      - "80:80"
 
 volumes:
   db_data:
