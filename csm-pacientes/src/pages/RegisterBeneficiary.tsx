@@ -2,19 +2,16 @@ import { createSignal } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import NavBar from '../components/NavBar'; // Importa el NavBar
 import FormInput from '../components/FormInput'; // Importa el componente reutilizable
-import { registerUser } from '../services/RegisterService'; // Importa el servicio de registro
-import { RegisterPatientRequest } from '../models/Login&Registers';
+import { registerBeneficiary, registerUser } from '../services/RegisterService'; // Importa el servicio de registro
+import { RegisterBeneficiaryRequest } from '../models/Login&Registers';
 
-const Register = () => {
+const RegisterBeneficiary = () => {
   // Creamos señales para manejar el estado de cada campo de formulario
   const [name, setName] = createSignal<string>("");
   const [lastname1, setLastname1] = createSignal<string>("");
   const [lastname2, setLastname2] = createSignal<string>("");
   const [curp, setCurp] = createSignal<string>("");
   const [sex, setSex] = createSignal<string>("");
-  const [phone, setPhone] = createSignal<string>("");
-  const [email, setEmail] = createSignal<string>("");
-  const [password, setPassword] = createSignal<string>("");
   const [registerError, setRegisterError] = createSignal<string | null>(null);
   const navigate = useNavigate();
 
@@ -23,20 +20,16 @@ const Register = () => {
     e.preventDefault();
     setRegisterError(null);
 
-    const user: RegisterPatientRequest = {
-      dependency_id: 1, // Puedes ajustar este valor según la afiliación seleccionada
+    const beneficiary: RegisterBeneficiaryRequest = {
       name: name(),
       lastname1: lastname1(),
       lastname2: lastname2(),
       curp: curp(),
       sex: sex(),
-      phone: phone(),
-      email: email(),
-      password: password(),
     };
 
     try {
-      await registerUser(user);
+      await registerBeneficiary(beneficiary);
       navigate('/login', { replace: true }); // Redirige al usuario al login después del registro exitoso
     } catch (error: any) {
       setRegisterError(error.message);
@@ -45,25 +38,12 @@ const Register = () => {
 
   return (
     <>
-      {/* Incluimos el NavBar siempre */}
-      <NavBar toggleMenu={() => {}} /> {/* No necesitamos el menú hamburguesa en el registro, por eso la función está vacía */}
 
       <div class="form-container">
         <div class="form-card">
           <h2>Registrar Usuario</h2>
           <form class="form" onSubmit={handleSubmit}>
             {/* Afiliación select */}
-            <div class="input-group select-wrapper">
-              <label for="afiliation">Afiliación</label>
-              <select name="afiliation" id="afiliation" required onInput={(e: InputEvent) => setSex((e.target as HTMLSelectElement).value)}>
-                <option value="">Selecciona una opción</option>
-                <option value="1">Administrativo</option>
-                <option value="2">FAAPA</option>
-                <option value="3">SUTES</option>
-                <option value="4">Estudiante</option>
-              </select>
-            </div>
-
             {/* Nombre */}
             <FormInput
               type="text"
@@ -115,48 +95,14 @@ const Register = () => {
               </select>
             </div>
 
-            {/* Teléfono */}
-            <FormInput
-              type="tel"
-              name="phone"
-              placeholder="Teléfono"
-              required={true}
-              value={phone()}
-              onInput={(e: InputEvent) => setPhone((e.target as HTMLInputElement).value)}
-            />
-
-            {/* Correo Electrónico */}
-            <FormInput
-              type="email"
-              name="email"
-              placeholder="Correo electrónico"
-              required={true}
-              value={email()}
-              onInput={(e: InputEvent) => setEmail((e.target as HTMLInputElement).value)}
-            />
-
-            {/* Contraseña */}
-            <FormInput
-              type="password"
-              name="password"
-              placeholder="Contraseña"
-              required={true}
-              value={password()}
-              onInput={(e: InputEvent) => setPassword((e.target as HTMLInputElement).value)}
-            />
-
             <button type="submit" class="form-button">Registrar</button>
           </form>
 
           {registerError() && <p class="error-message">Error: {registerError()}</p>}
-
-          <div class="form-links">
-            <p>¿Ya tienes una cuenta? <a href="#login">Iniciar sesión</a></p>
-          </div>
         </div>
       </div>
     </>
   );
 };
 
-export default Register;
+export default RegisterBeneficiary;

@@ -27,7 +27,7 @@ const Dashboard: Component = () => {
           icon="fas fa-user-plus" 
           title="Registrar Beneficiarios" 
           description="Gestiona a tus beneficiarios para un acceso más fácil a los servicios." 
-          link="/registrar-beneficiarios" 
+          link="/beneficiary" 
           buttonText="Registrar" 
         />
         <Widget 
@@ -37,13 +37,7 @@ const Dashboard: Component = () => {
           link="/laboratorio" 
           buttonText="Acceder" 
         />
-        <Widget 
-          icon="fas fa-history" 
-          title="Historial Médico" 
-          description="Consulta tu historial médico y mantén un registro actualizado." 
-          link="/medicalhistory" 
-          buttonText="Ver Historial" 
-        />
+
       </section>
     </main>
   );

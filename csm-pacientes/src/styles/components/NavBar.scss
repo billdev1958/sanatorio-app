@@ -2,52 +2,46 @@
   background-color: var(--color-primary);
   padding: 0.3rem 1rem;
   display: flex;
-  justify-content: center; /* Centra los elementos */
+  justify-content: space-between;
   align-items: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: sticky; /* Fija el navbar en la parte superior */
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;
-  width: 100%; /* Asegura que ocupe todo el ancho de la pantalla */
+  width: 100%;
   z-index: 1000;
-  height: 80px; /* Fija la altura del navbar */
+  height: 80px;
   overflow: hidden;
 }
 
-/* Contenedor para el logo y textos */
 .navbar-logos {
   display: flex;
   align-items: center;
-  justify-content: center; /* Centra el logo y los textos */
+  justify-content: center;
   gap: 1rem;
-  width: 100%; /* Ocupa todo el ancho para centrar el contenido */
 }
 
-/* Ajuste de alineación de textos debajo del logo */
 .navbar-logos div {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Alinea los textos debajo del logo */
-  text-align: center; /* Centra el texto */
+  align-items: center;
+  text-align: center;
 }
 
-/* Estilo para el primer párrafo */
 .navbar-logos div p:first-of-type {
   font-size: 0.9rem;
   font-weight: bold;
   margin: 0;
 }
 
-/* Línea debajo del primer párrafo */
 .navbar-logos div hr {
   width: 100%;
   border: none;
-  border-top: 2px solid var(--color-secondary); /* Línea en color secundario */
+  border-top: 2px solid var(--color-secondary);
   margin: 0.2rem 0;
 }
 
-/* Estilo para los párrafos adicionales */
 .navbar-logos div p {
   margin: 0;
   font-size: 0.85rem;
@@ -55,38 +49,29 @@
 }
 
 .navbar-logo-img {
-  width: 50px; /* Tamaño del logo */
+  width: 50px;
   height: auto;
   padding: 0.1rem 0;
 }
 
-/* Estilos para el marco dorado */
 .marco-dorado {
   height: 0.3rem;
   background-color: var(--color-secondary);
   margin-bottom: 0.5rem;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
-  /* Oculta los textos y deja solo el logo */
   .navbar-logos div {
-    display: none; /* Oculta los textos */
+    display: none;
   }
 
-  /* Centra el logo en pantallas pequeñas */
   .navbar-logos {
     justify-content: center;
-    width: 100%; /* Asegura que el logo ocupe todo el ancho disponible */
+    width: 100%;
   }
 
   .navbar-logo-img {
-    width: 60px; /* Aumenta el tamaño del logo para pantallas pequeñas */
+    width: 60px;
     height: auto;
   }
-}
-
-.navbar {
-  z-index: 1000;
-  /* otros estilos */
 }
