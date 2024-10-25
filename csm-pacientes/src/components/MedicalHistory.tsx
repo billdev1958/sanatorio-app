@@ -1,41 +1,81 @@
 // src/components/HistorialMedicoForm.tsx
 import { Component } from 'solid-js';
+import PatientInfo from './PatientInfo';
+import InfoPanel from './InfoPanel';
 
 const HistorialMedicoForm: Component = () => {
+  const medicalHistoryFields = [
+    { label: 'Antecedentes Heredofamiliares', value: 'Diabetes en la familia.' },
+    { label: 'Antecedentes Personales No Patológicos', value: 'No fuma, no consume alcohol.' },
+    { label: 'Antecedentes Personales Patológicos', value: 'Hipertensión.' },
+    { label: 'Antecedentes Gineco-Obstétricos / Androgénicos', value: 'No aplica.' },
+    { label: 'Padecimiento Actual', value: 'Dolor en la parte inferior del abdomen.' },
+  ];
+
+  const systemInterrogationFields = [
+    { label: 'Cardiovascular', value: 'Sin problemas.' },
+    { label: 'Respiratorio', value: 'Sin dificultades.' },
+    { label: 'Gastrointestinal', value: 'Reflujo ocasional.' },
+    { label: 'Genitourinario', value: 'Sin anomalías.' },
+    { label: 'Hemático y Linfático', value: 'No hay antecedentes.' },
+    { label: 'Endocrino', value: 'Función tiroidea normal.' },
+    { label: 'Nervioso', value: 'Sin síntomas.' },
+    { label: 'Musculoesquelético', value: 'Dolor leve en las articulaciones.' },
+    { label: 'Piel, Mucosas y Anexos', value: 'Piel seca en los codos.' },
+  ];
+
+  const vitalSignsFields = [
+    { label: 'T/A', value: '120/80 mmHg' },
+    { label: 'Temperatura', value: '36.7 °C' },
+    { label: 'Frecuencia Cardíaca', value: '72 bpm' },
+    { label: 'Frecuencia Respiratoria', value: '16 rpm' },
+    { label: 'Peso (kg)', value: '70 kg' },
+    { label: 'Talla (m)', value: '1.75 m' },
+    { label: 'IMC', value: '22.9' },
+  ];
+
+  const physicalExamFields = [
+    { label: 'Habitus Exterior', value: 'Paciente alerta, bien nutrido.' },
+    { label: 'Cabeza', value: 'Normocefálica, sin lesiones.' },
+    { label: 'Cuello', value: 'Sin adenopatías.' },
+    { label: 'Tórax', value: 'Simétrico, sin masas.' },
+    { label: 'Abdomen', value: 'Blando, depresible.' },
+    { label: 'Genitales', value: 'No aplica.' },
+    { label: 'Extremidades', value: 'Sin edemas.' },
+    { label: 'Piel', value: 'Piel seca.' },
+  ];
+
+  const diagnosticFields = [
+    { label: 'Diagnósticos o Problemas Clínicos', value: 'Gastritis.' },
+  ];
+
+  const treatmentFields = [
+    { label: 'Tratamiento Farmacológico', value: 'Omeprazol 20mg cada 24 horas.' },
+  ];
+
+  const prognosisFields = [
+    { label: 'Pronóstico', value: 'Bueno.' },
+    { label: 'Médico', value: 'Dr. Juan Pérez' },
+    { label: 'Cédula Profesional', value: '1234567890' },
+    { label: 'Cédula Especialidad', value: '0987654321' },
+  ];
+
   return (
     <div class="historial-medico-form">
       <div class="sidebar">
         <div class="title-box">
-          <h1>Patient Medical History Form</h1>
+          <h1>Historia Clínica General</h1>
         </div>
-        <div class="patient-info">
-          <h2><i class="fas fa-user"></i> Patient Information</h2>
-          <p><strong>Name:</strong> Reinaldos Prydden</p>
-          <p><strong>Email:</strong> csword2@comcast.net</p>
-          <p><strong>Birth Date:</strong> 1/10/2024</p>
-          <p><strong>Height (cm):</strong> 4</p>
-          <p><strong>Weight (kg):</strong> 4</p>
-          <p><strong>Gender:</strong> Option 2</p>
-        </div>
+        <PatientInfo />
       </div>
       <div class="content">
-        <div class="info-panel">
-          <h2><i class="fas fa-notes-medical"></i> Patient Medical History</h2>
-          <p><strong>Drug Allergies:</strong> Proin eu mi.</p>
-          <p><strong>Have you ever had:</strong> Option 2</p>
-          <p><strong>Other illnesses:</strong> Cras non velit nec nisi vulputate nonummy.</p>
-          <p><strong>Operations:</strong> Proin eu mi.</p>
-          <p><strong>Current Medications:</strong> Proin eu mi.</p>
-        </div>
-
-        <div class="info-panel">
-          <h2><i class="fas fa-heart"></i> Healthy & Unhealthy Habits</h2>
-          <p><strong>Exercise:</strong> Option 2</p>
-          <p><strong>Diet:</strong> Option 2</p>
-          <p><strong>Alcohol Consumption:</strong> Option 2</p>
-          <p><strong>Caffeine Consumption:</strong> Option 2</p>
-          <p><strong>Do you smoke?:</strong> Option 2</p>
-        </div>
+        <InfoPanel title="Historial Médico" fields={medicalHistoryFields} />
+        <InfoPanel title="Interrogatorio por Aparatos y Sistemas" fields={systemInterrogationFields} />
+        <InfoPanel title="Signos Vitales" fields={vitalSignsFields} />
+        <InfoPanel title="Exploración Física" fields={physicalExamFields} />
+        <InfoPanel title="Diagnósticos" fields={diagnosticFields} />
+        <InfoPanel title="Tratamiento" fields={treatmentFields} />
+        <InfoPanel title="Pronóstico" fields={prognosisFields} />
       </div>
     </div>
   );

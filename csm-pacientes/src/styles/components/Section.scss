@@ -1,47 +1,98 @@
-/* src/components/Section.css */
+/* src/components/HistorialMedicoForm.css */
 
-.section {
-    border-bottom: 1px solid #e0e0e0;
-    margin-bottom: 1rem;
+:root {
+  --color-primary: #284C34;
+  --color-secondary: #9C8414;
+  --color-box: #F5F5F5;
+  --color-text: #000000;
+  --font-size-default: 16px;
+}
+
+.historial-medico-form {
+  display: grid;
+  grid-template-columns: 0.7fr 2.3fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--color-box);
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+}
+
+.sidebar {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  max-height: 80vh; /* Limitar la altura máxima */
+  overflow-y: auto; /* Añadir barra de desplazamiento si excede la altura */
+}
+
+.title-box h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.patient-info h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.patient-info p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  line-height: 1.4rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.info-panel {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1.8rem;
+}
+
+.info-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: var(--color-secondary);
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.info-panel p {
+  margin: 0.4rem 0;
+  font-size: 1rem;
+  color: var(--color-text);
+  line-height: 1.5rem;
+}
+
+.info-panel strong {
+  font-weight: 600;
+}
+
+/* Estilos Responsivos */
+@media (max-width: 768px) {
+  .historial-medico-form {
+    grid-template-columns: 1fr;
   }
-  
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    padding: 1rem 0;
-    background-color: var(--color-primary);
-    color: #ffffff;
-    border-radius: 8px;
+
+  .sidebar {
+    text-align: center;
+    max-height: none; /* Eliminar restricción de altura para pantallas pequeñas */
+    overflow-y: unset;
   }
-  
-  .section-header h2 {
-    font-size: 1.2rem;
-    margin: 0;
-  }
-  
-  .toggle-btn {
-    background: none;
-    border: none;
-    color: #ffffff;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-  
-  .section-content {
-    padding: 1rem;
-    background-color: var(--color-box);
-    border-radius: 8px;
-    animation: fadeIn 0.3s ease-in-out;
-  }
-  
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-  
+}
