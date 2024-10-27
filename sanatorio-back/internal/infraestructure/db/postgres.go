@@ -136,6 +136,30 @@ func insertPermissions(ctx context.Context, storage *PgxStorage, roleID int, per
 	return nil
 }
 
+func (storage *PgxStorage) SeedOffice(ctx context.Context) (err error) {
+	officeName := []string{"Consultorio 1", "Consultorio 2", "Consultorio 3", "Consultorio 4"}
+
+	var count int
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM office").Scan(&count)
+	if err != nil {
+		return fmt.Errorf("count office: %w", err)
+	}
+	if count > 0 {
+		fmt.Println("La tabla office ya contiene datos")
+		return nil
+	}
+
+	query := "INSERT INTO office (name) VALUES ($1)"
+	for _, value := range officeName {
+		_, err = storage.DbPool.Exec(ctx, query, value)
+		if err != nil {
+			return fmt.Errorf("insert office names: %w", err)
+		}
+	}
+	fmt.Println("Valores insertados correctamente en office")
+	return nil
+}
+
 func (storage *PgxStorage) SeedOfficeStatus(ctx context.Context) (err error) {
 	statusValues := [3]string{"Disponible", "No disponible", "No asignado"}
 
@@ -294,3 +318,5 @@ func (storage *PgxStorage) SeedDependencies(ctx context.Context) (err error) {
 	fmt.Println("Dependencias insertadas correctamente en cat_dependencies")
 	return nil
 }
+
+// Seed de horarios y consultorios

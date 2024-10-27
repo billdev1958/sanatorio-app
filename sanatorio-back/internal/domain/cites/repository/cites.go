@@ -2,13 +2,12 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sanatorioApp/internal/domain/cites"
 	"sanatorioApp/internal/domain/cites/entities"
 	postgres "sanatorioApp/internal/infraestructure/db"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type citesRepository struct {
@@ -19,52 +18,40 @@ func NewCitesRepository(storage *postgres.PgxStorage) cites.CitesRepository {
 	return &citesRepository{storage: storage}
 }
 
-func (cr citesRepository) RegisterSpecialty(ctx context.Context, sp entities.Specialty) error {
-	query := "INSERT INTO cat_specialty (name, created_at) VALUES ($1, $2)"
+func (cr citesRepository) RegisterSpecialty(ctx context.Context, sp entities.Specialty) (string, error) {
+	query := "INSERT INTO cat_specialty (name) VALUES ($1, $2)"
 	_, err := cr.storage.DbPool.Exec(ctx, query, sp.Name, time.Now())
 	if err != nil {
 		log.Printf("error al registrar la especialidad '%s' en la db: %v", sp.Name, err)
-		return err
+		return "", err
 	}
-	return nil
+	return fmt.Sprintf("Especialidad '%s' registrada con éxito", sp.Name), nil
 }
 
-func (cr citesRepository) RegisterOffice(ctx context.Context, of entities.Office) error {
+func (cr citesRepository) RegisterOffice(ctx context.Context, of entities.Office) (string, error) {
 	query := `
-		INSERT INTO office (name, specialty_id, status_id, created_at)
-		VALUES ($1, $2, $3, $4)`
+		INSERT INTO office (name, specialty_id, status_id)
+		VALUES ($1, $2, $3)`
 
 	// Ejecutar la consulta
-	_, err := cr.storage.DbPool.Exec(ctx, query, of.Name, of.SpecialtyID, of.StatusID, time.Now())
+	_, err := cr.storage.DbPool.Exec(ctx, query, of.Name, of.SpecialtyID, entities.OfficeStatusUnassigned)
 	if err != nil {
 		log.Printf("error al registrar el consultorio '%s' en la db: %v", of.Name, err)
-		return err
+		return "", err
 	}
 
-	return nil
+	return fmt.Sprintf("Consultorio '%s' registrado con éxito", of.Name), nil
 }
 
-func (cr citesRepository) AssignDoctorToOffice(ctx context.Context, officeID int, doctorAccountID uuid.UUID) error {
-	query := "UPDATE office SET doctor_account_id = $1 WHERE id = $2"
-	_, err := cr.storage.DbPool.Exec(ctx, query, doctorAccountID, officeID)
-	if err != nil {
-		log.Printf("error al asignar el doctor '%s' al consultorio '%d': %v", doctorAccountID, officeID, err)
-		return err
-	}
-
-	return nil
-}
-
-func (cr citesRepository) RegisterSchedule(ctx context.Context, sc entities.Schedule) error {
-	// Proceder con el registro del horario, el trigger se encargará de validar el estado de la oficina
-	query := "INSERT INTO schedule (office_id, day_of_week, time_start, time_end, created_at) VALUES ($1, $2, $3, $4, $5)"
-	_, err := cr.storage.DbPool.Exec(ctx, query, sc.OfficeID, sc.DayOfWeek, sc.TimeStart, sc.TimeEnd, time.Now())
+func (cr citesRepository) RegisterSchedule(ctx context.Context, sc entities.Schedule) (string, error) {
+	query := "INSERT INTO schedule (office_id, day_of_week, time_start, time_end) VALUES ($1, $2, $3, $4)"
+	_, err := cr.storage.DbPool.Exec(ctx, query, sc.OfficeID, sc.DayOfWeek, sc.TimeStart, sc.TimeEnd)
 	if err != nil {
 		log.Printf("error al registrar el horario para la oficina '%d' en el día '%d' con hora inicio '%s' y hora fin '%s': %v", sc.OfficeID, sc.DayOfWeek, sc.TimeStart, sc.TimeEnd, err)
-		return err
+		return "", err
 	}
 
-	return nil
+	return fmt.Sprintf("Horario registrado con éxito para la oficina '%d' el día '%d'", sc.OfficeID, sc.DayOfWeek), nil
 }
 
-func (cr citesRepository) RegisterAppointment(ctx context.Context, ap entities.Appointment) (entities.Appointment, error)
+func (cr citesRepository) RegisterAppointment(ctx context.Context, ap entities.Appointment) (string, error)

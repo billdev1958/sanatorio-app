@@ -14,9 +14,8 @@ type Response struct {
 }
 
 type RegisterOfficeRequest struct {
-	Name            string    `json:"name"`
-	SpecialtyID     int       `json:"specialtyID"`
-	DoctorAccountID uuid.UUID `json:"doctorAccountID"`
+	Name        string `json:"name"`
+	SpecialtyID int    `json:"specialtyID"`
 }
 
 type RegisterSpecialtyRequest struct {

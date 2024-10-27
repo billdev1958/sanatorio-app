@@ -1,0 +1,63 @@
+package usecase
+
+import (
+	"context"
+	"fmt"
+	"sanatorioApp/internal/domain/cites"
+	"sanatorioApp/internal/domain/cites/entities"
+	"sanatorioApp/internal/domain/cites/http/models"
+)
+
+type usecase struct {
+	repo cites.CitesRepository
+}
+
+func NewUsecase(repo cites.CitesRepository) cites.Usecase {
+	return &usecase{repo: repo}
+}
+
+func (u *usecase) RegisterSpecialty(ctx context.Context, request models.RegisterSpecialtyRequest) (string, error) {
+
+	specialty := entities.Specialty{
+		Name: request.Name,
+	}
+
+	message, err := u.repo.RegisterSpecialty(ctx, specialty)
+	if err != nil {
+		return "", fmt.Errorf("failed to register specialty %w: ", err)
+	}
+
+	return message, nil
+}
+
+func (u *usecase) RegisterOffice(ctx context.Context, request models.RegisterOfficeRequest) (string, error) {
+	office := entities.Office{
+		Name:        request.Name,
+		SpecialtyID: request.SpecialtyID,
+	}
+
+	message, err := u.repo.RegisterOffice(ctx, office)
+	if err != nil {
+		return "", fmt.Errorf("failed to register office %w:", err)
+	}
+
+	return message, nil
+}
+
+func (u *usecase) RegisterSchedule(ctx context.Context, request models.RegisterScheduleRequest) (string, error) {
+
+	scheedule := entities.Schedule{
+		OfficeID:  request.OfficeID,
+		DayOfWeek: request.DayOfWeek,
+		TimeStart: request.TimeStart,
+		TimeEnd:   request.TimeEnd,
+	}
+
+	message, err := u.repo.RegisterSchedule(ctx, scheedule)
+	if err != nil {
+		return "", fmt.Errorf("failed to register schedule %w: ", err)
+	}
+	return message, nil
+}
+
+func (u *usecase) RegisterAppointment(ctx context.Context, appointment models.RegisterAppointmentRequest) (string, error)

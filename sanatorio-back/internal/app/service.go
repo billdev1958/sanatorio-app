@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func StartService(ctx context.Context, db *pgxpool.Pool, router *http.ServeMux) error {
+func UserService(ctx context.Context, db *pgxpool.Pool, router *http.ServeMux) error {
 	storage := postgres.NewPgxStorage(db)
 
 	repo := repository.NewUserRepository(storage)

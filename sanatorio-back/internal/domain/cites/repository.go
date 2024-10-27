@@ -3,8 +3,6 @@ package cites
 import (
 	"context"
 	"sanatorioApp/internal/domain/cites/entities"
-
-	"github.com/google/uuid"
 )
 
 type CitesRepository interface {
@@ -15,10 +13,10 @@ type CitesRepository interface {
 }
 
 type Register interface {
-	RegisterSpecialty(ctx context.Context, sp entities.Specialty) error
-	RegisterOffice(ctx context.Context, of entities.Office) error
-	RegisterSchedule(ctx context.Context, sc entities.Schedule) error
-	RegisterAppointment(ctx context.Context, ap entities.Appointment) (entities.Appointment, error)
+	RegisterSpecialty(ctx context.Context, sp entities.Specialty) (string, error)
+	RegisterOffice(ctx context.Context, of entities.Office) (string, error)
+	RegisterSchedule(ctx context.Context, sc entities.Schedule) (string, error)
+	RegisterAppointment(ctx context.Context, ap entities.Appointment) (string, error)
 }
 
 type Get interface {
@@ -33,7 +31,6 @@ type Update interface {
 	UpdateOffice(ctx context.Context, of entities.Office) (entities.Office, error)
 	UpdateSchedule(ctx context.Context, sc entities.Schedule) (entities.Schedule, error)
 	UpdateAppointment(ctx context.Context, ap entities.Appointment) (entities.Appointment, error)
-	AssignDoctorToOffice(ctx context.Context, officeID int, doctorAccountID uuid.UUID) error
 }
 
 type Delete interface {

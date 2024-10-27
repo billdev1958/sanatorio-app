@@ -86,7 +86,11 @@ func (app *App) Run() error {
 	}
 
 	// Inicia el servicio principal de la aplicación (base de datos, enrutador, etc.)
-	if err := StartService(context.Background(), app.DB, app.router); err != nil {
+	if err := UserService(context.Background(), app.DB, app.router); err != nil {
+		return fmt.Errorf("failed to start user service: %w", err) // Devuelve un error si no se pudo iniciar el servicio
+	}
+
+	if err := CitesService(context.Background(), app.DB, app.router); err != nil {
 		return fmt.Errorf("failed to start user service: %w", err) // Devuelve un error si no se pudo iniciar el servicio
 	}
 

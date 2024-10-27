@@ -28,14 +28,13 @@ type Appointment struct {
 }
 
 type Office struct {
-	ID              int
-	Name            string
-	SpecialtyID     int
-	StatusID        int
-	DoctorAccountID uuid.UUID
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	DeletedAt       *time.Time
+	ID          int
+	Name        string
+	SpecialtyID int
+	StatusID    int
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   *time.Time
 }
 
 type OfficeStatus struct {
