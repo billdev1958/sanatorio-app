@@ -23,10 +23,10 @@ type RegisterSpecialtyRequest struct {
 }
 
 type RegisterScheduleRequest struct {
-	OfficeID  int           `json:"officeID"`
-	DayOfWeek int           `json:"dayOfWeek"`
-	TimeStart time.Duration `json:"timeStart"`
-	TimeEnd   time.Duration `json:"timeEnd"`
+	OfficeID  int    `json:"officeID"`
+	DayOfWeek int    `json:"dayOfWeek"`
+	TimeStart string `json:"timeStart"`
+	TimeEnd   string `json:"timeEnd"`
 }
 
 type RegisterAppointmentRequest struct {

@@ -57,8 +57,8 @@ type Schedule struct {
 	ID        int
 	OfficeID  int
 	DayOfWeek int
-	TimeStart time.Duration
-	TimeEnd   time.Duration
+	TimeStart time.Time
+	TimeEnd   time.Time
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time

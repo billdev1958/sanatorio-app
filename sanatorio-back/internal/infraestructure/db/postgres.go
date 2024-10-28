@@ -241,7 +241,7 @@ func (storage *PgxStorage) SeedSpecialties(ctx context.Context) (err error) {
 	specialtiesValues := [5]string{"Medicina General", "Cardiologo", "Dermatologo", "Pediatra", "Ginecologia"}
 
 	var count int
-	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM specialty").Scan(&count)
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM cat_specialty").Scan(&count)
 	if err != nil {
 		return fmt.Errorf("count specialties: %w", err)
 	}
@@ -251,7 +251,7 @@ func (storage *PgxStorage) SeedSpecialties(ctx context.Context) (err error) {
 		return nil
 	}
 
-	query := "INSERT INTO specialty (name) VALUES($1)"
+	query := "INSERT INTO cat_specialty (name) VALUES($1)"
 	for _, value := range specialtiesValues {
 		_, err = storage.DbPool.Exec(ctx, query, value)
 		if err != nil {

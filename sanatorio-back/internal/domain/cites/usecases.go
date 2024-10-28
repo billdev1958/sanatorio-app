@@ -12,5 +12,5 @@ type Usecase interface {
 
 	RegisterSchedule(ctx context.Context, sh models.RegisterScheduleRequest) (string, error)
 
-	RegisterAppointment(ctx context.Context, appointment models.RegisterAppointmentRequest) (string, error)
+	// RegisterAppointment(ctx context.Context, appointment models.RegisterAppointmentRequest) (string, error)
 }

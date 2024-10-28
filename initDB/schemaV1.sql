@@ -244,7 +244,7 @@ CREATE TABLE IF NOT EXISTS consultation (
 -- ====================================
 
 -- Tabla de especialidades
-CREATE TABLE IF NOT EXISTS specialty (
+CREATE TABLE IF NOT EXISTS cat_specialty (
     id SERIAL PRIMARY KEY,
     name VARCHAR(75) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -258,7 +258,7 @@ CREATE TABLE IF NOT EXISTS office (
     name VARCHAR(60) NOT NULL,
     specialty_id INTEGER NOT NULL,
     status_id INTEGER NOT NULL,
-    doctor_id UUID NOT NULL,
+    -- doctor_id UUID NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -372,21 +372,16 @@ FOREIGN KEY (account_id) REFERENCES account(id);
 
 ALTER TABLE doctor
 ADD CONSTRAINT fk_specialty_doctor
-FOREIGN KEY (specialty_id) REFERENCES specialty(id);
+FOREIGN KEY (specialty_id) REFERENCES cat_specialty(id);
 
 -- Foreign keys para la tabla office
 ALTER TABLE office
 ADD CONSTRAINT fk_specialty_office
-FOREIGN KEY (specialty_id) REFERENCES specialty(id);
+FOREIGN KEY (specialty_id) REFERENCES cat_specialty(id);
 
 ALTER TABLE office
 ADD CONSTRAINT fk_status_office
 FOREIGN KEY (status_id) REFERENCES office_status(id);
-
--- **Corrección aplicada aquí**
-ALTER TABLE office
-ADD CONSTRAINT fk_doctor_office
-FOREIGN KEY (doctor_id) REFERENCES doctor(account_id);
 
 -- Foreign keys para la tabla schedule
 ALTER TABLE schedule
