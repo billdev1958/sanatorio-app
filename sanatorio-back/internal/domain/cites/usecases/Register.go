@@ -73,4 +73,19 @@ func (u *usecase) RegisterSchedule(ctx context.Context, request models.RegisterS
 	return message, nil
 }
 
-// func (u *usecase) RegisterAppointment(ctx context.Context, appointment models.RegisterAppointmentRequest) (string, error)
+func (u *usecase) RegisterAppointment(ctx context.Context, request models.RegisterAppointmentRequest) (string, error) {
+
+	appointment := entities.Appointment{
+		PatientAccountID: request.PatientAccountID,
+		OfficeID:         request.OfficeID,
+		Date:             request.Date,
+		ScheduleID:       request.ScheduleID,
+		StatusID:         int(entities.AppointmentStatusPendiente),
+	}
+
+	message, err := u.repo.RegisterAppointment(ctx, appointment)
+	if err != nil {
+		return "", fmt.Errorf("failed to register appointment: %w", err)
+	}
+	return message, nil
+}

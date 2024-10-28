@@ -16,7 +16,7 @@ type Register interface {
 	RegisterSpecialty(ctx context.Context, sp entities.Specialty) (string, error)
 	RegisterOffice(ctx context.Context, of entities.Office) (string, error)
 	RegisterSchedule(ctx context.Context, sc entities.Schedule) (string, error)
-	// RegisterAppointment(ctx context.Context, ap entities.Appointment) (string, error)
+	RegisterAppointment(ctx context.Context, ap entities.Appointment) (string, error)
 }
 
 type Get interface {

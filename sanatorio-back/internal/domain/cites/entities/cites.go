@@ -15,6 +15,15 @@ const (
 	OfficeStatusUnassigned
 )
 
+type AppointmentStatusType int
+
+const (
+	_ AppointmentStatusType = iota
+	AppointmentStatusPendiente
+	AppointmentStatusConfirmada
+	AppointmentStatusCancelada
+)
+
 type Appointment struct {
 	ID               uuid.UUID
 	PatientAccountID uuid.UUID
