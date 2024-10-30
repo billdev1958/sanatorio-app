@@ -216,7 +216,7 @@ CREATE TABLE IF NOT EXISTS cat_shift(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
-)
+);
 
 -- Tabla de citas
 CREATE TABLE IF NOT EXISTS appointment (
@@ -267,7 +267,7 @@ CREATE TABLE IF NOT EXISTS office (
     specialty_id INTEGER NOT NULL,
     status_id INTEGER NOT NULL,
     -- doctor_id UUID NOT NULL,
-    shift_id INTEGER NOT NULL 
+    shift_id INTEGER NOT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP

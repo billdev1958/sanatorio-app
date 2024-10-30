@@ -52,3 +52,24 @@ type PatientUser struct {
 	Created_At       time.Time
 	Updated_At       time.Time
 }
+
+type BeneficiaryUser struct {
+	ID               uuid.UUID
+	AccountHolder    uuid.UUID
+	MedicalHistoryID string
+	Firstname        string
+	Lastname1        string
+	Lastname2        string
+	Curp             string
+	Sex              string
+	Created_At       time.Time
+	Updated_At       time.Time
+}
+
+type User struct {
+	FirstName string
+	LastName1 string
+	LastName2 string
+	Curp      string
+	Sex       string
+}

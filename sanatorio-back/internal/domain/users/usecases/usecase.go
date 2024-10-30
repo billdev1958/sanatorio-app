@@ -77,6 +77,43 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 	}, nil
 }
 
+func (u *usecase) RegisterBeneficiary(ctx context.Context, request models.RegisterBeneficiaryRequest) (message string, err error) {
+	claims := auth.ExtractClaims(ctx)
+	if claims == nil {
+		return "", fmt.Errorf("unauthorized: no claims found in context")
+	}
+
+	beneficiaryMedicalHistory := patient{
+		FirstName: request.Firstname,
+		LastName1: request.Lastname1,
+		LastName2: request.Lastname2,
+		LegacyID:  rand.Intn(900000) + 100000,
+	}
+
+	medicalHistoryID, err := createMedicalHistoryID(beneficiaryMedicalHistory)
+	if err != nil {
+		log.Printf("Error creating medical history ID: %v", err)
+		return "models.UserData{}", err // Manejar el error devolviendo un valor vacío o adecuado
+	}
+
+	registerBeneficiary := entities.BeneficiaryUser{
+		ID:               uuid.New(),
+		AccountHolder:    claims.AccountID,
+		MedicalHistoryID: medicalHistoryID,
+		Firstname:        request.Firstname,
+		Lastname1:        request.Lastname1,
+		Lastname2:        request.Lastname2,
+	}
+
+	message, err = u.repo.RegisterBeneficiary(ctx, registerBeneficiary)
+	if err != nil {
+		log.Printf("Error registering beneficiary: %v", err)
+		return "", fmt.Errorf("failed to register beneficiary: %w", err)
+	}
+
+	return message, nil
+}
+
 func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (models.LoginResponse, error) {
 	// Crear la entidad de login
 	loginUser := entities.Account{

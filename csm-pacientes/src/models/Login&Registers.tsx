@@ -14,3 +14,11 @@ export interface RegisterUser {
     Email: string;
     Password: string;
 }
+
+export interface RegisterBeneficiaryRequest {
+  name: string;
+  lastname1: string;
+  lastname2: string;
+  curp: string;
+  sex: string;
+}

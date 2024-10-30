@@ -114,3 +114,55 @@ func (pr *userRepository) registerMedicalHistory(ctx context.Context, tx pgx.Tx,
 	}
 	return nil
 }
+
+func (pr *userRepository) registerMedicalHistoryB(ctx context.Context, tx pgx.Tx, medicalHistoryID string, bu entities.BeneficiaryUser) error {
+	query := "INSERT INTO medical_history (id, patient_name, curp, gender) VALUES ($1, $2, $3, $4)"
+	_, err := tx.Exec(ctx, query, medicalHistoryID, bu.Firstname, bu.Curp, bu.Sex)
+	if err != nil {
+		return fmt.Errorf("insert into medical_history table: %w", err)
+	}
+	return nil
+}
+
+func (ur *userRepository) RegisterBeneficiary(ctx context.Context, bu entities.BeneficiaryUser) (message string, err error) {
+	// Crear un contexto con cancelación
+	ctxTx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	// Iniciar la transacción
+	tx, err := ur.storage.DbPool.Begin(ctxTx)
+	if err != nil {
+		log.Printf("error beginning transaction: %v", err)
+		return "", fmt.Errorf("begin transaction: %w", err)
+	}
+
+	// Definir el defer para manejo de commit/rollback
+	defer func() {
+		if err != nil {
+			if rbErr := tx.Rollback(ctxTx); rbErr != nil {
+				log.Printf("error rolling back transaction: %v", rbErr)
+			}
+		} else {
+			err = tx.Commit(ctxTx)
+			if err != nil {
+				log.Printf("error committing transaction: %v", err)
+			}
+		}
+	}()
+
+	err = ur.registerMedicalHistoryB(ctxTx, tx, bu.MedicalHistoryID, bu)
+	if err != nil {
+		return "", fmt.Errorf("failed to register medical history: %w", err)
+	}
+
+	query := "INSERT INTO beneficiary (id, account_holder, medical_history_id, firstname, lastname1, lastname2, curp, sex) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
+
+	_, err = tx.Exec(ctxTx, query, bu.ID, bu.AccountHolder, bu.MedicalHistoryID, bu.Firstname, bu.Lastname1, bu.Lastname2, bu.Curp, bu.Sex)
+	if err != nil {
+		return "", fmt.Errorf("error al insertar en la tabla beneficiary: %w", err)
+	}
+
+	return "Beneficiario registrado exitosamente", nil
+}
+
+// TODO REFACTORIZAR ENTIDADES YA QUE AL REGISTRAR MEDICALHISTORY SE USAN DISTINTAS STRUCTS A PESAR DE QUE TIENEN LOS MISMOS PARAMETROS SEPARAR LOS CAMPOS QUE COINCIDEN Y HACER UNA NUEVA STRUCT

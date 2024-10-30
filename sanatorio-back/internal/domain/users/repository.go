@@ -19,6 +19,7 @@ type Autenticador interface {
 
 type RegisterU interface {
 	RegisterPatientTransaction(ctx context.Context, account entities.Account, pu entities.PatientUser) (entities.PatientUser, error)
+	RegisterBeneficiary(ctx context.Context, request entities.BeneficiaryUser) (message string, err error)
 }
 
 type GetU interface {

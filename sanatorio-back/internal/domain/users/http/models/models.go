@@ -29,6 +29,14 @@ type RegisterPatientRequest struct {
 	Password     string `json:"password"`
 }
 
+type RegisterBeneficiaryRequest struct {
+	Firstname string `json:"name"`
+	Lastname1 string `json:"lastname1"`
+	Lastname2 string `json:"lastname2"`
+	Curp      string `json:"curp"`
+	Sex       string `json:"sex"`
+}
+
 // Login
 type LoginUser struct {
 	Email    string `json:"email"`

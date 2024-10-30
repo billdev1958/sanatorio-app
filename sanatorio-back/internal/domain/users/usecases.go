@@ -9,6 +9,8 @@ type Usecase interface {
 	//REGISTER
 	RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.UserData, error)
 
+	RegisterBeneficiary(ctx context.Context, request models.RegisterBeneficiaryRequest) (message string, err error)
+
 	LoginUser(ctx context.Context, lu models.LoginUser) (models.LoginResponse, error)
 	// GET
 
