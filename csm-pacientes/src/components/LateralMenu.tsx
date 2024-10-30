@@ -33,12 +33,6 @@ const LateralMenu = (props: { open: boolean; toggleMenu: () => void }) => {
             </A>
           </li>
           <li>
-            <A href="/medicalhistory" activeClass="active" class="menu-link">
-              <img src={historiaClinicaIcon} alt="Historia Clínica" />
-              <span>Historia Clínica</span>
-            </A>
-          </li>
-          <li>
             <A href="/citas" activeClass="active" class="menu-link">
               <img src={cita} alt="Agendar Cita" />
               <span>Agendar Cita</span>

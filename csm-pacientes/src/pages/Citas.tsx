@@ -11,7 +11,7 @@ const Citas = () => {
           <div class="form-section">
             <h2>Selecciona Especialidad</h2>
             <select>
-              <option value="">-- Selecciona Especialidad --</option>
+              <option value="">Servicios --</option>
               <option value="medicina-general">Medicina General</option>
               <option value="pediatria">Pediatría</option>
               <option value="dermatologia">Dermatología</option>

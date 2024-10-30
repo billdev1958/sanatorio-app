@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import HistorialMedicoPage from "./pages/MedicalHistoryP";
 import { AuthProvider } from "./services/AuthContext";
 import ProtectedRoute from "./services/ProtectedRoute"; // Importamos el componente ProtectedRoute
+import RegisterBeneficiary from "./pages/RegisterBeneficiary";
 
 const root = document.getElementById("root");
 
@@ -38,6 +39,13 @@ render(
           <ProtectedRoute>
             <App>
               <HistorialMedicoPage />
+            </App>
+          </ProtectedRoute>
+        )} />
+        <Route path="/beneficiary" component={() => (
+          <ProtectedRoute>
+            <App>
+              <RegisterBeneficiary />
             </App>
           </ProtectedRoute>
         )} />

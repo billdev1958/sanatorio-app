@@ -3,22 +3,23 @@ export interface LoginUser {
     password: string;
   }
   
-export interface RegisterUser {
-    AfiliationID: number;
-    Name: string;
-    Lastname1: string;
-    Lastname2: string;
-    Curp: string;
-    Sex: string;
-    PhoneNumber: string;
-    Email: string;
-    Password: string;
-}
-
-export interface RegisterBeneficiaryRequest {
-  name: string;
-  lastname1: string;
-  lastname2: string;
-  curp: string;
-  sex: string;
-}
+  export interface RegisterPatientRequest {
+    dependency_id: number;
+    name: string;
+    lastname1: string;
+    lastname2: string;
+    curp: string;
+    sex: string;
+    phone: string;
+    email: string;
+    password: string;
+  }
+  
+  export interface RegisterBeneficiaryRequest {
+    name: string;
+    lastname1: string;
+    lastname2: string;
+    curp: string;
+    sex: string;
+  }
+  
