@@ -1,8 +1,7 @@
 import { createSignal } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
-import NavBar from '../components/NavBar'; // Importa el NavBar
 import FormInput from '../components/FormInput'; // Importa el componente reutilizable
-import { registerBeneficiary, registerUser } from '../services/RegisterService'; // Importa el servicio de registro
+import { registerBeneficiary } from '../services/RegisterService'; // Importa el servicio de registro
 import { RegisterBeneficiaryRequest } from '../models/Login&Registers';
 
 const RegisterBeneficiary = () => {
