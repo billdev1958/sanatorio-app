@@ -210,6 +210,14 @@ CREATE TABLE IF NOT EXISTS medical_history_relation (
 -- Tablas relacionadas con citas y consultas
 -- ====================================
 
+CREATE TABLE IF NOT EXISTS cat_shift(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR (10) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+)
+
 -- Tabla de citas
 CREATE TABLE IF NOT EXISTS appointment (
     id UUID PRIMARY KEY,
@@ -259,6 +267,7 @@ CREATE TABLE IF NOT EXISTS office (
     specialty_id INTEGER NOT NULL,
     status_id INTEGER NOT NULL,
     -- doctor_id UUID NOT NULL,
+    shift_id INTEGER NOT NULL 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -382,6 +391,10 @@ FOREIGN KEY (specialty_id) REFERENCES cat_specialty(id);
 ALTER TABLE office
 ADD CONSTRAINT fk_status_office
 FOREIGN KEY (status_id) REFERENCES office_status(id);
+
+ALTER TABLE office
+ADD CONSTRAINT fk_shift_office
+FOREIGN KEY (shift_id) REFERENCES cat_shift(id);
 
 -- Foreign keys para la tabla schedule
 ALTER TABLE schedule
