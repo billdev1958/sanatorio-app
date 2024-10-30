@@ -11,6 +11,8 @@ func (h *handler) UserRoutes(mux *http.ServeMux) {
 	// Registros
 	mux.HandleFunc("POST /v1/patients", h.RegisterPatient)
 
+	mux.HandleFunc("POST /v1/beneficiary", h.RegisterBeneficiary)
+
 	// Updates
 	mux.Handle("PUT /v1/users", CORS(auth.AuthMiddleware(http.HandlerFunc(h.UpdateUser))))
 
