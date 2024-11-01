@@ -6,6 +6,7 @@ const (
 	_ = iota
 	SuperAdmin
 	Admin
+	Receptionist
 	Doctor
 	Patient
 )

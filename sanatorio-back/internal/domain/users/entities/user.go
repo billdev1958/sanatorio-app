@@ -28,14 +28,36 @@ type Account struct {
 	Deleted_At          time.Time
 }
 
+type SuperAdminUser struct {
+	AccountID  uuid.UUID
+	FirstName  string
+	LastName1  string
+	LastName2  string
+	Curp       string
+	Sex        string
+	Created_At time.Time
+	Updated_At time.Time
+}
+
+type ReceptionistUser struct {
+	AccountID  uuid.UUID
+	FirstName  string
+	LastName1  string
+	LastName2  string
+	Curp       string
+	Sex        string
+	Created_At time.Time
+	Updated_At time.Time
+}
+
 type DoctorUser struct {
 	AccountID      uuid.UUID
 	MedicalLicense string
-	SpecialtyID    Specialties
+	SpecialtyID    int
 	FirstName      string
 	LastName1      string
 	LastName2      string
-	Sex            byte
+	Sex            string
 	Created_At     time.Time
 	Updated_At     time.Time
 }

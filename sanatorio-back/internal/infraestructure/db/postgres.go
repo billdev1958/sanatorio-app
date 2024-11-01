@@ -136,6 +136,30 @@ func insertPermissions(ctx context.Context, storage *PgxStorage, roleID int, per
 	return nil
 }
 
+// SeedDays inserta los días de la semana en la tabla days
+func (storage *PgxStorage) SeedDays(ctx context.Context) error {
+	nameDays := []string{"Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"}
+
+	for dayOfWeek, name := range nameDays {
+		if err := insertDay(ctx, storage, dayOfWeek, name); err != nil {
+			return fmt.Errorf("error inserting day %s: %w", name, err)
+		}
+	}
+
+	return nil
+}
+
+// insertDay inserta un único día en la tabla days
+func insertDay(ctx context.Context, storage *PgxStorage, dayOfWeek int, name string) error {
+	query := "INSERT INTO days (day_of_week, name) VALUES ($1, $2) ON CONFLICT (day_of_week) DO NOTHING"
+
+	_, err := storage.DbPool.Exec(ctx, query, dayOfWeek, name)
+	if err != nil {
+		return fmt.Errorf("failed to insert day %s: %w", name, err)
+	}
+	return nil
+}
+
 func (storage *PgxStorage) SeedOffice(ctx context.Context) (err error) {
 	officeName := []string{"Consultorio 1", "Consultorio 2", "Consultorio 3", "Consultorio 4"}
 

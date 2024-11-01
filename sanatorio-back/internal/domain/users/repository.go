@@ -14,10 +14,13 @@ type Repository interface {
 }
 
 type Autenticador interface {
-	LoginUser(ctx context.Context, lu entities.Account) (entities.Account, error)
+	GetUserByIdentifier(ctx context.Context, identifier string) (entities.Account, error)
 }
 
 type RegisterU interface {
+	RegisterAdminTransaction(ctx context.Context, account entities.Account, su entities.SuperAdminUser) (entities.SuperAdminUser, error)
+	RegisterReceptionistTransaction(ctx context.Context, account entities.Account, ru entities.ReceptionistUser) (entities.ReceptionistUser, error)
+	RegisterDoctorTransaction(ctx context.Context, account entities.Account, du entities.DoctorUser) (entities.DoctorUser, error)
 	RegisterPatientTransaction(ctx context.Context, account entities.Account, pu entities.PatientUser) (entities.PatientUser, error)
 	RegisterBeneficiary(ctx context.Context, request entities.BeneficiaryUser) (message string, err error)
 }

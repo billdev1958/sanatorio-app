@@ -29,6 +29,43 @@ type RegisterPatientRequest struct {
 	Password     string `json:"password"`
 }
 
+type RegisterSuperAdminRequest struct {
+	AfiliationID int    `json:"dependency_id"`
+	Name         string `json:"name"`
+	Lastname1    string `json:"lastname1"`
+	Lastname2    string `json:"lastname2"`
+	Curp         string `json:"curp"`
+	Sex          string `json:"sex"`
+	PhoneNumber  string `json:"phone"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+}
+
+type RegisterReceptionistRequest struct {
+	AfiliationID int    `json:"dependency_id"`
+	Name         string `json:"name"`
+	Lastname1    string `json:"lastname1"`
+	Lastname2    string `json:"lastname2"`
+	Curp         string `json:"curp"`
+	Sex          string `json:"sex"`
+	PhoneNumber  string `json:"phone"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+}
+
+type RegisterDoctorRequest struct {
+	AfiliationID   int    `json:"dependency_id"`
+	MedicalLicense string `json:"medical_license"`
+	SpecialtyID    int    `json:"specialty_id"`
+	Name           string `json:"name"`
+	Lastname1      string `json:"lastname1"`
+	Lastname2      string `json:"lastname2"`
+	Sex            string `json:"sex"`
+	PhoneNumber    string `json:"phone"`
+	Email          string `json:"email"`
+	Password       string `json:"password"`
+}
+
 type RegisterBeneficiaryRequest struct {
 	Firstname string `json:"name"`
 	Lastname1 string `json:"lastname1"`

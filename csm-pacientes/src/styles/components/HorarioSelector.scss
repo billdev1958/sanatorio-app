@@ -1,28 +1,34 @@
 .horario-container {
   text-align: center;
-  padding: 1rem;
+  padding: 1.5rem;
+  background-color: var(--color-box);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .horarios-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 10px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-top: 25px;
 }
 
 .horario-card {
-  background-color: #f0f0f0;
-  padding: 10px;
-  border-radius: 8px;
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  padding: 15px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
+  font-size: 1.1rem;
+  transition: background-color 0.3s, transform 0.2s;
   text-align: center;
   user-select: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .horario-card:hover {
-  background-color: #ddd;
+  background-color: var(--color-secondary);
+  transform: scale(1.05);
 }
 
 .horario-card.selected {
@@ -33,20 +39,21 @@
 /* Ajustes para pantallas pequeñas */
 @media (max-width: 768px) {
   .horarios-grid {
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Reduce el tamaño mínimo */
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); /* Reduce el tamaño mínimo */
   }
 
   .horario-card {
-    font-size: 0.85rem; /* Reduce el tamaño de la fuente */
+    font-size: 0.9rem; /* Reduce el tamaño de la fuente */
+    padding: 10px;
   }
 
   .horario-container {
-    padding: 0.5rem; /* Reduce el padding en pantallas pequeñas */
+    padding: 1rem; /* Reduce el padding en pantallas pequeñas */
   }
 
   /* Ajustes para el calendario */
   .calendar-container {
-    max-width: 90%; /* Ajusta el ancho máximo en pantallas pequeñas */
+    max-width: 95%; /* Ajusta el ancho máximo en pantallas pequeñas */
     margin: auto;
   }
 }

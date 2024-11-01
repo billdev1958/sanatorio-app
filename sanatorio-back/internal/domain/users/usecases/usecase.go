@@ -2,12 +2,14 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"sanatorioApp/internal/auth"
 	user "sanatorioApp/internal/domain/users"
 	"sanatorioApp/internal/domain/users/entities"
 	"sanatorioApp/internal/domain/users/http/models"
+	validation "sanatorioApp/pkg"
 	password "sanatorioApp/pkg/pass"
 	"strconv"
 
@@ -113,30 +115,34 @@ func (u *usecase) RegisterBeneficiary(ctx context.Context, request models.Regist
 
 	return message, nil
 }
-
 func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (models.LoginResponse, error) {
-	// Crear la entidad de login
-	loginUser := entities.Account{
-		Email:    request.Email,
-		Password: request.Password,
-	}
 
-	// Llamar al repositorio para autenticar el usuario
-	loginResponse, err := u.repo.LoginUser(ctx, loginUser)
+	// Validar los datos de login
+	err := validation.ValidateLoginData(request.Email, request.Password)
 	if err != nil {
-		return models.LoginResponse{}, err
+		return models.LoginResponse{}, fmt.Errorf("validación fallida: %w", err)
 	}
 
-	// Generar el token JWT si el login fue exitoso
-	token, err := auth.GenerateJWT(loginResponse.ID, int(loginResponse.Rol))
+	// Buscar el usuario por identificador (username o email)
+	account, err := u.repo.GetUserByIdentifier(ctx, request.Email)
 	if err != nil {
-		return models.LoginResponse{}, err
+		return models.LoginResponse{}, fmt.Errorf("usuario no encontrado: %w", err)
 	}
 
-	// Retornar los datos crudos (LoginResponse) al handler
+	// Verificar la contraseña
+	if !password.CheckPasswordHash(request.Password, account.Password) {
+		return models.LoginResponse{}, errors.New("contraseña incorrecta")
+	}
+
+	token, err := auth.GenerateJWT(account.ID, int(account.Rol))
+	if err != nil {
+		return models.LoginResponse{}, fmt.Errorf("error al generar el token: %w", err)
+	}
+
+	// Crear y devolver la respuesta del login
 	return models.LoginResponse{
-		AccountID: loginResponse.ID,
-		Role:      int(loginResponse.Rol),
+		AccountID: account.ID,
+		Role:      int(account.Rol),
 		Token:     token,
 	}, nil
 }

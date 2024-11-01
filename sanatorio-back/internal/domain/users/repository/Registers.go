@@ -20,7 +20,6 @@ func NewUserRepository(storage *postgres.PgxStorage) user.Repository {
 	return &userRepository{storage: storage}
 }
 
-// TODO corregir registro
 // Función para registrar un usuario
 func (ur *userRepository) RegisterPatientTransaction(ctx context.Context, account entities.Account, pu entities.PatientUser) (entities.PatientUser, error) {
 	// Iniciar la transacción
@@ -155,7 +154,7 @@ func (ur *userRepository) RegisterBeneficiary(ctx context.Context, bu entities.B
 		return "", fmt.Errorf("failed to register medical history: %w", err)
 	}
 
-	query := "INSERT INTO beneficiary (id, account_holder, medical_history_id, firstname, lastname1, lastname2, curp, sex) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
+	query := "INSERT INTO beneficiary (id, account_holder, medical_history_id, first_name, last_name1, last_name2, curp, sex) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
 
 	_, err = tx.Exec(ctxTx, query, bu.ID, bu.AccountHolder, bu.MedicalHistoryID, bu.Firstname, bu.Lastname1, bu.Lastname2, bu.Curp, bu.Sex)
 	if err != nil {

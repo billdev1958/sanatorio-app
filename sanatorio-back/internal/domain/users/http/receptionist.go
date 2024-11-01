@@ -4,55 +4,43 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	user "sanatorioApp/internal/domain/users"
 	"sanatorioApp/internal/domain/users/http/models"
 )
 
-type handler struct {
-	uc user.Usecase
-}
-
-func NewHandler(uc user.Usecase) *handler {
-	return &handler{uc: uc}
-}
-
-func (h *handler) LoginUser(w http.ResponseWriter, r *http.Request) {
-	var request models.LoginUser
-
+func (h *handler) RegisterReceptionist(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
+	// Decodificar el payload de la solicitud
+	var request models.RegisterReceptionistRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		log.Printf("Error al decodificar la solicitud: %v", err)
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
-	// Llamada al caso de uso
-	loginResponse, err := h.uc.LoginUser(r.Context(), request)
+	log.Printf("Decoded request: %+v", request)
+
+	// Llamar al caso de uso para manejar el registro
+	patientData, err := h.uc.RegisterReceptionist(r.Context(), request)
 	if err != nil {
-		log.Printf("Error en el proceso de login: %v", err)
 		response := models.Response{
 			Status:  "error",
 			Message: err.Error(),
 			Data:    nil,
 		}
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(response)
 		return
 	}
-
+	// Preparar la respuesta formateada
 	response := models.Response{
 		Status:  "success",
-		Message: "User logged in successfully",
-		Data:    loginResponse,
+		Message: "Receptionist registered successfully",
+		Data:    patientData,
 	}
 
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		log.Printf("Error al codificar la respuesta: %v", err)
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 		return
 	}
-
 }

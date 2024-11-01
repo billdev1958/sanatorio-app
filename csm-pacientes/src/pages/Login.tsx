@@ -1,10 +1,11 @@
-import { createSignal, createEffect } from "solid-js";
+import { createSignal, createEffect, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import logoCMS from '../assets/logo_cms.png'; 
 import FormInput from '../components/FormInput'; 
 import { useLoginService } from '../services/LoginService'; 
 import { LoginUser } from '../models/Login&Registers'; 
 import NavBar from '../components/NavBar'; // Importamos el NavBar para mostrarlo
+import Modal from "../components/Modal"; // Importamos el modal
 
 const Login = () => {
   // Utiliza el servicio de login
@@ -13,6 +14,14 @@ const Login = () => {
   // Señales para el email y la contraseña
   const [email, setEmail] = createSignal<string>(""); 
   const [password, setPassword] = createSignal<string>(""); 
+
+  // Señales para controlar el modal
+  const [showModal, setShowModal] = createSignal(false);
+  const [modalProps, setModalProps] = createSignal({
+    type: "error" as "success" | "error",
+    message: "",
+    onClose: () => setShowModal(false),
+  });
 
   // Hook para la navegación
   const navigate = useNavigate(); 
@@ -28,6 +37,16 @@ const Login = () => {
 
     // Intenta loguear al usuario
     await login(user);
+
+    // Si hay un error de login, mostramos el modal
+    if (loginError()) {
+      setModalProps({
+        type: "error",
+        message: loginError() ?? "Ocurrió un error inesperado.", // Aseguramos que message siempre sea un string
+        onClose: () => setShowModal(false),
+      });
+      setShowModal(true);
+    }
   };
 
   // Efecto para redirigir al usuario si hay un token presente
@@ -72,8 +91,6 @@ const Login = () => {
             </button>
           </form>
 
-          {loginError() && <p class="error-message">Error: {loginError()}</p>} 
-
           <div class="form-links">
             <p>Conoce nuestro <a href="#privacy">Aviso de Privacidad</a></p>
             <p>¿Eres nuevo? <a href="register">Regístrate</a></p>
@@ -81,6 +98,11 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal para mostrar errores o mensajes */}
+      <Show when={showModal()}>
+        <Modal {...modalProps()} />
+      </Show>
     </>
   );
 };

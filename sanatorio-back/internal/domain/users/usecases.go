@@ -7,6 +7,9 @@ import (
 
 type Usecase interface {
 	//REGISTER
+	RegisterSuperAdmin(ctx context.Context, request models.RegisterSuperAdminRequest) (models.UserData, error)
+	RegisterReceptionist(ctx context.Context, request models.RegisterReceptionistRequest) (models.UserData, error)
+	RegisterDoctor(ctx context.Context, request models.RegisterDoctorRequest) (models.UserData, error)
 	RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.UserData, error)
 
 	RegisterBeneficiary(ctx context.Context, request models.RegisterBeneficiaryRequest) (message string, err error)

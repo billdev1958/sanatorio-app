@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS doctor (
     last_name2 VARCHAR(50) NOT NULL,
     specialty_id INT NOT NULL,
     medical_license VARCHAR(25) NOT NULL,
+    sex VARCHAR(1) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -116,12 +117,13 @@ CREATE TABLE IF NOT EXISTS beneficiary (
 );
 
 -- Tabla de recepcionista
-CREATE TABLE IF NOT EXISTS recepcionista (
+CREATE TABLE IF NOT EXISTS receptionist (
     account_id UUID NOT NULL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
     last_name1 VARCHAR(50) NOT NULL,
     last_name2 VARCHAR(50) NOT NULL,
     curp CHAR(18) NOT NULL,
+    sex VARCHAR(1),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -134,6 +136,7 @@ CREATE TABLE IF NOT EXISTS super_admin (
     last_name1 VARCHAR(50) NOT NULL,
     last_name2 VARCHAR(50) NOT NULL,
     curp CHAR(18) NOT NULL,
+    sex VARCHAR(1),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -210,6 +213,12 @@ CREATE TABLE IF NOT EXISTS medical_history_relation (
 -- Tablas relacionadas con citas y consultas
 -- ====================================
 
+CREATE TABLE IF NOT EXISTS days (
+    id SERIAL PRIMARY KEY,
+    day_of_week INT NOT NULL UNIQUE,
+    name VARCHAR(10) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS cat_shift(
     id SERIAL PRIMARY KEY,
     name VARCHAR (10) NOT NULL,
@@ -226,7 +235,6 @@ CREATE TABLE IF NOT EXISTS appointment (
     office_id INTEGER NOT NULL,
     time_start TIMESTAMP NOT NULL,
     time_end TIMESTAMP NOT NULL,
-    schedule_id INTEGER NOT NULL,
     status_id INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
@@ -276,13 +284,34 @@ CREATE TABLE IF NOT EXISTS office (
 -- Tabla de horarios
 CREATE TABLE IF NOT EXISTS schedule (
     id SERIAL PRIMARY KEY,
+    doctor_id UUID,
+    service_id INTEGER,
     office_id INTEGER NOT NULL,
     day_of_week INT NOT NULL,
     time_start TIME NOT NULL,
     time_end TIME NOT NULL,
+    time_duration INTERVAL NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS schedule_block (
+    id SERIAL PRIMARY KEY,
+    office_id INTEGER NOT NULL,
+    doctor_id UUID,
+    service_id INTEGER,
+    block_date DATE NOT NULL,
+    time_start TIME,
+    time_end TIME,
+    reason VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP,
+    CHECK (
+        doctor_id IS NOT NULL OR
+        service_id IS NOT NULL
+    )
 );
 
 -- ====================================
@@ -398,15 +427,39 @@ FOREIGN KEY (shift_id) REFERENCES cat_shift(id);
 
 -- Foreign keys para la tabla schedule
 ALTER TABLE schedule
+ADD CONSTRAINT fk_schedule_doctor
+FOREIGN KEY (doctor_id) REFERENCES doctor(account_id);
+
+ALTER TABLE schedule
+ADD CONSTRAINT fk_schedule_service
+FOREIGN KEY (service_id) REFERENCES services(id);
+
+ALTER TABLE schedule
 ADD CONSTRAINT fk_office_schedule
 FOREIGN KEY (office_id) REFERENCES office(id);
 
--- Foreign keys para la tabla appointment
-ALTER TABLE appointment
-ADD CONSTRAINT fk_schedule_appointment
-FOREIGN KEY (schedule_id) REFERENCES schedule(id);
+ALTER TABLE schedule
+ADD CONSTRAINT fk_schedule_day
+FOREIGN KEY (day_of_week) REFERENCES days(day_of_week);
 
--- **Corrección aplicada aquí**
+-- Foreign keys para la tabla schedule_block
+ALTER TABLE schedule_block
+ADD CONSTRAINT fk_schedule_block_office
+FOREIGN KEY (office_id) REFERENCES office(id);
+
+
+ALTER TABLE schedule_block
+ADD CONSTRAINT fk_schedule_block_doctor
+FOREIGN KEY (doctor_id) REFERENCES doctor(account_id);
+
+ALTER TABLE schedule_block
+ADD CONSTRAINT fk_schedule_block_service
+FOREIGN KEY (service_id) REFERENCES services(id);
+
+
+
+-- Foreign keys para la tabla appointment
+
 ALTER TABLE appointment
 ADD CONSTRAINT fk_doctor_appointment
 FOREIGN KEY (doctor_id) REFERENCES doctor(account_id);
