@@ -54,16 +54,16 @@ type RegisterReceptionistRequest struct {
 }
 
 type RegisterDoctorRequest struct {
-	AfiliationID   int    `json:"dependency_id"`
-	MedicalLicense string `json:"medical_license"`
-	SpecialtyID    int    `json:"specialty_id"`
-	Name           string `json:"name"`
-	Lastname1      string `json:"lastname1"`
-	Lastname2      string `json:"lastname2"`
-	Sex            string `json:"sex"`
-	PhoneNumber    string `json:"phone"`
-	Email          string `json:"email"`
-	Password       string `json:"password"`
+	AfiliationID     int    `json:"dependency_id"`
+	MedicalLicense   string `json:"medical_license"`
+	SpecialtyLicense string `json:"specialty_license"`
+	Name             string `json:"name"`
+	Lastname1        string `json:"lastname1"`
+	Lastname2        string `json:"lastname2"`
+	Sex              string `json:"sex"`
+	PhoneNumber      string `json:"phone"`
+	Email            string `json:"email"`
+	Password         string `json:"password"`
 }
 
 type RegisterBeneficiaryRequest struct {
@@ -99,14 +99,14 @@ type UserRequest struct {
 }
 
 type DoctorRequest struct {
-	ID             uuid.UUID `json:"id"`
-	Name           string    `json:"name"`
-	Lastname1      string    `json:"lastname1"`
-	Lastname2      string    `json:"lastname2"`
-	Email          string    `json:"email"`
-	MedicalLicense string    `json:"medical_license"`
-	SpecialtyID    int       `json:"specialty"`
-	AccountID      uuid.UUID `json:"account_id"`
+	ID               uuid.UUID `json:"id"`
+	Name             string    `json:"name"`
+	Lastname1        string    `json:"lastname1"`
+	Lastname2        string    `json:"lastname2"`
+	Email            string    `json:"email"`
+	MedicalLicense   string    `json:"medical_license"`
+	SpecialtyLicense string    `json:"specialty"`
+	AccountID        uuid.UUID `json:"account_id"`
 }
 
 type PatientRequest struct {

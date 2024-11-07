@@ -275,7 +275,7 @@ func (storage *PgxStorage) SeedSpecialties(ctx context.Context) (err error) {
 		return nil
 	}
 
-	query := "INSERT INTO cat_specialty (name) VALUES($1)"
+	query := "INSERT INTO services (name) VALUES($1)"
 	for _, value := range specialtiesValues {
 		_, err = storage.DbPool.Exec(ctx, query, value)
 		if err != nil {
@@ -284,6 +284,32 @@ func (storage *PgxStorage) SeedSpecialties(ctx context.Context) (err error) {
 	}
 
 	fmt.Println("Especialidades insertadas correctamente en specialty")
+	return nil
+}
+
+func (storage *PgxStorage) SeedServices(ctx context.Context) (err error) {
+	specialtiesValues := [5]string{"Medicina General", "Cardiologo", "Dermatologo", "Pediatra", "Ginecologia"}
+
+	var count int
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM services").Scan(&count)
+	if err != nil {
+		return fmt.Errorf("count services: %w", err)
+	}
+
+	if count > 0 {
+		fmt.Println("La tabla services ya contiene datos")
+		return nil
+	}
+
+	query := "INSERT INTO services (name) VALUES($1)"
+	for _, value := range specialtiesValues {
+		_, err = storage.DbPool.Exec(ctx, query, value)
+		if err != nil {
+			return fmt.Errorf("insert services: %w", err)
+		}
+	}
+
+	fmt.Println("servicios insertads correctamente en servicios")
 	return nil
 }
 
@@ -344,3 +370,32 @@ func (storage *PgxStorage) SeedDependencies(ctx context.Context) (err error) {
 }
 
 // Seed de horarios y consultorios
+
+func (storage *PgxStorage) SeedShifts(ctx context.Context) (err error) {
+	// Estados de la cita que vamos a insertar
+	statusValues := [2]string{"Matutino", "Vespertino"}
+
+	// Verificar si ya hay datos en la tabla appointment_status
+	var count int
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM cat_shift").Scan(&count)
+	if err != nil {
+		return fmt.Errorf("count cat_shift: %w", err)
+	}
+
+	if count > 0 {
+		fmt.Println("La tabla cat_shift ya contiene datos")
+		return nil
+	}
+
+	// Query para insertar los estados
+	query := "INSERT INTO cat_shift (name) VALUES($1)"
+	for _, value := range statusValues {
+		_, err = storage.DbPool.Exec(ctx, query, value)
+		if err != nil {
+			return fmt.Errorf("insert cat_shift: %w", err)
+		}
+	}
+
+	fmt.Println("Estados de citas insertados correctamente en cat_shift")
+	return nil
+}

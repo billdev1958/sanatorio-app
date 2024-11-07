@@ -8,9 +8,9 @@ import (
 type Usecase interface {
 	RegisterSpecialty(ctx context.Context, sp models.RegisterSpecialtyRequest) (string, error)
 
-	RegisterOffice(ctx context.Context, office models.RegisterOfficeRequest) (string, error)
+	RegisterOfficeSchedule(ctx context.Context, request models.RegisterOfficeScheduleRequest) (string, error)
 
-	RegisterSchedule(ctx context.Context, sh models.RegisterScheduleRequest) (string, error)
+	RegisterOffice(ctx context.Context, office models.RegisterOfficeRequest) (string, error)
 
 	RegisterAppointment(ctx context.Context, appointment models.RegisterAppointmentRequest) (string, error)
 }

@@ -31,12 +31,12 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 
 	// Crear la entidad PatientUser con los datos de la solicitud
 	registerDoctor := entities.DoctorUser{
-		MedicalLicense: request.MedicalLicense,
-		SpecialtyID:    request.SpecialtyID,
-		FirstName:      request.Name,
-		LastName1:      request.Lastname1,
-		LastName2:      request.Lastname2,
-		Sex:            request.Sex,
+		MedicalLicense:   request.MedicalLicense,
+		SpecialtyLicense: request.SpecialtyLicense,
+		FirstName:        request.Name,
+		LastName1:        request.Lastname1,
+		LastName2:        request.Lastname2,
+		Sex:              request.Sex,
 	}
 
 	// Intentar registrar al paciente en una transacción

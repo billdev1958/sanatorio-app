@@ -158,6 +158,11 @@ func seedDatabase(dbPool *pgxpool.Pool) error {
 		log.Fatalf("error seeding user  %v\n", err)
 	}
 
+	err = storage.SeedServices(context.Background())
+	if err != nil {
+		log.Fatalf("error seeding user  %v\n", err)
+	}
+
 	err = storage.SeedPermissions(context.Background())
 	if err != nil {
 		log.Fatalf("error seeding user  %v\n", err)
@@ -176,6 +181,11 @@ func seedDatabase(dbPool *pgxpool.Pool) error {
 	err = storage.SeedAdminUser(context.Background())
 	if err != nil {
 		log.Fatalf("error seeding user  %v\n", err)
+	}
+
+	err = storage.SeedShifts(context.Background())
+	if err != nil {
+		log.Fatalf("error seeding days  %v\n", err)
 	}
 
 	err = storage.SeedDays(context.Background())

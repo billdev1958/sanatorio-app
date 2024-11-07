@@ -14,19 +14,23 @@ type Response struct {
 }
 
 type RegisterOfficeRequest struct {
-	Name        string `json:"name"`
-	SpecialtyID int    `json:"specialtyID"`
+	Name      string `json:"name"`
+	ServiceID int    `json:"service_id"`
 }
 
 type RegisterSpecialtyRequest struct {
 	Name string `json:"name"`
 }
 
-type RegisterScheduleRequest struct {
-	OfficeID  int    `json:"officeID"`
-	DayOfWeek int    `json:"dayOfWeek"`
-	TimeStart string `json:"timeStart"`
-	TimeEnd   string `json:"timeEnd"`
+type RegisterOfficeScheduleRequest struct {
+	DayOfWeek    int       `json:"dayOfWeek"`
+	TimeStart    string    `json:"timeStart"`
+	TimeEnd      string    `json:"timeEnd"`
+	TimeDuration string    `json:"timeDuration"`
+	OfficeID     int       `json:"officeID"`
+	ShiftID      int       `json:"shiftID"`
+	ServiceID    int       `json:"serviceID"`
+	DoctorID     uuid.UUID `json:"doctorID"`
 }
 
 type RegisterAppointmentRequest struct {

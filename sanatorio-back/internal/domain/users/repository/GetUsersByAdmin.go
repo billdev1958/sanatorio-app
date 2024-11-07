@@ -25,7 +25,7 @@ func (ur *userRepository) GetDoctorByID(ctx context.Context, doctorID int) (enti
 		&doctor.LastName1,
 		&doctor.LastName2,
 		&doctor.MedicalLicense,
-		&doctor.SpecialtyID,
+		&doctor.SpecialtyLicense,
 		&doctor.AccountID,
 	)
 

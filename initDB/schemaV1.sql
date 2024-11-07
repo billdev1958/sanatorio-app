@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS doctor (
     first_name VARCHAR(50) NOT NULL,
     last_name1 VARCHAR(50) NOT NULL,
     last_name2 VARCHAR(50) NOT NULL,
-    specialty_id INT NOT NULL,
+    specialty_license VARCHAR(25) NOT NULL,
     medical_license VARCHAR(25) NOT NULL,
     sex VARCHAR(1) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -148,7 +148,8 @@ CREATE TABLE IF NOT EXISTS super_admin (
 
 -- Tabla de historiales médicos
 CREATE TABLE IF NOT EXISTS medical_history (
-    id VARCHAR(12) PRIMARY KEY NOT NULL,
+    id UUID PRIMARY KEY NOT NULL,
+    medical_history_id VARCHAR(12) NOT NULL UNIQUE,
     date_of_record DATE, -- 'Fecha'
     time_of_record TIME, -- 'Hora'
     patient_name VARCHAR(50) NOT NULL, -- 'Nombre'
@@ -201,7 +202,6 @@ CREATE TABLE IF NOT EXISTS medical_history (
 -- Tabla de relaciones de historial médico
 CREATE TABLE IF NOT EXISTS medical_history_relation (
     id UUID PRIMARY KEY,
-    medical_history_id VARCHAR(12) NOT NULL,
     patient_id UUID,
     beneficiary_id UUID,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -217,14 +217,6 @@ CREATE TABLE IF NOT EXISTS days (
     id SERIAL PRIMARY KEY,
     day_of_week INT NOT NULL UNIQUE,
     name VARCHAR(10) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS cat_shift(
-    id SERIAL PRIMARY KEY,
-    name VARCHAR (10) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    deleted_at TIMESTAMP
 );
 
 -- Tabla de citas
@@ -272,10 +264,8 @@ CREATE TABLE IF NOT EXISTS cat_specialty (
 CREATE TABLE IF NOT EXISTS office (
     id SERIAL PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
-    specialty_id INTEGER NOT NULL,
+    service_id INTEGER NOT NULL,
     status_id INTEGER NOT NULL,
-    -- doctor_id UUID NOT NULL,
-    shift_id INTEGER NOT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -284,9 +274,6 @@ CREATE TABLE IF NOT EXISTS office (
 -- Tabla de horarios
 CREATE TABLE IF NOT EXISTS schedule (
     id SERIAL PRIMARY KEY,
-    doctor_id UUID,
-    service_id INTEGER,
-    office_id INTEGER NOT NULL,
     day_of_week INT NOT NULL,
     time_start TIME NOT NULL,
     time_end TIME NOT NULL,
@@ -295,6 +282,29 @@ CREATE TABLE IF NOT EXISTS schedule (
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS cat_shift(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR (10) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+
+-- Tabla de oficinas y horarios
+CREATE TABLE IF NOT EXISTS office_schedule (
+    id SERIAL PRIMARY KEY,
+    schedule_id INTEGER NOT NULL,
+    office_id INTEGER NOT NULL,
+    shift_id INTEGER NOT NULL,
+    service_id INTEGER NOT NULL,
+    doctor_id UUID NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP,
+    UNIQUE (office_id, shift_id, service_id, doctor_id)
+);
+
 
 CREATE TABLE IF NOT EXISTS schedule_block (
     id SERIAL PRIMARY KEY,
@@ -347,7 +357,8 @@ CREATE TABLE IF NOT EXISTS services (
 
 -- Tabla de notas de evolución
 CREATE TABLE IF NOT EXISTS evolution_note (
-    folio SERIAL PRIMARY KEY, -- folio
+    id SERIAL PRIMARY KEY,
+    folio VARCHAR(10), -- folio
     date DATE NOT NULL, -- fecha
     name VARCHAR(50) NOT NULL, -- nombre
     curp CHAR(18) NOT NULL, -- curp
@@ -367,7 +378,8 @@ CREATE TABLE IF NOT EXISTS evolution_note (
 
 -- Tabla de incapacidades
 CREATE TABLE IF NOT EXISTS incapacity (
-    folio SERIAL PRIMARY KEY, -- folio
+    id SERIAL PRIMARY KEY,
+    folio VARCHAR(10), -- folio
     date DATE NOT NULL, -- fecha
     name VARCHAR(50) NOT NULL, -- nombre
     curp CHAR(18) NOT NULL, -- curp
@@ -401,46 +413,50 @@ FOREIGN KEY (account_id) REFERENCES account(id);
 
 ALTER TABLE patient
 ADD CONSTRAINT fk_record_patient
-FOREIGN KEY (medical_history_id) REFERENCES medical_history(id);
+FOREIGN KEY (medical_history_id) REFERENCES medical_history(medical_history_id);
 
 -- Foreign keys para la tabla doctor
 ALTER TABLE doctor
 ADD CONSTRAINT fk_account_doctor
 FOREIGN KEY (account_id) REFERENCES account(id);
 
-ALTER TABLE doctor
-ADD CONSTRAINT fk_specialty_doctor
-FOREIGN KEY (specialty_id) REFERENCES cat_specialty(id);
-
 -- Foreign keys para la tabla office
 ALTER TABLE office
-ADD CONSTRAINT fk_specialty_office
-FOREIGN KEY (specialty_id) REFERENCES cat_specialty(id);
+ADD CONSTRAINT fk_service_office
+FOREIGN KEY (service_id) REFERENCES services(id);
 
 ALTER TABLE office
 ADD CONSTRAINT fk_status_office
 FOREIGN KEY (status_id) REFERENCES office_status(id);
 
-ALTER TABLE office
-ADD CONSTRAINT fk_shift_office
-FOREIGN KEY (shift_id) REFERENCES cat_shift(id);
-
 -- Foreign keys para la tabla schedule
-ALTER TABLE schedule
-ADD CONSTRAINT fk_schedule_doctor
-FOREIGN KEY (doctor_id) REFERENCES doctor(account_id);
-
-ALTER TABLE schedule
-ADD CONSTRAINT fk_schedule_service
-FOREIGN KEY (service_id) REFERENCES services(id);
-
-ALTER TABLE schedule
-ADD CONSTRAINT fk_office_schedule
-FOREIGN KEY (office_id) REFERENCES office(id);
-
 ALTER TABLE schedule
 ADD CONSTRAINT fk_schedule_day
 FOREIGN KEY (day_of_week) REFERENCES days(day_of_week);
+
+-- Foreign keys para la tabla office_schedule
+ALTER TABLE office_schedule
+ADD CONSTRAINT fk_office_schedule_office_id
+FOREIGN KEY (office_id) REFERENCES office(id);
+
+ALTER TABLE office_schedule
+ADD CONSTRAINT fk_office_schedule_shift
+FOREIGN KEY (shift_id) REFERENCES cat_shift(id);
+
+ALTER TABLE office_schedule
+ADD CONSTRAINT fk_office_schedule_service
+FOREIGN KEY (service_id) REFERENCES services(id);
+
+ALTER TABLE office_schedule
+ADD CONSTRAINT fk_office_schedule_doctor_id
+FOREIGN KEY (doctor_id) REFERENCES doctor(account_id);
+
+ALTER TABLE office_schedule 
+ADD CONSTRAINT fk_office_schedule_id
+FOREIGN KEY (schedule_id) REFERENCES schedule(id)
+ON UPDATE CASCADE
+ON DELETE CASCADE;
+
 
 -- Foreign keys para la tabla schedule_block
 ALTER TABLE schedule_block
@@ -483,14 +499,10 @@ FOREIGN KEY (account_holder) REFERENCES patient(account_id);
 
 ALTER TABLE beneficiary
 ADD CONSTRAINT fk_record_beneficiary
-FOREIGN KEY (medical_history_id) REFERENCES medical_history(id);
+FOREIGN KEY (medical_history_id) REFERENCES medical_history(medical_history_id);
 
 -- Foreign keys para la tabla medical_history_relation
-ALTER TABLE medical_history_relation
-ADD CONSTRAINT fk_medical_history_relation_medical_history
-FOREIGN KEY (medical_history_id) REFERENCES medical_history(id);
 
--- **Corrección aplicada aquí**
 ALTER TABLE medical_history_relation
 ADD CONSTRAINT fk_medical_history_relation_patient
 FOREIGN KEY (patient_id) REFERENCES patient(account_id);
@@ -546,5 +558,5 @@ $$ LANGUAGE plpgsql;
 
 -- Trigger para validar el estado de la oficina antes de insertar o actualizar un horario
 CREATE TRIGGER trigger_validate_office_status
-BEFORE INSERT OR UPDATE ON schedule
+BEFORE INSERT OR UPDATE ON office_schedule
 FOR EACH ROW EXECUTE FUNCTION validate_office_status();

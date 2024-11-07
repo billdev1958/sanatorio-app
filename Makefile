@@ -1,10 +1,11 @@
 # Makefile
-
-CONTAINER_ID=ea09cc387548
+CONTAINER_NAME=sanatorio-app-db-1
 USER=root
 DATABASE=university_db
 
-# entra a la db
+# Función para obtener el ID del contenedor basado en el nombre
+CONTAINER_ID=$(shell docker ps -qf "name=$(CONTAINER_NAME)")
+
+# Entra a la base de datos para revisar registros
 showdb:
 	@docker exec -it $(CONTAINER_ID) psql -U $(USER) -d $(DATABASE)
-

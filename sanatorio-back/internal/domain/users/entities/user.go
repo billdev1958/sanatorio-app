@@ -51,15 +51,15 @@ type ReceptionistUser struct {
 }
 
 type DoctorUser struct {
-	AccountID      uuid.UUID
-	MedicalLicense string
-	SpecialtyID    int
-	FirstName      string
-	LastName1      string
-	LastName2      string
-	Sex            string
-	Created_At     time.Time
-	Updated_At     time.Time
+	AccountID        uuid.UUID
+	MedicalLicense   string
+	SpecialtyLicense string
+	FirstName        string
+	LastName1        string
+	LastName2        string
+	Sex              string
+	Created_At       time.Time
+	Updated_At       time.Time
 }
 
 type PatientUser struct {

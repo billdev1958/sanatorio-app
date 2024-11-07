@@ -33,8 +33,8 @@ func (u *usecase) RegisterSpecialty(ctx context.Context, request models.Register
 
 func (u *usecase) RegisterOffice(ctx context.Context, request models.RegisterOfficeRequest) (string, error) {
 	office := entities.Office{
-		Name:        request.Name,
-		SpecialtyID: request.SpecialtyID,
+		Name:      request.Name,
+		ServiceID: request.ServiceID,
 	}
 
 	message, err := u.repo.RegisterOffice(ctx, office)
@@ -45,28 +45,45 @@ func (u *usecase) RegisterOffice(ctx context.Context, request models.RegisterOff
 	return message, nil
 }
 
-func (u *usecase) RegisterSchedule(ctx context.Context, request models.RegisterScheduleRequest) (string, error) {
+func (u *usecase) RegisterOfficeSchedule(ctx context.Context, request models.RegisterOfficeScheduleRequest) (string, error) {
+	// Definir el formato de hora
 	layout := "15:04"
 
+	// Parsear TimeStart desde el request
 	startTime, err := time.Parse(layout, request.TimeStart)
 	if err != nil {
 		return "", fmt.Errorf("invalid time format for TimeStart: %w", err)
 	}
 
+	// Parsear TimeEnd desde el request
 	endTime, err := time.Parse(layout, request.TimeEnd)
 	if err != nil {
 		return "", fmt.Errorf("invalid time format for TimeEnd: %w", err)
 	}
 
+	timeDuration, err := time.ParseDuration(request.TimeDuration)
+	if err != nil {
+		return "", fmt.Errorf("invalid duration format for TimeDuration: %w", err)
+	}
+
+	// Crear la entidad Schedule a partir del request
 	schedule := entities.Schedule{
+		DayOfWeek:    request.DayOfWeek,
+		TimeStart:    startTime,
+		TimeEnd:      endTime,
+		TimeDuration: timeDuration,
+	}
+
+	// Crear la entidad OfficeSchedule a partir del request
+	officeSchedule := entities.OfficeSchedule{
 		OfficeID:  request.OfficeID,
-		DayOfWeek: request.DayOfWeek,
-		TimeStart: startTime,
-		TimeEnd:   endTime,
+		ShiftID:   request.ShiftID,
+		ServiceID: request.ServiceID,
+		DoctorID:  request.DoctorID,
 	}
 
 	// Llama al repositorio para registrar el horario
-	message, err := u.repo.RegisterSchedule(ctx, schedule)
+	message, err := u.repo.RegisterOfficeSchedule(ctx, schedule, officeSchedule)
 	if err != nil {
 		return "", fmt.Errorf("failed to register schedule: %w", err)
 	}

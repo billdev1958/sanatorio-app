@@ -66,10 +66,10 @@ func (pr *userRepository) registerDoctor(ctx context.Context, tx pgx.Tx, account
 	}
 
 	// Preparar la consulta para insertar el tipo de doctor
-	query := "INSERT INTO doctor (account_id, first_name, last_name1, last_name2, specialty_id, medical_license, sex) VALUES ($1, $2, $3, $4, $5, $6, $7)"
+	query := "INSERT INTO doctor (account_id, first_name, last_name1, last_name2, specialty_license, medical_license, sex) VALUES ($1, $2, $3, $4, $5, $6, $7)"
 
 	// Ejecutar la consulta dentro de la transacción
-	_, err := tx.Exec(ctx, query, accountID, du.FirstName, du.LastName1, du.LastName2, du.SpecialtyID, du.MedicalLicense, du.Sex)
+	_, err := tx.Exec(ctx, query, accountID, du.FirstName, du.LastName1, du.LastName2, du.SpecialtyLicense, du.MedicalLicense, du.Sex)
 	if err != nil {
 		return fmt.Errorf("insert into doctor table: %w", err)
 	}

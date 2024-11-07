@@ -78,8 +78,8 @@ func (h *handler) RegisterOffice(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *handler) RegisterSchedule(w http.ResponseWriter, r *http.Request) {
-	var request models.RegisterScheduleRequest
+func (h *handler) RegisterOfficeSchedule(w http.ResponseWriter, r *http.Request) {
+	var request models.RegisterOfficeScheduleRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -87,7 +87,7 @@ func (h *handler) RegisterSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	schedule, err := h.uc.RegisterSchedule(r.Context(), request)
+	schedule, err := h.uc.RegisterOfficeSchedule(r.Context(), request)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)

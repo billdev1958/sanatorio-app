@@ -37,13 +37,13 @@ type Appointment struct {
 }
 
 type Office struct {
-	ID          int
-	Name        string
-	SpecialtyID int
-	StatusID    int
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   *time.Time
+	ID        int
+	Name      string
+	ServiceID int
+	StatusID  int
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
 }
 
 type OfficeStatus struct {
@@ -63,14 +63,26 @@ type AppointmentStatus struct {
 }
 
 type Schedule struct {
-	ID        int
-	OfficeID  int
-	DayOfWeek int
-	TimeStart time.Time
-	TimeEnd   time.Time
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt *time.Time
+	ID           int
+	DayOfWeek    int
+	TimeStart    time.Time
+	TimeEnd      time.Time
+	TimeDuration time.Duration
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	DeletedAt    *time.Time
+}
+
+type OfficeSchedule struct {
+	ID         int
+	ScheduleID int
+	OfficeID   int
+	ShiftID    int
+	ServiceID  int
+	DoctorID   uuid.UUID
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  *time.Time
 }
 
 type Specialty struct {
