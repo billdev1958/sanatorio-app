@@ -143,3 +143,8 @@ type UpdateDoctor struct {
 	MedicalLicense string    `json:"medical_license,omitempty"`
 	AdminPassword  string    `json:"admin_password"`
 }
+
+type CheckPermission struct {
+	RoleID     int
+	Permission int
+}

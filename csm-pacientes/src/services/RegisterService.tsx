@@ -1,6 +1,6 @@
 import api from './Api';
 import { RegisterBeneficiaryRequest, RegisterPatientRequest } from '../models/Login&Registers';
-import { useAuth } from './AuthContext';
+// import { useAuth } from './AuthContext';
 
 
 export async function registerUser(user: RegisterPatientRequest) {

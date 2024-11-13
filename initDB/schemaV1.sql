@@ -57,17 +57,6 @@ CREATE TABLE IF NOT EXISTS role_permission (
     PRIMARY KEY (role_id, permission_id) -- Clave primaria compuesta
 );
 
--- Tabla para asociar roles a usuarios
-CREATE TABLE IF NOT EXISTS user_roles (
-    id SERIAL PRIMARY KEY,
-    account_id UUID NOT NULL, -- Relación con la cuenta/usuario
-    role_id INTEGER NOT NULL, -- Relación con roles
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    deleted_at TIMESTAMP,
-    UNIQUE (account_id, role_id) -- Clave única para evitar duplicados
-);
-
 -- ====================================
 -- Tablas relacionadas con pacientes, médicos, beneficiarios y super-usuarios
 -- ====================================
@@ -519,15 +508,6 @@ FOREIGN KEY (role_id) REFERENCES cat_role(id);
 ALTER TABLE role_permission
 ADD CONSTRAINT fk_role_permission_permission
 FOREIGN KEY (permission_id) REFERENCES permissions(id);
-
--- Foreign keys para la tabla user_roles
-ALTER TABLE user_roles
-ADD CONSTRAINT fk_user_roles_account
-FOREIGN KEY (account_id) REFERENCES account(id);
-
-ALTER TABLE user_roles
-ADD CONSTRAINT fk_user_roles_role
-FOREIGN KEY (role_id) REFERENCES cat_role(id);
 
 -- Foreign keys para la tabla consultation
 -- **Corrección aplicada aquí**

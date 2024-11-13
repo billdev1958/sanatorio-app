@@ -1,6 +1,17 @@
 package validation
 
-import "errors"
+import (
+	"errors"
+)
+
+/*type UserErrors int
+
+const (
+
+	ErrUserNotFound = errors.New("Usuario no encontrado")
+	ErrPasswordInvalid = errors.New("Contraseña invalida")
+	ErrInvalidInput = errors.New("Permiso denegado")
+)*/
 
 func ValidateLoginData(identifier, pass string) error {
 	if identifier == "" {
@@ -12,3 +23,13 @@ func ValidateLoginData(identifier, pass string) error {
 
 	return nil
 }
+
+/*func CheckPermissionUser(ctx context.Context, permissionID int) error {
+	claims := auth.ExtractClaims(ctx)
+	if claims == nil {
+		return "", fmt.Errorf("unauthorized: no claims found in context")
+	}
+
+	roleID := claims.
+      }
+*/

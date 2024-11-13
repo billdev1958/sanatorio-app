@@ -74,9 +74,9 @@ func (ur *userRepository) SoftDeleteUser(ctx context.Context, accountID string) 
 
 	// Marcar como eliminado el usuario en la tabla 'users' utilizando el user_id de la tabla 'account'
 	query := `
-		UPDATE users 
+		UPDATE patient 
 		SET deleted_at = NOW() 
-		WHERE id = (SELECT user_id FROM account WHERE id = $1)
+		WHERE id = (SELECT account_id FROM account WHERE id = $1)
 		RETURNING name
 	`
 	var updatedName string

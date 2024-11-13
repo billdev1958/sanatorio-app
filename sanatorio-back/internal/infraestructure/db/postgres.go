@@ -343,7 +343,7 @@ func (storage *PgxStorage) SeedAppointmentStatus(ctx context.Context) (err error
 }
 
 func (storage *PgxStorage) SeedDependencies(ctx context.Context) (err error) {
-	dependenciesValues := [4]string{"Administrativo", "FAAPA", "SUTES", "Estudiante"}
+	dependenciesValues := [5]string{"Administrativo", "FAAPA", "SUTES", "Estudiante", "Externo"}
 
 	var count int
 	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM cat_dependencies").Scan(&count)

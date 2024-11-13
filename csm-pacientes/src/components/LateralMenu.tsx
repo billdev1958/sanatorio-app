@@ -1,6 +1,5 @@
 import home from '../assets/home-outline.svg';
 
-import historiaClinicaIcon from '../assets/historiaclinica.png';
 import cita from '../assets/citaicon.png';
 import notaEvolucionIcon from '../assets/notaevolucion.png';
 import recetaIcon from '../assets/receta.png';
