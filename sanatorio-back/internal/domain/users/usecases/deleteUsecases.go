@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// Hard delete
 func (u *usecase) DeleteUser(ctx context.Context, accountID string) (string, error) {
 	message, err := u.repo.DeleteUser(ctx, accountID)
 	if err != nil {
