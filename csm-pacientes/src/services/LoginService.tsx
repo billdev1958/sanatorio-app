@@ -13,7 +13,7 @@ export function useLoginService() {
     setLoginError(null);
 
     try {
-      const response = await axios.post("http://localhost:8080/v1/login", user);
+      const response = await axios.post("http://api.ax01.dev/v1/login", user);
       console.log("Login successful:", response.data);
 
       const receivedToken = response.data?.data?.token;
