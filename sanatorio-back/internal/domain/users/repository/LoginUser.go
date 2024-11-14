@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"log"
 	"sanatorioApp/internal/domain/users/entities"
 )
 
@@ -14,6 +15,8 @@ func (ur *userRepository) GetUserByIdentifier(ctx context.Context, identifier st
 	if err != nil {
 		return account, fmt.Errorf("failed to find user: %w", err)
 	}
+
+	log.Printf("ID retrieved from database: %v", account.ID)
 
 	return account, nil
 }
