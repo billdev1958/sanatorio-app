@@ -11,6 +11,8 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: university_db
+    networks:
+      - my_bridge
 
   app:
     build:
@@ -22,7 +24,9 @@ services:
       - ./sanatorio-back/.env
     restart: always
     expose:
-      - "8080"  # Exponer solo internamente para el proxy
+      - "8080"  # Exponer solo internamente para el proxyi
+    networks:
+      - my_bridge
 
   frontend:
     build:
@@ -32,7 +36,9 @@ services:
       - app
     restart: always
     expose:
-      - "5173"  # Exponer en un puerto interno diferente para el proxy
+      - "80"  # Exponer en un puerto interno diferente para el proxy
+    networks:
+      - my_bridge
 
   proxy:
     image: nginx:latest
@@ -44,6 +50,12 @@ services:
     ports:
       - "80:80"  # Exponer el puerto 80 al exterior para el acceso HTTP
     restart: always
+    networks:
+      - my_bridge
 
 volumes:
   db_data:
+
+networks:
+  my_bridge:
+    driver: bridge

@@ -22,7 +22,7 @@ FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Exponer el puerto 80, que es donde Nginx corre por defecto
-EXPOSE 5173
+EXPOSE 80
 
 # El CMD predeterminado de Nginx ya está configurado para servir los archivos
 CMD ["nginx", "-g", "daemon off;"]
