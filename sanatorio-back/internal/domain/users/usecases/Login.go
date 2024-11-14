@@ -13,7 +13,6 @@ import (
 )
 
 func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (models.LoginResponse, error) {
-
 	// Validar los datos de login
 	err := validation.ValidateLoginData(request.Email, request.Password)
 	if err != nil {
@@ -31,6 +30,7 @@ func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (mode
 		return models.LoginResponse{}, errors.New("contraseña incorrecta")
 	}
 
+	// Generar el token JWT usando account.ID y account.Rol
 	token, err := auth.GenerateJWT(account.ID, int(account.Rol))
 	if err != nil {
 		return models.LoginResponse{}, fmt.Errorf("error al generar el token: %w", err)
@@ -38,8 +38,8 @@ func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (mode
 
 	// Crear y devolver la respuesta del login
 	return models.LoginResponse{
-		AccountID: account.ID,
-		Role:      int(account.Rol),
+		AccountID: account.ID,       // ID de account
+		Role:      int(account.Rol), // role_id obtenido de account
 		Token:     token,
 	}, nil
 }
