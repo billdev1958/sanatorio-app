@@ -21,10 +21,8 @@ FROM nginx:alpine
 # Copia los archivos estáticos construidos desde la etapa anterior
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copia la configuración personalizada de Nginx, si la tienes
-COPY nginx.conf /etc/nginx/nginx.conf
-
 # Exponer el puerto 80, que es donde Nginx corre por defecto
-EXPOSE 80
+EXPOSE 5173
 
 # El CMD predeterminado de Nginx ya está configurado para servir los archivos
+CMD ["nginx", "-g", "daemon off;"]

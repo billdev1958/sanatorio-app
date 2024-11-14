@@ -248,15 +248,6 @@ func (storage *PgxStorage) SeedAdminUser(ctx context.Context) (err error) {
 		return fmt.Errorf("insert super_admin: %w", err)
 	}
 
-	// Insertar en la tabla user_roles para asignar el rol de administrador al usuario
-	queryUserRole := `
-		INSERT INTO user_roles (account_id, role_id) 
-		VALUES ($1, $2)`
-	_, err = storage.DbPool.Exec(ctx, queryUserRole, accountID, 1) // 1 es el ID del rol de administrador
-	if err != nil {
-		return fmt.Errorf("insert user_roles: %w", err)
-	}
-
 	fmt.Println("Usuario administrador insertado correctamente")
 	return nil
 }
