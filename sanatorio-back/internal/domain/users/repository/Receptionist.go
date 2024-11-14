@@ -45,15 +45,6 @@ func (ur *userRepository) RegisterReceptionistTransaction(ctx context.Context, a
 		return ru, fmt.Errorf("failed to register receptionist: %w", err)
 	}
 
-	// registrar la cuenta de doctor en tabla user_roles
-	queryUserRole := `
-		INSERT INTO user_roles (account_id, role_id) 
-		VALUES ($1, $2)`
-	_, err = tx.Exec(ctxTx, queryUserRole, accountID, entities.Receptionist)
-	if err != nil {
-		return ru, fmt.Errorf("failed to assign receptionist role in user_roles: %w", err)
-	}
-
 	return ru, nil
 }
 

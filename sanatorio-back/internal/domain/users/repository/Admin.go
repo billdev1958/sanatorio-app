@@ -45,15 +45,6 @@ func (ur *userRepository) RegisterAdminTransaction(ctx context.Context, account 
 		return su, fmt.Errorf("failed to register super_admin: %w", err)
 	}
 
-	// registrar la cuenta de doctor en tabla user_roles
-	queryUserRole := `
-		INSERT INTO user_roles (account_id, role_id) 
-		VALUES ($1, $2)`
-	_, err = tx.Exec(ctxTx, queryUserRole, accountID, entities.SuperAdmin)
-	if err != nil {
-		return su, fmt.Errorf("failed to assign super_admin role in user_roles: %w", err)
-	}
-
 	return su, nil
 }
 
