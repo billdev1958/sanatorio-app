@@ -24,9 +24,10 @@ services:
       - ./sanatorio-back/.env
     restart: always
     expose:
-      - "8080"  # Exponer solo internamente para el proxyi
+      - "8080"  # Exponer solo internamente para el proxy
     networks:
       - my_bridge
+
 
   frontend:
     build:
@@ -40,6 +41,7 @@ services:
     networks:
       - my_bridge
 
+        
   proxy:
     image: nginx:latest
     depends_on:
