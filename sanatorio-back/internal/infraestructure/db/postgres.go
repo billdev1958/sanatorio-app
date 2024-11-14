@@ -18,7 +18,7 @@ func NewPgxStorage(dbPool *pgxpool.Pool) *PgxStorage {
 }
 
 func (storage *PgxStorage) SeedRoles(ctx context.Context) (err error) {
-	rolesValues := [4]string{"SuperAdmin", "Admin", "Doctor", "Patient"}
+	rolesValues := [5]string{"SuperAdmin", "Admin", "Doctor", "Receptionist", "Patient"}
 
 	var count int
 
