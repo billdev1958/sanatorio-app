@@ -94,6 +94,8 @@ func (u *usecase) RegisterBeneficiary(ctx context.Context, request models.Regist
 		return "models.UserData{}", err // Manejar el error devolviendo un valor vacío o adecuado
 	}
 
+
+
 	registerBeneficiary := entities.BeneficiaryUser{
 		ID:               uuid.New(),
 		AccountHolder:    claims.AccountID,
