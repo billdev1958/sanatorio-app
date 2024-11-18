@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"sanatorioApp/internal/domain/users/entities"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,6 +24,11 @@ const (
 	AppointmentStatusConfirmada
 	AppointmentStatusCancelada
 )
+
+type CatStatus struct {
+	ID   int
+	Name string
+}
 
 type Appointment struct {
 	ID               uuid.UUID
@@ -74,18 +80,20 @@ type Schedule struct {
 }
 
 type OfficeSchedule struct {
-	ID         int
-	ScheduleID int
-	OfficeID   int
+	ID int
+	Services
+	Schedule
+	Office
+	StatusName string
 	ShiftID    int
-	ServiceID  int
-	DoctorID   uuid.UUID
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	DeletedAt  *time.Time
+	ShiftName  string
+	entities.DoctorUser
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
 }
 
-type Specialty struct {
+type Services struct {
 	ID        int
 	Name      string
 	CreatedAt time.Time

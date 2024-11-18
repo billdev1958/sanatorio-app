@@ -13,4 +13,6 @@ type Usecase interface {
 	RegisterOffice(ctx context.Context, office models.RegisterOfficeRequest) (string, error)
 
 	RegisterAppointment(ctx context.Context, appointment models.RegisterAppointmentRequest) (string, error)
+
+	GetSchedules(ctx context.Context) ([]models.OfficeScheduleResponse, error)
 }

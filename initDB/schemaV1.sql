@@ -253,7 +253,6 @@ CREATE TABLE IF NOT EXISTS cat_specialty (
 CREATE TABLE IF NOT EXISTS office (
     id SERIAL PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
-    service_id INTEGER NOT NULL,
     status_id INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,

@@ -18,7 +18,7 @@ func (cr *citesRepository) RegisterOfficeSchedule(ctx context.Context, sc entiti
 	defer tx.Rollback(ctx)
 
 	// Primero actualiza el estado de la oficina a "asignado"
-	if err := cr.updateOfficeStatus(ctx, tx, os.OfficeID, 1); err != nil {
+	if err := cr.updateOfficeStatus(ctx, tx, os.Office.ID, 1); err != nil {
 		return "", fmt.Errorf("failed to update office status: %w", err)
 	}
 
@@ -29,7 +29,7 @@ func (cr *citesRepository) RegisterOfficeSchedule(ctx context.Context, sc entiti
 	}
 
 	// Inserta el nuevo registro en la tabla `office_schedule`, incluyendo el `scheduleID`
-	os.ScheduleID = scheduleID
+	os.Schedule.ID = scheduleID
 	if err := cr.insertOfficeSchedule(ctx, tx, os); err != nil {
 		return "", fmt.Errorf("failed to insert office schedule: %w", err)
 	}
@@ -39,7 +39,7 @@ func (cr *citesRepository) RegisterOfficeSchedule(ctx context.Context, sc entiti
 		return "", fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	return fmt.Sprintf("Horario registrado con éxito para la oficina '%d' el día '%d'", os.OfficeID, sc.DayOfWeek), nil
+	return fmt.Sprintf("Horario registrado con éxito para la oficina '%d' el día '%d'", os.Office.ID, sc.DayOfWeek), nil
 }
 
 func (cr *citesRepository) updateOfficeStatus(ctx context.Context, tx pgx.Tx, officeID int, statusID int) error {
@@ -73,10 +73,96 @@ func (cr *citesRepository) insertOfficeSchedule(ctx context.Context, tx pgx.Tx, 
 		ON CONFLICT (office_id, shift_id, service_id, doctor_id)
 		DO NOTHING
 	`
-	_, err := tx.Exec(ctx, queryInsert, sc.ScheduleID, sc.OfficeID, sc.ShiftID, sc.ServiceID, sc.DoctorID)
+	_, err := tx.Exec(ctx, queryInsert, sc.Schedule.ID, sc.Office.ID, sc.ShiftID, sc.Office.ServiceID, sc.DoctorUser.AccountID)
 	if err != nil {
-		log.Printf("error al registrar la programación de la oficina '%d' con turno '%d' y servicio '%d': %v", sc.OfficeID, sc.ShiftID, sc.ServiceID, err)
+		log.Printf("error al registrar la programación de la oficina '%d' con turno '%d' y servicio '%d': %v", sc.Office.ID, sc.ShiftID, sc.ServiceID, err)
 		return err
 	}
 	return nil
+}
+
+func (cr *citesRepository) GetSchedules(ctx context.Context) ([]entities.OfficeSchedule, error) {
+	query := `
+	SELECT
+	    os.id AS office_schedule_id,
+	    os.service_id,
+	    os.schedule_id,
+	    os.office_id,
+		of_status.id AS office_status_id,
+	    os.shift_id,
+	    os.doctor_id,
+	    s.name AS service_name,
+	    sc.day_of_week AS day_schedule,
+	    sc.time_start,
+	    sc.time_end,
+	    sc.time_duration,
+	    o.name AS office_name,
+		of_status.name AS office_status,
+	    sh.name AS shift_name,
+	    d.first_name AS doctor_name,
+	    d.last_name1 AS doctor_lastname1,
+	    d.last_name2 AS doctor_lastname2,
+	    d.medical_license
+		FROM office_schedule os
+	INNER JOIN office o
+		ON os.office_id = o.id
+	INNER JOIN services s
+		ON os.service_id = s.id
+	INNER JOIN office_status of_status
+	    ON o.status_id = of_status.id 
+	INNER JOIN schedule sc 
+		on os.schedule_id = sc.id
+	INNER JOIN cat_shift sh
+		on os.shift_id = sh.id
+	INNER JOIN doctor d
+		on os.doctor_id = d.account_id
+	`
+
+	// Ejecutar la consulta
+	rows, err := cr.storage.DbPool.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Crear un slice para almacenar los resultados
+	var responses []entities.OfficeSchedule
+
+	// Iterar sobre las filas
+	for rows.Next() {
+		var response entities.OfficeSchedule
+
+		err := rows.Scan(
+			&response.ID,
+			&response.Services.ID,
+			&response.Schedule.ID,
+			&response.Office.ID,
+			&response.Office.StatusID,
+			&response.ShiftID,
+			&response.DoctorUser.AccountID,
+			&response.Services.Name,
+			&response.Schedule.DayOfWeek,
+			&response.Schedule.TimeStart,
+			&response.Schedule.TimeEnd,
+			&response.Schedule.TimeDuration,
+			&response.Office.Name,
+			&response.StatusName,
+			&response.ShiftName,
+			&response.DoctorUser.FirstName,
+			&response.DoctorUser.LastName1,
+			&response.DoctorUser.LastName2,
+			&response.DoctorUser.MedicalLicense,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		responses = append(responses, response)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return responses, nil
 }

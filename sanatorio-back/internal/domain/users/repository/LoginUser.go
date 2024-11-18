@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"log"
 	"sanatorioApp/internal/domain/users/entities"
 )
 

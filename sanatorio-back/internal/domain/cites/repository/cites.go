@@ -17,7 +17,7 @@ func NewCitesRepository(storage *postgres.PgxStorage) cites.CitesRepository {
 	return &citesRepository{storage: storage}
 }
 
-func (cr *citesRepository) RegisterSpecialty(ctx context.Context, sp entities.Specialty) (string, error) {
+func (cr *citesRepository) RegisterSpecialty(ctx context.Context, sp entities.Services) (string, error) {
 	query := "INSERT INTO cat_specialty (name) VALUES ($1)"
 	_, err := cr.storage.DbPool.Exec(ctx, query, sp.Name)
 	if err != nil {
@@ -29,11 +29,11 @@ func (cr *citesRepository) RegisterSpecialty(ctx context.Context, sp entities.Sp
 
 func (cr *citesRepository) RegisterOffice(ctx context.Context, of entities.Office) (string, error) {
 	query := `
-		INSERT INTO office (name, service_id, status_id)
+		INSERT INTO office (name, status_id)
 		VALUES ($1, $2, $3)`
 
 	// Ejecutar la consulta
-	_, err := cr.storage.DbPool.Exec(ctx, query, of.Name, of.ServiceID, entities.OfficeStatusUnassigned)
+	_, err := cr.storage.DbPool.Exec(ctx, query, of.Name, entities.OfficeStatusUnassigned)
 	if err != nil {
 		log.Printf("error al registrar el consultorio '%s' en la db: %v", of.Name, err)
 		return "", err

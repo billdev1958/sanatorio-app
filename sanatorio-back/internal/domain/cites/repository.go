@@ -7,34 +7,34 @@ import (
 
 type CitesRepository interface {
 	Register
-	//Get
+	Get
 	//Update
 	//Delete
 }
 
 type Register interface {
-	RegisterSpecialty(ctx context.Context, sp entities.Specialty) (string, error)
+	RegisterSpecialty(ctx context.Context, sp entities.Services) (string, error)
 	RegisterOffice(ctx context.Context, of entities.Office) (string, error)
 	RegisterOfficeSchedule(ctx context.Context, sc entities.Schedule, os entities.OfficeSchedule) (string, error)
 	RegisterAppointment(ctx context.Context, ap entities.Appointment) (string, error)
 }
 
 type Get interface {
-	GetSpecialty(ctx context.Context) (entities.Specialty, error)
-	GetOffice(ctx context.Context) (entities.Office, error)
-	GetSchedule(ctx context.Context) (entities.Schedule, error)
-	GetAppointment(ctx context.Context) (entities.Appointment, error)
+	//GetSpecialty(ctx context.Context) (entities.Services, error)
+	//GetOffice(ctx context.Context) (entities.Office, error)
+	GetSchedules(ctx context.Context) ([]entities.OfficeSchedule, error)
+	//GetAppointment(ctx context.Context) (entities.Appointment, error)
 }
 
 type Update interface {
-	UpdateSpecialty(ctx context.Context, sp entities.Specialty) (entities.Specialty, error)
+	UpdateSpecialty(ctx context.Context, sp entities.Services) (entities.Services, error)
 	UpdateOffice(ctx context.Context, of entities.Office) (entities.Office, error)
 	UpdateSchedule(ctx context.Context, sc entities.Schedule) (entities.Schedule, error)
 	UpdateAppointment(ctx context.Context, ap entities.Appointment) (entities.Appointment, error)
 }
 
 type Delete interface {
-	DeleteSpecialty(ctx context.Context, id int) (entities.Specialty, error)
+	DeleteSpecialty(ctx context.Context, id int) (entities.Services, error)
 	DeleteOffice(ctx context.Context, id int) (entities.Office, error)
 	DeleteSchedule(ctx context.Context, id int) (entities.Schedule, error)
 	DeleteAppointment(ctx context.Context, id int) (entities.Appointment, error)

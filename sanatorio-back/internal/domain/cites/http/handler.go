@@ -109,3 +109,31 @@ func (h *handler) RegisterOfficeSchedule(w http.ResponseWriter, r *http.Request)
 	}
 
 }
+
+func (h *handler) GetAllOfficeSchedules(w http.ResponseWriter, r *http.Request) {
+	// Llamar al caso de uso para obtener todos los horarios
+	schedules, err := h.uc.GetSchedules(r.Context())
+	if err != nil {
+		// Manejar errores del caso de uso
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(models.Response{
+			Status:  "error",
+			Message: "Failed to retrieve office schedules",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+	// Construir respuesta de éxito
+	response := models.Response{
+		Status:  "success",
+		Message: "Office schedules retrieved successfully",
+		Data:    schedules,
+	}
+
+	// Responder con éxito
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}

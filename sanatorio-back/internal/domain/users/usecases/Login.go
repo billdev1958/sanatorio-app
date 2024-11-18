@@ -7,8 +7,8 @@ import (
 	"sanatorioApp/internal/auth"
 	"sanatorioApp/internal/domain/users/entities"
 	"sanatorioApp/internal/domain/users/http/models"
-	validation "sanatorioApp/pkg"
 	password "sanatorioApp/pkg/pass"
+	"sanatorioApp/pkg/validation"
 	"strconv"
 )
 

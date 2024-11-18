@@ -252,34 +252,40 @@ func (storage *PgxStorage) SeedAdminUser(ctx context.Context) (err error) {
 	return nil
 }
 
-func (storage *PgxStorage) SeedSpecialties(ctx context.Context) (err error) {
-	specialtiesValues := [5]string{"Medicina General", "Cardiologo", "Dermatologo", "Pediatra", "Ginecologia"}
-
-	var count int
-	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM cat_specialty").Scan(&count)
-	if err != nil {
-		return fmt.Errorf("count specialties: %w", err)
-	}
-
-	if count > 0 {
-		fmt.Println("La tabla specialty ya contiene datos")
-		return nil
-	}
-
-	query := "INSERT INTO services (name) VALUES($1)"
-	for _, value := range specialtiesValues {
-		_, err = storage.DbPool.Exec(ctx, query, value)
-		if err != nil {
-			return fmt.Errorf("insert specialties: %w", err)
-		}
-	}
-
-	fmt.Println("Especialidades insertadas correctamente en specialty")
-	return nil
-}
-
 func (storage *PgxStorage) SeedServices(ctx context.Context) (err error) {
-	specialtiesValues := [5]string{"Medicina General", "Cardiologo", "Dermatologo", "Pediatra", "Ginecologia"}
+	// Lista de nombres de servicios
+	services := []string{
+		"Audiometría",
+		"Acupuntura",
+		"Densitometría",
+		"Educación especial",
+		"Electrocardiografía",
+		"Evaluación psicológica infantil",
+		"Gerontología",
+		"Ginecología",
+		"Laboratorio clínico",
+		"Mastografías",
+		"Rayos X",
+		"Medicina física y rehabilitación",
+		"Medicina general matutino",
+		"Medicina general vespertino",
+		"Nutrición matutino",
+		"Nutrición vespertino",
+		"Odontología Matutino",
+		"Odontología Vespertino",
+		"Otorrinolaringología",
+		"Prueba de detección por PCR de SARS-CoV-2",
+		"Prueba de detección PCR de SARS-CoV-2 e Influenza",
+		"Prueba PCR diagnóstico de Infecciones Urogenitales",
+		"Prueba rápida de antígeno SARS-CoV-2 e Influenza",
+		"Psicología clínica infantil",
+		"Psicología matutino",
+		"Psicología sabatino",
+		"Psicología vespertino",
+		"Terapia ocupacional",
+		"Terapia física matutino",
+		"Terapia física vespertino",
+	}
 
 	var count int
 	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM services").Scan(&count)
@@ -293,14 +299,14 @@ func (storage *PgxStorage) SeedServices(ctx context.Context) (err error) {
 	}
 
 	query := "INSERT INTO services (name) VALUES($1)"
-	for _, value := range specialtiesValues {
-		_, err = storage.DbPool.Exec(ctx, query, value)
+	for _, service := range services {
+		_, err = storage.DbPool.Exec(ctx, query, service)
 		if err != nil {
 			return fmt.Errorf("insert services: %w", err)
 		}
 	}
 
-	fmt.Println("servicios insertads correctamente en servicios")
+	fmt.Println("Servicios insertados correctamente en la tabla services")
 	return nil
 }
 
