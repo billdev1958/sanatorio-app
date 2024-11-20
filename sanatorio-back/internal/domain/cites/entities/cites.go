@@ -43,10 +43,9 @@ type Appointment struct {
 }
 
 type Office struct {
-	ID        int
-	Name      string
-	ServiceID int
-	StatusID  int
+	ID   int
+	Name string
+	OfficeStatus
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time

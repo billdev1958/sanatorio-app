@@ -6,6 +6,7 @@ import (
 	"sanatorioApp/internal/domain/cites"
 	"sanatorioApp/internal/domain/cites/entities"
 	users "sanatorioApp/internal/domain/users/entities"
+	"sanatorioApp/pkg"
 
 	"sanatorioApp/internal/domain/cites/http/models"
 	"time"
@@ -17,33 +18,6 @@ type usecase struct {
 
 func NewUsecase(repo cites.CitesRepository) cites.Usecase {
 	return &usecase{repo: repo}
-}
-
-func (u *usecase) RegisterSpecialty(ctx context.Context, request models.RegisterSpecialtyRequest) (string, error) {
-
-	specialty := entities.Services{
-		Name: request.Name,
-	}
-
-	message, err := u.repo.RegisterSpecialty(ctx, specialty)
-	if err != nil {
-		return "", fmt.Errorf("failed to register specialty %w: ", err)
-	}
-
-	return message, nil
-}
-
-func (u *usecase) RegisterOffice(ctx context.Context, request models.RegisterOfficeRequest) (string, error) {
-	office := entities.Office{
-		Name: request.Name,
-	}
-
-	message, err := u.repo.RegisterOffice(ctx, office)
-	if err != nil {
-		return "", fmt.Errorf("failed to register office %w:", err)
-	}
-
-	return message, nil
 }
 
 func (u *usecase) RegisterOfficeSchedule(ctx context.Context, request models.RegisterOfficeScheduleRequest) (string, error) {
@@ -112,9 +86,15 @@ func (u *usecase) RegisterAppointment(ctx context.Context, request models.Regist
 	return message, nil
 }
 
-func (u *usecase) GetSchedules(ctx context.Context) ([]models.OfficeScheduleResponse, error) {
-	// Obtener las entidades desde el repositorio
-	schedules, err := u.repo.GetSchedules(ctx)
+func (u *usecase) GetSchedules(ctx context.Context, filtersRequest models.OfficeSCheduleFiltersRequest) ([]models.OfficeScheduleResponse, error) {
+	// Convertir la estructura en filtros dinámicos
+	filters, err := pkg.Filter(filtersRequest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to process filters: %w", err)
+	}
+
+	// Llamar al repositorio con los filtros
+	schedules, err := u.repo.GetSchedules(ctx, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -129,14 +109,14 @@ func (u *usecase) GetSchedules(ctx context.Context) ([]models.OfficeScheduleResp
 			ServiceID:        schedule.Services.ID,
 			ScheduleID:       schedule.Schedule.ID,
 			OfficeID:         schedule.Office.ID,
-			OfficeStatus:     schedule.Office.StatusID,
+			OfficeStatusID:   schedule.Services.ID,
 			ShiftID:          schedule.ShiftID,
 			DoctorID:         schedule.DoctorUser.AccountID,
 			ServiceName:      schedule.Services.Name,
 			DaySchedule:      schedule.Schedule.DayOfWeek,
-			TimeStart:        schedule.Schedule.TimeStart.Format("15:04"), // Formato requerido
-			TimeEnd:          schedule.Schedule.TimeEnd.Format("15:04"),   // Formato requerido
-			TimeDuration:     schedule.Schedule.TimeDuration.String(),     // "HH:MM"
+			TimeStart:        schedule.Schedule.TimeStart.Format("15:04"),
+			TimeEnd:          schedule.Schedule.TimeEnd.Format("15:04"),
+			TimeDuration:     schedule.Schedule.TimeDuration.String(),
 			OfficeName:       schedule.Office.Name,
 			OfficeStatusName: schedule.StatusName,
 			ShiftName:        schedule.ShiftName,
@@ -152,5 +132,3 @@ func (u *usecase) GetSchedules(ctx context.Context) ([]models.OfficeScheduleResp
 
 	return responses, nil
 }
-
-// Get by various id for example AccountID, ServicesID, OfficeID, StatusID, ShiftID

@@ -8,12 +8,11 @@ import (
 type CitesRepository interface {
 	Register
 	Get
-	//Update
+	Update
 	//Delete
 }
 
 type Register interface {
-	RegisterSpecialty(ctx context.Context, sp entities.Services) (string, error)
 	RegisterOffice(ctx context.Context, of entities.Office) (string, error)
 	RegisterOfficeSchedule(ctx context.Context, sc entities.Schedule, os entities.OfficeSchedule) (string, error)
 	RegisterAppointment(ctx context.Context, ap entities.Appointment) (string, error)
@@ -21,16 +20,16 @@ type Register interface {
 
 type Get interface {
 	//GetSpecialty(ctx context.Context) (entities.Services, error)
-	//GetOffice(ctx context.Context) (entities.Office, error)
-	GetSchedules(ctx context.Context) ([]entities.OfficeSchedule, error)
+	GetOffices(ctx context.Context) ([]entities.Office, error)
+	GetSchedules(ctx context.Context, filters map[string]interface{}) ([]entities.OfficeSchedule, error)
 	//GetAppointment(ctx context.Context) (entities.Appointment, error)
 }
 
 type Update interface {
-	UpdateSpecialty(ctx context.Context, sp entities.Services) (entities.Services, error)
-	UpdateOffice(ctx context.Context, of entities.Office) (entities.Office, error)
-	UpdateSchedule(ctx context.Context, sc entities.Schedule) (entities.Schedule, error)
-	UpdateAppointment(ctx context.Context, ap entities.Appointment) (entities.Appointment, error)
+	//UpdateSpecialty(ctx context.Context, sp entities.Services) (entities.Services, error)
+	UpdateOffice(ctx context.Context, of entities.Office) (string, error)
+	//UpdateSchedule(ctx context.Context, sc entities.Schedule) (entities.Schedule, error)
+	//UpdateAppointment(ctx context.Context, ap entities.Appointment) (entities.Appointment, error)
 }
 
 type Delete interface {

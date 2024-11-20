@@ -6,13 +6,15 @@ import (
 )
 
 type Usecase interface {
-	RegisterSpecialty(ctx context.Context, sp models.RegisterSpecialtyRequest) (string, error)
-
 	RegisterOfficeSchedule(ctx context.Context, request models.RegisterOfficeScheduleRequest) (string, error)
 
 	RegisterOffice(ctx context.Context, office models.RegisterOfficeRequest) (string, error)
 
+	UpdateOffice(ctx context.Context, request models.UpdateOfficeRequest) (string, error)
+
 	RegisterAppointment(ctx context.Context, appointment models.RegisterAppointmentRequest) (string, error)
 
-	GetSchedules(ctx context.Context) ([]models.OfficeScheduleResponse, error)
+	GetSchedules(ctx context.Context, filtersRequest models.OfficeSCheduleFiltersRequest) ([]models.OfficeScheduleResponse, error)
+
+	GetOffices(ctx context.Context) ([]models.OfficeResponse, error)
 }
