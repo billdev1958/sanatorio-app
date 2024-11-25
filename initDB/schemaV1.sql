@@ -186,7 +186,9 @@ CREATE TABLE IF NOT EXISTS medical_history (
     doctor_name VARCHAR(50), -- 'Nombre médico'
     medical_license VARCHAR(10), -- 'Cédula profesional'
     specialty_license VARCHAR(10), -- 'Cédula especialidad'
-    status_md BOOLEAN NOT NULL 
+    status_md BOOLEAN NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 -- Tabla de relaciones de historial médico

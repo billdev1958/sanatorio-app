@@ -73,18 +73,24 @@ func (u *usecase) GetMedicalHistoryByID(ctx context.Context, md models.MedicalHi
 
 func (u *usecase) CompleteMedicalHistory(ctx context.Context, request models.CompleteMedicalHistoryRequest) (string, error) {
 
+	// Obtener la fecha y hora actuales
 	updated_at := time.Now()
+	dateRecord := time.Now()
 
+	// Crear un puntero de tipo time.Time para la hora actual
+	timeOnly := time.Date(0, 1, 1, dateRecord.Hour(), dateRecord.Minute(), dateRecord.Second(), 0, time.UTC)
+
+	// Crear la instancia de MedicalHistory con las correcciones necesarias
 	medicalHistory := entities.MedicalHistory{
-		DateOfRecord:             request.DateOfRecord,
-		TimeOfRecord:             request.TimeOfRecord,
+		DateOfRecord:             &dateRecord,
+		TimeOfRecord:             &timeOnly,
 		PlaceOfOrigin:            request.PlaceOfOrigin,
 		EthnicGroup:              request.EthnicGroup,
 		PhoneNumber:              request.PhoneNumber,
 		Address:                  request.Address,
 		Occupation:               request.Occupation,
 		GuardianName:             request.GuardianName,
-		FamilyMedicalHistory:     request.NonPathologicalHistory,
+		FamilyMedicalHistory:     request.FamilyMedicalHistory,
 		NonPathologicalHistory:   request.NonPathologicalHistory,
 		PathologicalHistory:      request.PathologicalHistory,
 		GynecObstetricHistory:    request.GynecObstetricHistory,
@@ -118,7 +124,7 @@ func (u *usecase) CompleteMedicalHistory(ctx context.Context, request models.Com
 		DoctorName:               request.DoctorName,
 		MedicalLicense:           request.MedicalLicense,
 		SpecialtyLicense:         request.SpecialtyLicense,
-		Status:                   request.Status,
+		Status:                   true,
 		Updated_At:               updated_at,
 		MedicalHistoryID:         request.MedicalHistoryID,
 	}
@@ -138,5 +144,4 @@ func (u *usecase) CompleteMedicalHistory(ctx context.Context, request models.Com
 
 	// Retornar un mensaje de éxito
 	return "Medical history updated successfully", nil
-
 }

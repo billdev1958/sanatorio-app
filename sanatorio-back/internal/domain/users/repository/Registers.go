@@ -98,8 +98,8 @@ func (pr *userRepository) registerAccount(ctx context.Context, tx pgx.Tx, ru ent
 }
 
 func (pr *userRepository) registerMedicalHistory(ctx context.Context, tx pgx.Tx, medicalHistoryID string, pt entities.PatientUser) error {
-	query := "INSERT INTO medical_history (id, medical_history_id, patient_name, curp, gender) VALUES ($1, $2, $3, $4, $5)"
-	_, err := tx.Exec(ctx, query, uuid.New(), medicalHistoryID, pt.FirstName, pt.Curp, pt.Sex)
+	query := "INSERT INTO medical_history (id, medical_history_id, patient_name, curp, gender, status_md) VALUES ($1, $2, $3, $4, $5, $6)"
+	_, err := tx.Exec(ctx, query, uuid.New(), medicalHistoryID, pt.FirstName, pt.Curp, pt.Sex, false)
 	if err != nil {
 		return fmt.Errorf("insert into medical_history table: %w", err)
 	}

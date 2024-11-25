@@ -8,13 +8,68 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (ur *userRepository) GetMedicalHistoryByID(ctx context.Context, MedicalHistoryID string) (entities.MedicalHistory, error) {
-	query := "SELECT * FROM medical_history WHERE medical_history_id = ?"
+func (ur *userRepository) GetMedicalHistoryByID(ctx context.Context, medicalHistoryID string) (entities.MedicalHistory, error) {
+	query := `
+SELECT 
+    medical_history_id,
+    date_of_record,
+    time_of_record,
+    patient_name,
+    curp,
+    birth_date,
+    COALESCE(age, '') AS age,
+    gender,
+    COALESCE(place_of_origin, '') AS place_of_origin,
+    COALESCE(ethnic_group, '') AS ethnic_group,
+    COALESCE(phone_number, '') AS phone_number,
+    COALESCE(address, '') AS address,
+    COALESCE(occupation, '') AS occupation,
+    COALESCE(guardian_name, '') AS guardian_name,
+    COALESCE(family_medical_history, '') AS family_medical_history,
+    COALESCE(non_pathological_history, '') AS non_pathological_history,
+    COALESCE(pathological_history, '') AS pathological_history,
+    COALESCE(gynec_obstetric_history, '') AS gynec_obstetric_history,
+    COALESCE(current_condition, '') AS current_condition,
+    COALESCE(cardiovascular, '') AS cardiovascular,
+    COALESCE(respiratory, '') AS respiratory,
+    COALESCE(gastrointestinal, '') AS gastrointestinal,
+    COALESCE(genitourinary, '') AS genitourinary,
+    COALESCE(hematic_lymphatic, '') AS hematic_lymphatic,
+    COALESCE(endocrine, '') AS endocrine,
+    COALESCE(nervous_system, '') AS nervous_system,
+    COALESCE(musculoskeletal, '') AS musculoskeletal,
+    COALESCE(skin, '') AS skin,
+    COALESCE(body_temperature, '') AS body_temperature,
+    COALESCE(weight, '') AS weight,
+    COALESCE(height, '') AS height,
+    COALESCE(bmi, '') AS bmi,
+    COALESCE(heart_rate, '') AS heart_rate,
+    COALESCE(respiratory_rate, '') AS respiratory_rate,
+    COALESCE(blood_pressure, '') AS blood_pressure,
+    COALESCE(physical, '') AS physical,
+    COALESCE(head, '') AS head,
+    COALESCE(neck_and_chest, '') AS neck_and_chest,
+    COALESCE(abdomen, '') AS abdomen,
+    COALESCE(genital, '') AS genital,
+    COALESCE(extremities, '') AS extremities,
+    COALESCE(previous_results, '') AS previous_results,
+    COALESCE(diagnoses, '') AS diagnoses,
+    COALESCE(pharmacological_treatment, '') AS pharmacological_treatment,
+    COALESCE(prognosis, '') AS prognosis,
+    COALESCE(doctor_name, '') AS doctor_name,
+    COALESCE(medical_license, '') AS medical_license,
+    COALESCE(specialty_license, '') AS specialty_license,
+    status_md
+FROM medical_history
+WHERE medical_history_id = $1
+
+
+`
 
 	var medicalHistory entities.MedicalHistory
 
-	err := ur.storage.DbPool.QueryRow(ctx, query, MedicalHistoryID).Scan(
-		&medicalHistory.ID,
+	// Ejecutar la consulta y escanear los resultados
+	err := ur.storage.DbPool.QueryRow(ctx, query, medicalHistoryID).Scan(
 		&medicalHistory.MedicalHistoryID,
 		&medicalHistory.DateOfRecord,
 		&medicalHistory.TimeOfRecord,
@@ -66,11 +121,12 @@ func (ur *userRepository) GetMedicalHistoryByID(ctx context.Context, MedicalHist
 		&medicalHistory.Status,
 	)
 
+	// Manejo de errores
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return medicalHistory, fmt.Errorf("doctor with ID %v not found", MedicalHistoryID)
+			return medicalHistory, fmt.Errorf("medical history with ID %v not found", medicalHistoryID)
 		}
-		return medicalHistory, fmt.Errorf("failed to get doctor by ID: %w", err)
+		return medicalHistory, fmt.Errorf("failed to retrieve medical history by ID: %w", err)
 	}
 
 	return medicalHistory, nil
@@ -122,7 +178,7 @@ func (ur *userRepository) CompleteMedicalHistory(ctx context.Context, md entitie
             doctor_name = $40,
             medical_license = $41,
             specialty_license = $42,
-            status = $43,
+            status_md = $43,
             updated_at = $44
         WHERE medical_history_id = $45
     `
