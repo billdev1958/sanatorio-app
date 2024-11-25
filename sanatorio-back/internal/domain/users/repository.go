@@ -27,10 +27,12 @@ type RegisterU interface {
 
 type GetU interface {
 	GetDoctorByID(ctx context.Context, userID int) (entities.DoctorUser, error)
+	GetMedicalHistoryByID(ctx context.Context, MedicalHistoryID string) (entities.MedicalHistory, error)
 }
 
 type UpdateU interface {
 	UpdatePatient(ctx context.Context, patientAccount entities.Account, patientUpdate entities.PatientUser) (string, error)
+	CompleteMedicalHistory(ctx context.Context, md entities.MedicalHistory) (bool, error)
 }
 
 type DeleteU interface {

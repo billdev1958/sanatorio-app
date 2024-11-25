@@ -185,7 +185,8 @@ CREATE TABLE IF NOT EXISTS medical_history (
     prognosis VARCHAR(100), -- 'Pronóstico'
     doctor_name VARCHAR(50), -- 'Nombre médico'
     medical_license VARCHAR(10), -- 'Cédula profesional'
-    specialty_license VARCHAR(10) -- 'Cédula especialidad'
+    specialty_license VARCHAR(10), -- 'Cédula especialidad'
+    status_md BOOLEAN NOT NULL 
 );
 
 -- Tabla de relaciones de historial médico
@@ -409,9 +410,6 @@ ADD CONSTRAINT fk_account_doctor
 FOREIGN KEY (account_id) REFERENCES account(id);
 
 -- Foreign keys para la tabla office
-ALTER TABLE office
-ADD CONSTRAINT fk_service_office
-FOREIGN KEY (service_id) REFERENCES services(id);
 
 ALTER TABLE office
 ADD CONSTRAINT fk_status_office

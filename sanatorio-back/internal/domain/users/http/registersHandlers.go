@@ -17,7 +17,7 @@ func (h *handler) RegisterPatient(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Decoded request: %+v", request)
+	// log.Printf("Decoded request: %+v", request)
 
 	// Llamar al caso de uso para manejar el registro
 	patientData, err := h.uc.RegisterPatient(r.Context(), request)

@@ -19,8 +19,12 @@ type Usecase interface {
 
 	GetDoctorByID(ctx context.Context, doctorID int) (models.DoctorRequest, error)
 
+	GetMedicalHistoryByID(ctx context.Context, md models.MedicalHistoryRequest) (models.MedicalHistoryResponse, error)
+
 	// EDIT
 	UpdateUser(ctx context.Context, userUpdate models.UpdateUser) (string, error)
+
+	CompleteMedicalHistory(ctx context.Context, request models.CompleteMedicalHistoryRequest) (string, error)
 
 	// deletes
 	DeleteUser(ctx context.Context, accountID string) (string, error)
