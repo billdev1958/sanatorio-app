@@ -31,10 +31,8 @@ func (u *usecase) GetOffices(ctx context.Context) ([]models.OfficeResponse, erro
 
 	for _, office := range offices {
 		response := models.OfficeResponse{
-			OfficeID:       office.ID,
-			OfficeStatusID: office.OfficeStatus.ID,
-			OfficeName:     office.Name,
-			StatusName:     office.OfficeStatus.Name,
+			OfficeID:   office.ID,
+			OfficeName: office.Name,
 		}
 
 		responses = append(responses, response)

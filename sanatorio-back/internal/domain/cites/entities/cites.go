@@ -43,9 +43,8 @@ type Appointment struct {
 }
 
 type Office struct {
-	ID   int
-	Name string
-	OfficeStatus
+	ID        int
+	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time
@@ -83,9 +82,9 @@ type OfficeSchedule struct {
 	Services
 	Schedule
 	Office
-	StatusName string
-	ShiftID    int
-	ShiftName  string
+	OfficeStatus
+	ShiftID   int
+	ShiftName string
 	entities.DoctorUser
 	CreatedAt time.Time
 	UpdatedAt time.Time

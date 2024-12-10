@@ -1,0 +1,311 @@
+
+  .form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: var(--color-box);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: var(--color-primary);
+  }
+  
+  .form-group select,
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: var(--font-size-default);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .form-group select {
+    background-color: #fff;
+  }
+  
+  .btn-submit {
+    display: inline-block;
+    background-color: var(--color-primary);
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: var(--font-size-default);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-submit:hover {
+    background-color: var(--color-secondary);
+  }
+  
+  /* Estilos Responsivos */
+  @media (max-width: 768px) {
+    .form {
+      padding: 15px;
+      margin: 10px;
+    }
+  
+    .form-group {
+      margin-bottom: 15px;
+    }
+  
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .form {
+      padding: 10px;
+    }
+  
+    .form-group label {
+      font-size: 14px;
+    }
+  
+    .form-group select,
+    .form-group input {
+      font-size: 14px;
+      padding: 8px;
+    }
+  
+    .btn-submit {
+      padding: 10px;
+      font-size: 14px;
+    }
+  }
+  
+
+  .schedule-page {
+    padding: 2rem;
+    background-color: var(--color-box);
+    position: relative;
+    min-height: 100vh;
+  }
+  
+  .schedule-cards-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 1.5rem;
+    justify-items: center;
+  }
+  
+  .schedule-card {
+    width: 100%;
+    max-width: 600px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    border-left: 6px solid var(--color-primary);
+  }
+  
+  .schedule-card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+  }
+  
+  .schedule-card-content {
+    color: var(--color-text);
+  }
+  
+  .schedule-office-name {
+    color: var(--color-primary);
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .schedule-info {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  
+  .btn-add-schedule {
+    position: fixed;
+    right: 2rem;
+    bottom: 2rem;
+    background-color: var(--color-secondary);
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    text-decoration: none;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .btn-add-schedule:hover {
+    background-color: #7f6d10;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .register-form-container {
+    margin-top: 1.5rem;
+  }
+  
+  /* Ajustes para resoluciones más pequeñas (Tablets y escritorios más compactos) */
+  @media (max-width: 1024px) {
+    .schedule-page {
+      padding: 1.5rem;
+    }
+  
+    .btn-add-schedule {
+      right: 1rem;
+      bottom: 1rem;
+    }
+  
+    .schedule-card {
+      max-width: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .schedule-page {
+      padding: 1rem;
+    }
+  
+    .schedule-card {
+      padding: 1rem;
+    }
+  
+    .schedule-office-name {
+      font-size: 1.1rem;
+    }
+  
+    .btn-add-schedule {
+      padding: 0.5rem 0.75rem;
+    }
+  }
+
+  .filter-tab {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding: 1.5rem;
+    background-color: #fff;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 250px;
+  }
+  
+  .filter-group label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+  }
+  
+  .filter-group input,
+  .filter-group select {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: var(--font-size-default);
+    color: var(--color-text);
+    background-color: var(--color-box);
+    transition: border 0.3s ease;
+  }
+  
+  .filter-group input:focus,
+  .filter-group select:focus {
+    border: 1px solid var(--color-secondary);
+    outline: none;
+  }
+  
+  .filter-group select {
+    appearance: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 1024px) {
+    .filter-tab {
+      padding: 1rem;
+      gap: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .filter-group {
+      min-width: 200px;
+    }
+  }
+  
+  .register-form-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Asegura que esté sobre otros elementos */
+  }
+  
+  .register-form-content {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 90%;
+    max-height: 90%;
+    overflow-y: auto; /* Añadir scroll si el contenido excede la altura */
+  }
+  
+  .register-form-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-text);
+  }
+  
+  .register-form-close:hover {
+    color: var(--color-secondary);
+  }
+  .btn-cancel {
+    background-color: #ffffff; /* Fondo blanco */
+    color: var(--color-primary); /* Color de texto: Verde oscuro */
+    border: 2px solid var(--color-primary); /* Borde del color principal */
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-left: 1rem;
+  }
+  
+  .btn-cancel:hover {
+    background-color: var(--color-primary);
+    color: #ffffff; /* Texto blanco al pasar el ratón */
+  }
+  
+  .btn-cancel:active {
+    transform: scale(0.95); /* Efecto de clic */
+  }

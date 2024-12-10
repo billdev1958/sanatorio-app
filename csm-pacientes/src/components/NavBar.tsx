@@ -22,7 +22,7 @@ const NavBar = (props: { toggleMenu: () => void }) => {
           <div>
             <p>UNIVERSIDAD AUTONOMA DEL ESTADO DE MEXICO</p>
             <hr></hr>
-            <p>UAEM</p>
+            <p>SECRETARIA DE EXTENSIÓN Y VINCULACIÓN</p>
             <p>CLINICA MULTIDISCIPLINARIA DE SALUD</p>
           </div>
         </div>

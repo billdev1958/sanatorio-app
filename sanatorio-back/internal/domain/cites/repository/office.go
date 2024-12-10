@@ -9,10 +9,10 @@ import (
 
 func (cr *citesRepository) RegisterOffice(ctx context.Context, of entities.Office) (string, error) {
 	query := `
-		INSERT INTO office (name, status_id)
-		VALUES ($1, $2, $3)`
+		INSERT INTO office (name)
+		VALUES ($1)`
 
-	_, err := cr.storage.DbPool.Exec(ctx, query, of.Name, entities.OfficeStatusUnassigned)
+	_, err := cr.storage.DbPool.Exec(ctx, query, of.Name)
 	if err != nil {
 		log.Printf("error al registrar el consultorio '%s' en la db: %v", of.Name, err)
 		return "", err
@@ -48,12 +48,8 @@ func (cr *citesRepository) GetOffices(ctx context.Context) ([]entities.Office, e
 	query := `
 		SELECT 
 			o.id AS office_id,
-			status_id,
-			o.name AS office_name,
-			st.name AS status_name
+			o.name AS office_name
 		FROM office o
-		INNER JOIN office_status st
-		ON o.status_id = st.id
 	`
 
 	rows, err := cr.storage.DbPool.Query(ctx, query)
@@ -69,9 +65,7 @@ func (cr *citesRepository) GetOffices(ctx context.Context) ([]entities.Office, e
 
 		err := rows.Scan(
 			&office.ID,
-			&office.OfficeStatus.ID,
 			&office.Name,
-			&office.OfficeStatus.Name,
 		)
 		if err != nil {
 			return nil, err

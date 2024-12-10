@@ -69,12 +69,12 @@ func (cr *citesRepository) insertSchedule(ctx context.Context, tx pgx.Tx, sc ent
 
 func (cr *citesRepository) insertOfficeSchedule(ctx context.Context, tx pgx.Tx, sc entities.OfficeSchedule) error {
 	queryInsert := `
-		INSERT INTO office_schedule (schedule_id, office_id, shift_id, service_id, doctor_id)
+		INSERT INTO office_schedule (schedule_id, office_id, shift_id, service_id, doctor_id, status_id)
 		VALUES ($1, $2, $3, $4, $5)
 		ON CONFLICT (office_id, shift_id, service_id, doctor_id)
 		DO NOTHING
 	`
-	_, err := tx.Exec(ctx, queryInsert, sc.Schedule.ID, sc.Office.ID, sc.ShiftID, sc.Services.ID, sc.DoctorUser.AccountID)
+	_, err := tx.Exec(ctx, queryInsert, sc.Schedule.ID, sc.Office.ID, sc.ShiftID, sc.Services.ID, sc.DoctorUser.AccountID, sc.OfficeStatus.ID)
 	if err != nil {
 		log.Printf("error al registrar la programación de la oficina '%d' con turno '%d' y servicio '%d': %v", sc.Office.ID, sc.ShiftID, sc.Services.ID, err)
 		return err
@@ -108,35 +108,33 @@ func (cr *citesRepository) GetSchedules(ctx context.Context, filters map[string]
 
 	// Construir la consulta completa
 	query := fmt.Sprintf(`
-		SELECT
-			os.id AS office_schedule_id,
-			os.service_id,
-			os.schedule_id,
-			os.office_id,
-			of_status.id AS office_status_id,
-			os.shift_id,
-			os.doctor_id,
-			s.name AS service_name,
-			sc.day_of_week AS day_schedule,
-			sc.time_start,
-			sc.time_end,
-			sc.time_duration,
-			o.name AS office_name,
-			of_status.name AS office_status,
-			sh.name AS shift_name,
-			d.first_name AS doctor_name,
-			d.last_name1 AS doctor_lastname1,
-			d.last_name2 AS doctor_lastname2,
-			d.medical_license
-		FROM office_schedule os
-		INNER JOIN office o ON os.office_id = o.id
-		INNER JOIN services s ON os.service_id = s.id
-		INNER JOIN office_status of_status ON o.status_id = of_status.id 
-		INNER JOIN schedule sc ON os.schedule_id = sc.id
-		INNER JOIN cat_shift sh ON os.shift_id = sh.id
-		INNER JOIN doctor d ON os.doctor_id = d.account_id
-		%s
-	`, whereClause)
+	SELECT
+		os.id AS office_schedule_id,
+		os.service_id,
+		os.schedule_id,
+		os.office_id,
+		os.status_id AS office_schedule_status_id, -- Status de office_schedule
+		os.shift_id,
+		os.doctor_id,
+		s.name AS service_name,
+		sc.day_of_week AS day_schedule,
+		sc.time_start,
+		sc.time_end,
+		sc.time_duration,
+		o.name AS office_name,
+		sh.name AS shift_name,
+		d.first_name AS doctor_name,
+		d.last_name1 AS doctor_lastname1,
+		d.last_name2 AS doctor_lastname2,
+		d.medical_license
+	FROM office_schedule os
+	INNER JOIN office o ON os.office_id = o.id
+	INNER JOIN services s ON os.service_id = s.id
+	INNER JOIN schedule sc ON os.schedule_id = sc.id
+	INNER JOIN cat_shift sh ON os.shift_id = sh.id
+	INNER JOIN doctor d ON os.doctor_id = d.account_id
+	%s
+`, whereClause)
 
 	// Ejecutar la consulta con los argumentos generados
 	rows, err := cr.storage.DbPool.Query(ctx, query, args...)
@@ -157,7 +155,7 @@ func (cr *citesRepository) GetSchedules(ctx context.Context, filters map[string]
 			&response.Services.ID,
 			&response.Schedule.ID,
 			&response.Office.ID,
-			&response.Office.OfficeStatus.ID,
+			&response.OfficeStatus.ID,
 			&response.ShiftID,
 			&response.DoctorUser.AccountID,
 			&response.Services.Name,
@@ -166,7 +164,7 @@ func (cr *citesRepository) GetSchedules(ctx context.Context, filters map[string]
 			&response.Schedule.TimeEnd,
 			&response.Schedule.TimeDuration,
 			&response.Office.Name,
-			&response.StatusName,
+			&response.OfficeStatus.Name,
 			&response.ShiftName,
 			&response.DoctorUser.FirstName,
 			&response.DoctorUser.LastName1,

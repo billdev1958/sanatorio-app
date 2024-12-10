@@ -59,6 +59,9 @@ func (u *usecase) RegisterOfficeSchedule(ctx context.Context, request models.Reg
 		DoctorUser: users.DoctorUser{
 			AccountID: request.DoctorID,
 		},
+		OfficeStatus: entities.OfficeStatus{
+			ID: int(entities.OfficeStatusAvailable),
+		},
 	}
 
 	// Llama al repositorio para registrar el horario
@@ -118,7 +121,7 @@ func (u *usecase) GetSchedules(ctx context.Context, filtersRequest models.Office
 			TimeEnd:          schedule.Schedule.TimeEnd.Format("15:04"),
 			TimeDuration:     schedule.Schedule.TimeDuration.String(),
 			OfficeName:       schedule.Office.Name,
-			OfficeStatusName: schedule.StatusName,
+			OfficeStatusName: schedule.OfficeStatus.Name,
 			ShiftName:        schedule.ShiftName,
 			DoctorName:       schedule.DoctorUser.FirstName,
 			DoctorLastName1:  schedule.DoctorUser.LastName1,

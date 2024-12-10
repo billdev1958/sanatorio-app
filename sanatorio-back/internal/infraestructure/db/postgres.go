@@ -160,30 +160,6 @@ func insertDay(ctx context.Context, storage *PgxStorage, dayOfWeek int, name str
 	return nil
 }
 
-func (storage *PgxStorage) SeedOffice(ctx context.Context) (err error) {
-	officeName := []string{"Consultorio 1", "Consultorio 2", "Consultorio 3", "Consultorio 4"}
-
-	var count int
-	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM office").Scan(&count)
-	if err != nil {
-		return fmt.Errorf("count office: %w", err)
-	}
-	if count > 0 {
-		fmt.Println("La tabla office ya contiene datos")
-		return nil
-	}
-
-	query := "INSERT INTO office (name) VALUES ($1)"
-	for _, value := range officeName {
-		_, err = storage.DbPool.Exec(ctx, query, value)
-		if err != nil {
-			return fmt.Errorf("insert office names: %w", err)
-		}
-	}
-	fmt.Println("Valores insertados correctamente en office")
-	return nil
-}
-
 func (storage *PgxStorage) SeedOfficeStatus(ctx context.Context) (err error) {
 	statusValues := [3]string{"Disponible", "No disponible", "No asignado"}
 
@@ -394,5 +370,57 @@ func (storage *PgxStorage) SeedShifts(ctx context.Context) (err error) {
 	}
 
 	fmt.Println("Estados de citas insertados correctamente en cat_shift")
+	return nil
+}
+
+func (storage *PgxStorage) SeedOffices(ctx context.Context) (err error) {
+	rolesValues := [24]string{
+		"Consultorio: Audiometría",
+		"Consultorio: Acupuntura",
+		"Consultorio: Densitometría",
+		"Consultorio: Educación especial",
+		"Consultorio: Electrocardiografía",
+		"Consultorio: Evaluación psicológica infantil",
+		"Consultorio: Gerontología",
+		"Consultorio: Ginecología",
+		"Consultorio: Laboratorio clínico",
+		"Consultorio: Mastografías",
+		"Consultorio: Rayos X",
+		"Consultorio: Medicina física y rehabilitación",
+		"Consultorio: Medicina general matutino",
+		"Consultorio: Medicina general vespertino",
+		"Consultorio: Nutrición matutino",
+		"Consultorio: Nutrición vespertino",
+		"Consultorio: Odontología Matutino",
+		"Consultorio: Odontología Vespertino",
+		"Consultorio: Otorrinolaringología",
+		"Consultorio: Prueba de detección por PCR de SARS-CoV-2",
+		"Consultorio: Prueba de detección PCR de SARS-CoV-2 e Influenza",
+		"Consultorio: Prueba PCR diagnóstico de Infecciones Urogenitales",
+		"Consultorio: Prueba rápida de antígeno SARS-CoV-2 e Influenza",
+		"Consultorio: Psicología clínica infantil",
+	}
+
+	var count int
+
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM office").Scan(&count)
+	if err != nil {
+		return fmt.Errorf("count office: %w", err)
+	}
+
+	if count > 0 {
+		fmt.Println("La tabla office ya contiene datos")
+		return nil
+	}
+
+	query := "INSERT INTO office (name) VALUES($1)"
+	for _, value := range rolesValues {
+		_, err = storage.DbPool.Exec(ctx, query, value)
+		if err != nil {
+			return fmt.Errorf("insert roles: %w", err)
+		}
+	}
+
+	fmt.Println("Valores insertados correctamente en office")
 	return nil
 }

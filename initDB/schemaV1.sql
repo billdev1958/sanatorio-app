@@ -135,6 +135,10 @@ CREATE TABLE IF NOT EXISTS super_admin (
 -- Tablas relacionadas con historiales médicos
 -- ====================================
 
+-- Updates 
+-- Procedencias  = 1: dependencias,  ALUMNOS, FAAPA ,SUTES Y CONFIANZA AL REGISTRO DE PACIENTES
+-- DerechoHabiencia: IMSS, ISSSTE, ISSEMYM, SEDENA, PEMEX, LLENADO DE HISTORIAL, NOTA DE EVOLUCION Y HOJA DE REFERENCIA
+
 -- Tabla de historiales médicos
 CREATE TABLE IF NOT EXISTS medical_history (
     id UUID PRIMARY KEY NOT NULL,
@@ -142,6 +146,8 @@ CREATE TABLE IF NOT EXISTS medical_history (
     date_of_record DATE, -- 'Fecha'
     time_of_record TIME, -- 'Hora'
     patient_name VARCHAR(50) NOT NULL, -- 'Nombre'
+    --apellido paterno
+    --apellidomaterno
     curp CHAR(18) NOT NULL, -- 'CURP'
     birth_date DATE , -- 'Fecha nacimiento'
     age VARCHAR(3) , -- 'Edad'
@@ -256,7 +262,6 @@ CREATE TABLE IF NOT EXISTS cat_specialty (
 CREATE TABLE IF NOT EXISTS office (
     id SERIAL PRIMARY KEY,
     name VARCHAR(60) NOT NULL,
-    status_id INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -290,6 +295,7 @@ CREATE TABLE IF NOT EXISTS office_schedule (
     shift_id INTEGER NOT NULL,
     service_id INTEGER NOT NULL,
     doctor_id UUID NOT NULL,
+    status_id INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
@@ -413,7 +419,7 @@ FOREIGN KEY (account_id) REFERENCES account(id);
 
 -- Foreign keys para la tabla office
 
-ALTER TABLE office
+ALTER TABLE office_schedule
 ADD CONSTRAINT fk_status_office
 FOREIGN KEY (status_id) REFERENCES office_status(id);
 
@@ -524,18 +530,19 @@ FOREIGN KEY (account_id) REFERENCES account(id);
 -- Funciones y triggers
 -- ====================================
 
--- Función para validar el estado de la oficina antes de programar un horario
-CREATE OR REPLACE FUNCTION validate_office_status()
+-- Función para validar el estado del horario (status_id)
+CREATE OR REPLACE FUNCTION validate_schedule_status()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF (SELECT status_id FROM office WHERE id = NEW.office_id) != 1 THEN
-        RAISE EXCEPTION 'The office is not available for scheduling';
+    -- Verificar que el horario está activo (status_id = 1)
+    IF NEW.status_id != 1 THEN
+        RAISE EXCEPTION 'El horario no está activo y no puede ser asignado.';
     END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger para validar el estado de la oficina antes de insertar o actualizar un horario
-CREATE TRIGGER trigger_validate_office_status
+-- Asociar el trigger con la tabla `office_schedule`
+CREATE TRIGGER trigger_validate_schedule_status
 BEFORE INSERT OR UPDATE ON office_schedule
-FOR EACH ROW EXECUTE FUNCTION validate_office_status();
+FOR EACH ROW EXECUTE FUNCTION validate_schedule_status();

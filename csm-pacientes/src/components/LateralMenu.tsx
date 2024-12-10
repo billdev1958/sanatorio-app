@@ -38,36 +38,22 @@ const LateralMenu = (props: { open: boolean; toggleMenu: () => void }) => {
             </A>
           </li>
           <li>
-            <A href="/nota-evolucion" activeClass="active" class="menu-link">
-              <img src={notaEvolucionIcon} alt="Nota de Evolución" />
-              <span>Nota de Evolución</span>
+            <A href="/citas" activeClass="active" class="menu-link">
+              <img src={cita} alt="Agendar Cita" />
+              <span>Mis proximas citan</span>
+            </A>
+          </li>
+
+          <li>
+            <A href="/citas" activeClass="active" class="menu-link">
+              <img src={cita} alt="Agendar Cita" />
+              <span>Historial de citas</span>
             </A>
           </li>
           <li>
-            <A href="/receta" activeClass="active" class="menu-link">
-              <img src={recetaIcon} alt="Receta" />
-              <span>Receta</span>
-            </A>
-          </li>
-          <li>
-            <A href="/incapacidad" activeClass="active" class="menu-link">
-              <img src={incapacidadIcon} alt="Incapacidad" />
-              <span>Incapacidad</span>
-            </A>
-          </li>
-          <li>
-            <A href="/archivo" activeClass="active" class="menu-link">
-              <img src={fileIcon} alt="Archivo" />
-              <span>Archivo</span>
-            </A>
-          </li>
-          <li>
-            <A href="/laboratorio" activeClass="active" class="menu-link">
-              <img src={laboratorioIcon} alt="Laboratorio" />
-              <span>Laboratorio</span>
-            </A>
-          </li>
-          <li>
+
+            
+            
             {/* Utilizamos un botón para manejar el logout */}
             <button onClick={handleLogout} class="menu-link logout-button">
               <img src={logoutIcon} alt="Cerrar sesión" />

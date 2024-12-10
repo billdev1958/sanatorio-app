@@ -57,10 +57,11 @@ const Register = () => {
               <label for="afiliation">Afiliación</label>
               <select name="afiliation" id="afiliation" required onInput={(e: InputEvent) => setSex((e.target as HTMLSelectElement).value)}>
                 <option value="">Selecciona una opción</option>
-                <option value="1">Administrativo</option>
+                <option value="1">Confianza</option>
                 <option value="2">FAAPA</option>
                 <option value="3">SUTES</option>
                 <option value="4">Estudiante</option>
+                <option value="5">Externo</option>
               </select>
             </div>
 
