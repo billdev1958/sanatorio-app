@@ -9,8 +9,6 @@ import HistorialMedicoPage from "./pages/MedicalHistoryP";
 import { AuthProvider } from "./services/AuthContext";
 import ProtectedRoute from "./services/ProtectedRoute"; // Importamos el componente ProtectedRoute
 import RegisterBeneficiary from "./pages/RegisterBeneficiary";
-import RegisterOfficeSchedule from "./components/SchedulePrueba";
-import SchedulesPage from "./pages/SchedulePagePrueba";
 
 const root = document.getElementById("root");
 
@@ -19,7 +17,6 @@ render(
     <AuthProvider>
       <Router>
         {/* Rutas públicas */}
-        <Route path="/schedule" component={SchedulesPage} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
 
