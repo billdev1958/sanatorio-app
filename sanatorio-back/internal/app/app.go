@@ -140,7 +140,12 @@ func seedDatabase(dbPool *pgxpool.Pool) error {
 
 	err = storage.SeedDependencies(context.Background())
 	if err != nil {
-		log.Fatalf("error seeding user  %v\n", err)
+		log.Fatalf("error seeding dependencies  %v\n", err)
+	}
+
+	err = storage.SeedMedicalInstitution(context.Background())
+	if err != nil {
+		log.Fatalf("error seeding cat_medical_institutions %v\n", err)
 	}
 
 	err = storage.SeedOfficeStatus(context.Background())

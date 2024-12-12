@@ -342,6 +342,33 @@ func (storage *PgxStorage) SeedDependencies(ctx context.Context) (err error) {
 	return nil
 }
 
+func (storage *PgxStorage) SeedMedicalInstitution(ctx context.Context) (err error) {
+	mi := [6]string{"IMMS", "ISSSTE", "ISSEMYM", "SEDENA", "PEMEX", "NINGUNO"}
+
+	var count int
+	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM cat_medical_institutions").Scan(&count)
+	if err != nil {
+		return fmt.Errorf("count cat_medical_institutions status: %w", err)
+	}
+
+	if count > 0 {
+		fmt.Println("La tabla cat_medical_institutions ya contiene datos")
+		return nil
+	}
+
+	query := "INSERT INTO cat_medical_institutions (name) VALUES($1)"
+	for _, value := range mi {
+		_, err = storage.DbPool.Exec(ctx, query, value)
+		if err != nil {
+			return fmt.Errorf("insert cat_medical_institutions status: %w", err)
+
+		}
+
+	}
+	fmt.Println("Dependencias insertadas correctamente en cat_medical_institutions")
+	return nil
+}
+
 // Seed de horarios y consultorios
 
 func (storage *PgxStorage) SeedShifts(ctx context.Context) (err error) {
@@ -374,7 +401,7 @@ func (storage *PgxStorage) SeedShifts(ctx context.Context) (err error) {
 }
 
 func (storage *PgxStorage) SeedOffices(ctx context.Context) (err error) {
-	rolesValues := [24]string{
+	rolesValues := [48]string{
 		"Consultorio: Audiometría",
 		"Consultorio: Acupuntura",
 		"Consultorio: Densitometría",
@@ -387,8 +414,6 @@ func (storage *PgxStorage) SeedOffices(ctx context.Context) (err error) {
 		"Consultorio: Mastografías",
 		"Consultorio: Rayos X",
 		"Consultorio: Medicina física y rehabilitación",
-		"Consultorio: Medicina general matutino",
-		"Consultorio: Medicina general vespertino",
 		"Consultorio: Nutrición matutino",
 		"Consultorio: Nutrición vespertino",
 		"Consultorio: Odontología Matutino",
@@ -399,6 +424,39 @@ func (storage *PgxStorage) SeedOffices(ctx context.Context) (err error) {
 		"Consultorio: Prueba PCR diagnóstico de Infecciones Urogenitales",
 		"Consultorio: Prueba rápida de antígeno SARS-CoV-2 e Influenza",
 		"Consultorio: Psicología clínica infantil",
+
+		"Consultorio 1: Medicina general matutino (Respiratorio)",
+		"Consultorio 2: Medicina general matutino (Respiratorio)",
+		"Consultorio 3: Medicina general matutino",
+		"Consultorio 4: Medicina general matutino",
+		"Consultorio 5: Medicina general matutino",
+		"Consultorio 3: Medicina general vespertino",
+		"Consultorio 4: Medicina general vespertino",
+		"Consultorio 5: Medicina general vespertino (Respiratorio)",
+
+		"Consultorio 2: Psicología Matutino ",
+		"Consultorio 3: Psicología Matutino ",
+		"Consultorio 4: Psicología Matutino ",
+		"Consultorio 5: Psicología Matutino ",
+		"Consultorio 6: Psicología Matutino ",
+
+		"Consultorio 1: Psicología Sabatino ",
+		"Consultorio 2: Psicología Sabatino ",
+		"Consultorio 3: Psicología Sabatino ",
+
+		"Consultorio 1: Psicología Vespertino ",
+		"Consultorio 3: Psicología Vespertino ",
+		"Consultorio 4: Psicología Vespertino ",
+		"Consultorio 5: Psicología Vespertino ",
+
+		"Consultorio 1: Terapia Ocupacional ",
+		"Consultorio 2: Terapia Ocupacional ",
+
+		"Consultorio 1: Terapia Fisica Matutino",
+		"Consultorio 2: Terapia Fisica Matutino",
+
+		"Consultorio 1: Terapia Fisica Vespertino",
+		"Consultorio 2: Terapia Fisica Vespertino",
 	}
 
 	var count int

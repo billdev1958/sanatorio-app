@@ -139,6 +139,14 @@ CREATE TABLE IF NOT EXISTS super_admin (
 -- Procedencias  = 1: dependencias,  ALUMNOS, FAAPA ,SUTES Y CONFIANZA AL REGISTRO DE PACIENTES
 -- DerechoHabiencia: IMSS, ISSSTE, ISSEMYM, SEDENA, PEMEX, LLENADO DE HISTORIAL, NOTA DE EVOLUCION Y HOJA DE REFERENCIA
 
+CREATE TABLE IF NOT EXISTS cat_medical_institutions (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+
 -- Tabla de historiales médicos
 CREATE TABLE IF NOT EXISTS medical_history (
     id UUID PRIMARY KEY NOT NULL,
@@ -146,13 +154,15 @@ CREATE TABLE IF NOT EXISTS medical_history (
     date_of_record DATE, -- 'Fecha'
     time_of_record TIME, -- 'Hora'
     patient_name VARCHAR(50) NOT NULL, -- 'Nombre'
-    --apellido paterno
-    --apellidomaterno
+    lastname_1 VARCHAR (50) NOT NULL,
+    lastname_2 VARCHAR (50) NOT NULL,
     curp CHAR(18) NOT NULL, -- 'CURP'
     birth_date DATE , -- 'Fecha nacimiento'
     age VARCHAR(3) , -- 'Edad'
-    gender VARCHAR(10) NOT NULL, -- 'Sexo'
-    place_of_origin VARCHAR(10) , -- 'Procedencia'
+    gender VARCHAR(1) NOT NULL, -- 'Sexo'
+    adress VARCHAR(100) NOT NULL, -- 'Domicilio'
+    dependency_id INTEGER, -- 'Procedencia'
+    derecho_habiencia_id INTEGER,
     ethnic_group VARCHAR(20) , -- 'Grupo étnico'
     phone_number VARCHAR(10) , -- 'Teléfono'
     address VARCHAR(50) , -- 'Domicilio'
@@ -161,7 +171,7 @@ CREATE TABLE IF NOT EXISTS medical_history (
     family_medical_history VARCHAR(100), -- 'Antecedentes heredofamiliares'
     non_pathological_history VARCHAR(100), -- 'Antecedentes personales no patológicos'
     pathological_history VARCHAR(100), -- 'Antecedentes personales patológicos'
-    gynec_obstetric_history VARCHAR(100), -- 'Antecendentes gineco-obstétricos'
+    gynec_obstetric_history VARCHAR(100), -- 'Antecendentes gineco-obstétricos / androgenos'
     current_condition VARCHAR(100), -- 'Padecimiento actual'
     cardiovascular VARCHAR(100), -- 'Cardiovascular'
     respiratory VARCHAR(100), -- 'Respiratorio'
@@ -171,7 +181,7 @@ CREATE TABLE IF NOT EXISTS medical_history (
     endocrine VARCHAR(100), -- 'Endocrino'
     nervous_system VARCHAR(100), -- 'Nervioso'
     musculoskeletal VARCHAR(100), -- 'Musculo esquelético'
-    skin VARCHAR(100), -- 'Piel'
+    skin_mucous_appendages VARCHAR(100), -- 'Piel, Mucosas y Anexos'
     body_temperature VARCHAR(10), -- 'Temperatura'
     weight VARCHAR(5), -- 'Peso'
     height VARCHAR(10), -- 'Talla'
@@ -181,10 +191,12 @@ CREATE TABLE IF NOT EXISTS medical_history (
     blood_pressure VARCHAR(10), -- 'T/A'
     physical VARCHAR(100), -- 'Habitus exterior'
     head VARCHAR(100), -- 'Cabeza'
-    neck_and_chest VARCHAR(100), -- 'Cuello tórax'
+    neck VARCHAR(100),
+    chest VARCHAR(100),
     abdomen VARCHAR(100), -- 'Abdomen'
     genital VARCHAR(100), -- 'Genitales'
     extremities VARCHAR(100), -- 'Extremidades'
+    skin VARCHAR(100), -- 'Piel'
     previous_results VARCHAR(100), -- 'Resultados previos y actuales'
     diagnoses VARCHAR(100), -- 'Diagnósticos o problemas'
     pharmacological_treatment VARCHAR(100), -- 'Tratamiento farmacológico'
@@ -261,7 +273,7 @@ CREATE TABLE IF NOT EXISTS cat_specialty (
 -- Tabla de oficinas
 CREATE TABLE IF NOT EXISTS office (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(60) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
@@ -494,6 +506,15 @@ FOREIGN KEY (account_holder) REFERENCES patient(account_id);
 ALTER TABLE beneficiary
 ADD CONSTRAINT fk_record_beneficiary
 FOREIGN KEY (medical_history_id) REFERENCES medical_history(medical_history_id);
+
+-- Foreign keys para la tabla medical_history
+ALTER TABLE medical_history
+ADD CONSTRAINT fk_dependency_medical_history
+FOREIGN KEY (dependency_id) REFERENCES cat_dependencies(id); 
+
+ALTER TABLE medical_history
+ADD CONSTRAINT fk_derecho_habiencia_medical_history
+FOREIGN KEY (derecho_habiencia_id) REFERENCES cat_medical_institutions(id); 
 
 -- Foreign keys para la tabla medical_history_relation
 
