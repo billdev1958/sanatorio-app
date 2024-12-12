@@ -1,11 +1,7 @@
 import home from '../assets/home-outline.svg';
 
 import cita from '../assets/citaicon.png';
-import notaEvolucionIcon from '../assets/notaevolucion.png';
-import recetaIcon from '../assets/receta.png';
-import incapacidadIcon from '../assets/incapacidad.png';
-import fileIcon from '../assets/file.png';
-import laboratorioIcon from '../assets/laboratorio.png';
+
 import logoutIcon from '../assets/logout.png';
 import { A, useNavigate } from "@solidjs/router";
 import { useLoginService } from '../services/LoginService';
