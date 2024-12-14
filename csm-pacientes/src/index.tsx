@@ -9,6 +9,7 @@ import HistorialMedicoPage from "./pages/MedicalHistoryP";
 import { AuthProvider } from "./services/AuthContext";
 import ProtectedRoute from "./services/ProtectedRoute"; // Importamos el componente ProtectedRoute
 import RegisterBeneficiary from "./pages/RegisterBeneficiary";
+import DashboardAdmin from "./Admin/Pages/Menu";
 
 const root = document.getElementById("root");
 
@@ -25,6 +26,13 @@ render(
           <ProtectedRoute>
             <App>
               <Dashboard />
+            </App>
+          </ProtectedRoute>
+        )} />
+          <Route path="/admin" component={() => (
+          <ProtectedRoute>
+            <App>
+              <DashboardAdmin />
             </App>
           </ProtectedRoute>
         )} />
