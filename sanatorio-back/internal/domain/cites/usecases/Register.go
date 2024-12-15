@@ -7,6 +7,7 @@ import (
 	"sanatorioApp/internal/domain/cites/entities"
 	users "sanatorioApp/internal/domain/users/entities"
 	"sanatorioApp/pkg"
+	"strings"
 
 	"sanatorioApp/internal/domain/cites/http/models"
 	"time"
@@ -20,56 +21,74 @@ func NewUsecase(repo cites.CitesRepository) cites.Usecase {
 	return &usecase{repo: repo}
 }
 
-func (u *usecase) RegisterOfficeSchedule(ctx context.Context, request models.RegisterOfficeScheduleRequest) (string, error) {
+func (u *usecase) RegisterOfficeSchedule(ctx context.Context, request models.RegisterOfficeSchedule) (string, error) {
+	// Validar campos obligatorios
+	if len(request.SelectedDays) == 0 {
+		return "", fmt.Errorf("selectedDays cannot be empty")
+	}
+	if len(request.TimeSlots) == 0 {
+		return "", fmt.Errorf("timeSlots cannot be empty")
+	}
+
 	// Definir el formato de hora
 	layout := "15:04"
 
-	// Parsear TimeStart desde el request
-	startTime, err := time.Parse(layout, request.TimeStart)
-	if err != nil {
-		return "", fmt.Errorf("invalid time format for TimeStart: %w", err)
+	// Procesar `SelectedDays` y `TimeSlots`
+	var messages []string
+	for _, day := range request.SelectedDays {
+		for _, slot := range request.TimeSlots {
+			// Dividir el `timeSlot` en inicio y fin
+			times := strings.Split(slot, " - ")
+			if len(times) != 2 {
+				return "", fmt.Errorf("invalid time slot format: %s", slot)
+			}
+
+			timeStart, err := time.Parse(layout, times[0])
+			if err != nil {
+				return "", fmt.Errorf("invalid time format for TimeStart in slot: %w", err)
+			}
+			timeEnd, err := time.Parse(layout, times[1])
+			if err != nil {
+				return "", fmt.Errorf("invalid time format for TimeEnd in slot: %w", err)
+			}
+
+			duration := timeEnd.Sub(timeStart)
+
+			// Crear la entidad Schedule
+			schedule := entities.Schedule{
+				DayOfWeek:    day,
+				TimeStart:    timeStart,
+				TimeEnd:      timeEnd,
+				TimeDuration: duration,
+			}
+
+			// Crear la entidad OfficeSchedule
+			officeSchedule := entities.OfficeSchedule{
+				Office: entities.Office{
+					ID: request.OfficeID,
+				},
+				ShiftID: request.ShiftID,
+				Services: entities.Services{
+					ID: request.ServiceID,
+				},
+				DoctorUser: users.DoctorUser{
+					AccountID: request.DoctorID,
+				},
+				OfficeStatus: entities.OfficeStatus{
+					ID: int(entities.OfficeStatusAvailable),
+				},
+			}
+
+			// Registrar el horario en el repositorio
+			message, err := u.repo.RegisterOfficeSchedule(ctx, schedule, officeSchedule)
+			if err != nil {
+				return "", fmt.Errorf("failed to register schedule for day %d, slot %s: %w", day, slot, err)
+			}
+			messages = append(messages, message)
+		}
 	}
 
-	// Parsear TimeEnd desde el request
-	endTime, err := time.Parse(layout, request.TimeEnd)
-	if err != nil {
-		return "", fmt.Errorf("invalid time format for TimeEnd: %w", err)
-	}
-
-	// Calcula la duracion de las horas ingresadas
-	timeDuration := endTime.Sub(startTime)
-
-	// Crear la entidad Schedule a partir del request
-	schedule := entities.Schedule{
-		DayOfWeek:    request.DayOfWeek,
-		TimeStart:    startTime,
-		TimeEnd:      endTime,
-		TimeDuration: timeDuration,
-	}
-
-	// Crear la entidad OfficeSchedule a partir del request
-	officeSchedule := entities.OfficeSchedule{
-		Office: entities.Office{
-			ID: request.OfficeID,
-		},
-		ShiftID: request.ShiftID,
-		Services: entities.Services{
-			ID: request.ServiceID,
-		},
-		DoctorUser: users.DoctorUser{
-			AccountID: request.DoctorID,
-		},
-		OfficeStatus: entities.OfficeStatus{
-			ID: int(entities.OfficeStatusAvailable),
-		},
-	}
-
-	// Llama al repositorio para registrar el horario
-	message, err := u.repo.RegisterOfficeSchedule(ctx, schedule, officeSchedule)
-	if err != nil {
-		return "", fmt.Errorf("failed to register schedule: %w", err)
-	}
-	return message, nil
+	return fmt.Sprintf("Schedules registered: %s", strings.Join(messages, "; ")), nil
 }
 
 func (u *usecase) RegisterAppointment(ctx context.Context, request models.RegisterAppointmentRequest) (string, error) {

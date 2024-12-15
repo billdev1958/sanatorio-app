@@ -43,3 +43,14 @@ export interface DayOfWeek {
   // Tipo específico para la respuesta de este endpoint
   export type GetOfficeScheduleApiResponse = ApiResponse<GetOfficeScheduleInfoResponse>;
   
+  export interface RegisterOfficeScheduleRequest {
+    selectedDays: number[];
+    timeStart: string;     // Formato HH:MM (ej. "09:00")
+    timeEnd: string;       // Formato HH:MM (ej. "12:00")
+    timeDuration: string;  // Duración en formato hh:mm (ej. "01:00")
+    shiftID: string;       // ID del turno como string
+    serviceID: string;     // ID del servicio como string
+    doctorID: string;      // UUID del doctor
+    officeID: number;      // ID de la oficina
+    timeSlots: string[];   // Array de intervalos (ej. ["09:00 - 10:00", "10:00 - 11:00", ...])
+  }

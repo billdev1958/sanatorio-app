@@ -47,7 +47,7 @@ func (h *handler) RegisterOffice(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) RegisterOfficeSchedule(w http.ResponseWriter, r *http.Request) {
-	var request models.RegisterOfficeScheduleRequest
+	var request models.RegisterOfficeSchedule
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {

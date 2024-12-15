@@ -24,6 +24,19 @@ type FormData = {
   timeSlots: string[]; // Horarios generados
 };
 
+// Definimos el tipo para el request del endpoint POST /v1/schedule
+interface RegisterOfficeScheduleRequest {
+  selectedDays: number[];
+  timeStart: string;    // Formato HH:MM, ej: "09:00"
+  timeEnd: string;      // Formato HH:MM, ej: "12:00"
+  timeDuration: string; // Formato hh:mm, ej: "01:00"
+  shiftID: string;      
+  serviceID: string;    
+  doctorID: string;     
+  officeID: number;     
+  timeSlots: string[];  
+}
+
 function RegisterOfficeScheduleForm() {
   const [daysOfWeek, setDaysOfWeek] = createSignal<DayOfWeek[]>([]);
   const [shifts, setShifts] = createSignal<CatShift[]>([]);
@@ -67,7 +80,6 @@ function RegisterOfficeScheduleForm() {
 
     const slots: string[] = [];
     const durationMs = (durationHours * 60 + durationMinutes) * 60 * 1000;
-
     let currentTime = start;
 
     while (currentTime < end) {
@@ -174,15 +186,43 @@ function RegisterOfficeScheduleForm() {
     setFormData({ ...formData(), [name]: newValue });
   };
 
+  const submitSchedule = async (data: RegisterOfficeScheduleRequest) => {
+    try {
+      const response = await api.post("/v1/schedule", data);
+      console.log("Respuesta del servidor:", response.data);
+      alert("Horario registrado con éxito");
+    } catch (error: any) {
+      console.error("Error al registrar el horario:", error);
+      alert("Ocurrió un error al registrar el horario. Por favor, intenta nuevamente.");
+    }
+  };
+
   const handleSubmit = (e: Event): void => {
     e.preventDefault();
     generateTimeSlots();
 
-    // Obtener los datos actuales del formulario
     const currentFormData = formData();
 
-    console.log("Formulario Enviado:");
-    console.log(JSON.stringify(currentFormData, null, 2));
+    // Convertir timeStart, timeEnd a formato HH:MM
+    const timeStartFormatted = new Date(currentFormData.timeStart).toTimeString().slice(0, 5);
+    const timeEndFormatted = new Date(currentFormData.timeEnd).toTimeString().slice(0, 5);
+
+    const payload: RegisterOfficeScheduleRequest = {
+      selectedDays: currentFormData.selectedDays,
+      timeStart: timeStartFormatted,
+      timeEnd: timeEndFormatted,
+      timeDuration: currentFormData.timeDuration,
+      shiftID: String(currentFormData.shiftID),
+      serviceID: String(currentFormData.serviceID),
+      doctorID: currentFormData.doctorID,
+      officeID: Number(currentFormData.officeID),
+      timeSlots: currentFormData.timeSlots,
+    };
+
+    console.log("Formulario Enviado (Payload):");
+    console.log(JSON.stringify(payload, null, 2));
+
+    submitSchedule(payload);
   };
 
   return (

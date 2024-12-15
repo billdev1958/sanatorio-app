@@ -6,7 +6,7 @@ import (
 )
 
 type Usecase interface {
-	RegisterOfficeSchedule(ctx context.Context, request models.RegisterOfficeScheduleRequest) (string, error)
+	RegisterOfficeSchedule(ctx context.Context, request models.RegisterOfficeSchedule) (string, error)
 
 	RegisterOffice(ctx context.Context, office models.RegisterOfficeRequest) (string, error)
 
