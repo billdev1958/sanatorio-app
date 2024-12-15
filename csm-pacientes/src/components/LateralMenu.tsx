@@ -46,6 +46,13 @@ const LateralMenu = (props: { open: boolean; toggleMenu: () => void }) => {
               <span>Historial de citas</span>
             </A>
           </li>
+
+          <li>
+            <A href="/admin" activeClass="active" class="menu-link">
+              <img src={cita} alt="VersionAdmin" />
+              <span>Admin</span>
+            </A>
+          </li>
           <li>
 
             
