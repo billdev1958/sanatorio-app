@@ -47,6 +47,44 @@ function RegisterOfficeScheduleForm() {
   let timeEndPicker: HTMLInputElement | undefined;
   let timeDurationPicker: HTMLInputElement | undefined;
 
+  // Función para generar horarios (time slots)
+  const generateTimeSlots = () => {
+    const { timeStart, timeEnd, timeDuration } = formData();
+
+    if (!timeStart || !timeEnd || !timeDuration) {
+      alert("Por favor, completa los campos de tiempo correctamente.");
+      return;
+    }
+
+    const start = new Date(timeStart);
+    const end = new Date(timeEnd);
+    const [durationHours, durationMinutes] = timeDuration.split(":").map(Number);
+
+    if (isNaN(durationHours) || isNaN(durationMinutes)) {
+      alert("Duración no válida. Usa el formato hh:mm.");
+      return;
+    }
+
+    const slots: string[] = [];
+    const durationMs = (durationHours * 60 + durationMinutes) * 60 * 1000;
+
+    let currentTime = start;
+
+    while (currentTime < end) {
+      const nextTime = new Date(currentTime.getTime() + durationMs);
+      if (nextTime > end) break;
+      slots.push(`${formatTime(currentTime)} - ${formatTime(nextTime)}`);
+      currentTime = nextTime;
+    }
+
+    setFormData({ ...formData(), timeSlots: slots });
+  };
+
+  // Formatea una hora en formato hh:mm
+  const formatTime = (date: Date) => {
+    return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+  };
+
   onMount(async () => {
     try {
       const response = await api.get<GetOfficeScheduleApiResponse>("/admin/schedule");
@@ -138,7 +176,13 @@ function RegisterOfficeScheduleForm() {
 
   const handleSubmit = (e: Event): void => {
     e.preventDefault();
-    console.log("Form Data:", JSON.stringify(formData(), null, 2));
+    generateTimeSlots();
+
+    // Obtener los datos actuales del formulario
+    const currentFormData = formData();
+
+    console.log("Formulario Enviado:");
+    console.log(JSON.stringify(currentFormData, null, 2));
   };
 
   return (
