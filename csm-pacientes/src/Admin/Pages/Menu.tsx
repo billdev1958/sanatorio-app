@@ -27,7 +27,7 @@ const DashboardAdmin: Component = () => {
           icon="fas fa-user-plus" 
           title="Registras oficinas" 
           description="Gestiona los consultorios." 
-          link="/admin/offices" 
+          link="/admin/office" 
           buttonText="Registrar" 
         />
         <Widget 
