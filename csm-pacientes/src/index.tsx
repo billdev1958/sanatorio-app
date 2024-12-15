@@ -9,6 +9,10 @@ import HistorialMedicoPage from "./pages/MedicalHistoryP";
 import { AuthProvider } from "./services/AuthContext";
 import ProtectedRoute from "./services/ProtectedRoute"; // Importamos el componente ProtectedRoute
 import RegisterBeneficiary from "./pages/RegisterBeneficiary";
+import DashboardAdmin from "./Admin/Pages/Menu";
+import RegisterOfficeForm from "./Admin/Pages/RegisterOffice";
+import RegisterOfficeScheduleForm from "./Admin/Pages/RegistrarHorarios";
+import RegisterDoctorForm from "./Admin/Pages/RegistrarDoctores";
 
 const root = document.getElementById("root");
 
@@ -28,6 +32,39 @@ render(
             </App>
           </ProtectedRoute>
         )} />
+        
+          <Route path="/admin" component={() => (
+          <ProtectedRoute>
+            <App>
+              <DashboardAdmin />
+            </App>
+          </ProtectedRoute>
+        )} />
+        
+        <Route path="/admin/office" component={() => (
+          <ProtectedRoute>
+            <App>
+              <RegisterOfficeForm />
+            </App>
+          </ProtectedRoute>
+        )} />
+
+        <Route path="/admin/doctor" component={() => (
+          <ProtectedRoute>
+            <App>
+              <RegisterDoctorForm />
+            </App>
+          </ProtectedRoute>
+        )} />
+
+        <Route path="/admin/schedule" component={() => (
+          <ProtectedRoute>
+            <App>
+              <RegisterOfficeScheduleForm />
+            </App>
+          </ProtectedRoute>
+        )} />
+
         <Route path="/citas" component={() => (
           <ProtectedRoute>
             <App>
