@@ -2,6 +2,11 @@ package models
 
 import "github.com/google/uuid"
 
+type Office struct {
+	ID   int    `json:"office_id"`
+	Name string `json:"office_name"`
+}
+
 type DayOfWeek struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
