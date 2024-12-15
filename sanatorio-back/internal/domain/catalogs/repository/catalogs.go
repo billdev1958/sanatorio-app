@@ -101,3 +101,39 @@ func (cr *catalogRepository) GetDoctors(ctx context.Context) ([]models.Doctor, e
 	}
 	return doctors, nil
 }
+
+func (cr *catalogRepository) GetOffices(ctx context.Context) ([]models.Office, error) {
+	query := `
+		SELECT 
+			o.id AS office_id,
+			o.name AS office_name
+		FROM office o
+	`
+
+	rows, err := cr.storage.DbPool.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var offices []models.Office
+
+	for rows.Next() {
+		var office models.Office
+
+		err := rows.Scan(
+			&office.ID,
+			&office.Name,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		offices = append(offices, office)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return offices, nil
+}

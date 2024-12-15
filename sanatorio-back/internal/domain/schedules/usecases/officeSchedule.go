@@ -43,11 +43,17 @@ func (u *usecase) GetInfoOfficeSchedule(ctx context.Context) (models.GetInfoOffi
 		return models.GetInfoOfficeSchedule{}, fmt.Errorf("error al obtener doctores: %w", err)
 	}
 
+	offices, err := u.catalogRepo.GetOffices(ctx)
+	if err != nil {
+		return models.GetInfoOfficeSchedule{}, fmt.Errorf("error al obtener offices: %w", err)
+	}
+
 	response := models.GetInfoOfficeSchedule{
 		CatDays:     days,
 		CatShifts:   shifts,
 		CatServices: services,
 		Doctors:     doctors,
+		Offices:     offices,
 	}
 
 	return response, nil
