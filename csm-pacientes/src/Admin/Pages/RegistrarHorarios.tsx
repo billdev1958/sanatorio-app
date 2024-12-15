@@ -1,6 +1,14 @@
 import { createSignal, onMount } from "solid-js";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
+import api from "../Services/Api"; // Importa el cliente API configurado
+import {
+  DayOfWeek,
+  CatShift,
+  CatService,
+  Office,
+  GetOfficeScheduleInfoResponse,
+} from "../Services/RegisterSchedule"; // Importa los modelos
 
 type FormData = {
   selectedDays: number[];
@@ -10,20 +18,17 @@ type FormData = {
   shiftID: number | "";
   serviceID: number | "";
   doctorID: string;
+  officeID: number | ""; // Campo para seleccionar oficina
   timeSlots: string[]; // Horarios generados
 };
 
-const DAYS_OF_WEEK = [
-  { value: 0, label: "Sunday" },
-  { value: 1, label: "Monday" },
-  { value: 2, label: "Tuesday" },
-  { value: 3, label: "Wednesday" },
-  { value: 4, label: "Thursday" },
-  { value: 5, label: "Friday" },
-  { value: 6, label: "Saturday" },
-];
-
 function RegisterOfficeScheduleForm() {
+  // Estados para los datos dinámicos obtenidos de la API
+  const [daysOfWeek, setDaysOfWeek] = createSignal<DayOfWeek[]>([]);
+  const [shifts, setShifts] = createSignal<CatShift[]>([]);
+  const [services, setServices] = createSignal<CatService[]>([]);
+  const [offices, setOffices] = createSignal<Office[]>([]); // Nuevo estado para oficinas
+
   const [formData, setFormData] = createSignal<FormData>({
     selectedDays: [],
     timeStart: "",
@@ -32,6 +37,7 @@ function RegisterOfficeScheduleForm() {
     shiftID: "",
     serviceID: "",
     doctorID: "",
+    officeID: "", // Campo para oficina
     timeSlots: [],
   });
 
@@ -39,13 +45,29 @@ function RegisterOfficeScheduleForm() {
   let timeEndPicker: HTMLInputElement | undefined;
   let timeDurationPicker: HTMLInputElement | undefined;
 
-  onMount(() => {
+  // Consumir API al montar el componente
+  onMount(async () => {
+    try {
+      // Llama al servicio
+      const response = await api.get<GetOfficeScheduleInfoResponse>("/admin/schedule");
+      const { day_of_week, cat_shift, cat_services, office } = response.data.data;
+
+      // Actualiza los estados con los datos obtenidos
+      setDaysOfWeek(day_of_week);
+      setShifts(cat_shift);
+      setServices(cat_services);
+      setOffices(office); // Oficinas
+
+    } catch (error) {
+      console.error("Error al obtener datos del servicio:", error);
+    }
+
     // Flatpickr para timeStart
     flatpickr(timeStartPicker!, {
       enableTime: true,
       noCalendar: true,
       dateFormat: "H:i",
-      defaultDate: "08:00", // Valor predeterminado
+      defaultDate: "08:00",
       onChange: (selectedDates) => {
         setFormData({
           ...formData(),
@@ -59,7 +81,7 @@ function RegisterOfficeScheduleForm() {
       enableTime: true,
       noCalendar: true,
       dateFormat: "H:i",
-      defaultDate: "17:00", // Valor predeterminado
+      defaultDate: "17:00",
       onChange: (selectedDates) => {
         setFormData({
           ...formData(),
@@ -74,7 +96,7 @@ function RegisterOfficeScheduleForm() {
       noCalendar: true,
       dateFormat: "H:i",
       time_24hr: true,
-      defaultDate: "00:00", // Empieza desde 00:00
+      defaultDate: "00:00",
       onChange: (selectedDates) => {
         setFormData({
           ...formData(),
@@ -117,15 +139,15 @@ function RegisterOfficeScheduleForm() {
         <div class="form-group">
           <label>Select Days</label>
           <div class="day-selector">
-            {DAYS_OF_WEEK.map((day) => (
+            {daysOfWeek().map((day) => (
               <button
                 type="button"
                 class={`day-button ${
-                  formData().selectedDays.includes(day.value) ? "selected" : ""
+                  formData().selectedDays.includes(day.id) ? "selected" : ""
                 }`}
-                onClick={() => toggleDaySelection(day.value)}
+                onClick={() => toggleDaySelection(day.id)}
               >
-                {day.label}
+                {day.name}
               </button>
             ))}
           </div>
@@ -144,7 +166,6 @@ function RegisterOfficeScheduleForm() {
         <div class="form-group">
           <label>Duration (hh:mm)</label>
           <input type="text" ref={timeDurationPicker} />
-          <small>Specify the duration in hours and minutes.</small>
         </div>
 
         <div class="form-group">
@@ -157,8 +178,9 @@ function RegisterOfficeScheduleForm() {
             onInput={(e) => handleSelectChange(e as any)}
           >
             <option value="">Select...</option>
-            <option value="1">Morning</option>
-            <option value="2">Evening</option>
+            {shifts().map((shift) => (
+              <option value={shift.id}>{shift.name}</option>
+            ))}
           </select>
         </div>
 
@@ -172,96 +194,30 @@ function RegisterOfficeScheduleForm() {
             onInput={(e) => handleSelectChange(e as any)}
           >
             <option value="">Select a service...</option>
-            <option value="101">General Consultation</option>
-            <option value="102">Pediatrics</option>
-            <option value="103">Dermatology</option>
+            {services().map((service) => (
+              <option value={service.id}>{service.name}</option>
+            ))}
           </select>
         </div>
 
         <div class="form-group">
-          <label for="doctorID">Doctor</label>
+          <label for="officeID">Office</label>
           <select
-            id="doctorID"
-            name="doctorID"
+            id="officeID"
+            name="officeID"
             required
-            value={formData().doctorID}
+            value={formData().officeID}
             onInput={(e) => handleSelectChange(e as any)}
           >
-            <option value="">Select a doctor...</option>
-            <option value="uuid-1">Dr. John Smith</option>
-            <option value="uuid-2">Dr. Alice Johnson</option>
-            <option value="uuid-3">Dr. Emily Davis</option>
+            <option value="">Select an office...</option>
+            {offices().map((office) => (
+              <option value={office.office_id}>{office.office_name}</option>
+            ))}
           </select>
         </div>
 
         <button type="submit">Submit</button>
       </form>
-
-      <style>
-        {`
-          .form-container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 1em;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background: #f9f9f9;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          }
-          .form-group {
-            margin-bottom: 1em;
-          }
-          label {
-            display: block;
-            margin-bottom: 0.5em;
-            font-weight: bold;
-          }
-          input, select {
-            width: 100%;
-            padding: 0.5em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-          }
-          .day-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5em;
-          }
-          .day-button {
-            padding: 0.5em 1em;
-            border: 1px solid #007bff;
-            border-radius: 4px;
-            background: white;
-            color: #007bff;
-            cursor: pointer;
-          }
-          .day-button.selected {
-            background: #007bff;
-            color: white;
-          }
-          .day-button:hover {
-            background: #0056b3;
-            color: white;
-          }
-          button {
-            padding: 0.7em 1.5em;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-          }
-          button:hover {
-            background: #0056b3;
-          }
-          small {
-            display: block;
-            margin-top: 0.3em;
-            color: #6c757d;
-            font-size: 0.85em;
-          }
-        `}
-      </style>
     </div>
   );
 }
