@@ -1,14 +1,16 @@
 import { createSignal, onMount } from "solid-js";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
-import api from "../Services/Api"; // Importa el cliente API configurado
+import api from "../Services/Api";
 import {
+  GetOfficeScheduleApiResponse,
+  GetOfficeScheduleInfoResponse,
   DayOfWeek,
   CatShift,
   CatService,
+  Doctor,
   Office,
-  GetOfficeScheduleInfoResponse,
-} from "../Services/RegisterSchedule"; // Importa los modelos
+} from "../Services/RegisterSchedule";
 
 type FormData = {
   selectedDays: number[];
@@ -23,11 +25,11 @@ type FormData = {
 };
 
 function RegisterOfficeScheduleForm() {
-  // Estados para los datos dinámicos obtenidos de la API
   const [daysOfWeek, setDaysOfWeek] = createSignal<DayOfWeek[]>([]);
   const [shifts, setShifts] = createSignal<CatShift[]>([]);
   const [services, setServices] = createSignal<CatService[]>([]);
-  const [offices, setOffices] = createSignal<Office[]>([]); // Nuevo estado para oficinas
+  const [doctors, setDoctors] = createSignal<Doctor[] | null>(null);
+  const [offices, setOffices] = createSignal<Office[]>([]);
 
   const [formData, setFormData] = createSignal<FormData>({
     selectedDays: [],
@@ -37,7 +39,7 @@ function RegisterOfficeScheduleForm() {
     shiftID: "",
     serviceID: "",
     doctorID: "",
-    officeID: "", // Campo para oficina
+    officeID: "",
     timeSlots: [],
   });
 
@@ -45,24 +47,31 @@ function RegisterOfficeScheduleForm() {
   let timeEndPicker: HTMLInputElement | undefined;
   let timeDurationPicker: HTMLInputElement | undefined;
 
-  // Consumir API al montar el componente
   onMount(async () => {
     try {
-      // Llama al servicio
-      const response = await api.get<GetOfficeScheduleInfoResponse>("/admin/schedule");
-      const { day_of_week, cat_shift, cat_services, office } = response.data.data;
+      const response = await api.get<GetOfficeScheduleApiResponse>("/admin/schedule");
 
-      // Actualiza los estados con los datos obtenidos
-      setDaysOfWeek(day_of_week);
-      setShifts(cat_shift);
-      setServices(cat_services);
-      setOffices(office); // Oficinas
+      if (response.data.status === "success" && response.data.data) {
+        const data: GetOfficeScheduleInfoResponse = response.data.data;
 
-    } catch (error) {
-      console.error("Error al obtener datos del servicio:", error);
+        setDaysOfWeek(data.day_of_week);
+        setShifts(data.cat_shift);
+        setServices(data.cat_services);
+        setDoctors(data.doctor);
+        setOffices(data.office);
+      } else {
+        console.error("Error en la respuesta de la API:", response.data.message);
+      }
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        console.error("No autorizado: falta un token válido.");
+        alert("Sesión expirada o no autorizada. Por favor, inicia sesión nuevamente.");
+      } else {
+        console.error("Error al realizar la solicitud:", error);
+        alert("Ocurrió un error al cargar los datos. Inténtalo más tarde.");
+      }
     }
 
-    // Flatpickr para timeStart
     flatpickr(timeStartPicker!, {
       enableTime: true,
       noCalendar: true,
@@ -76,7 +85,6 @@ function RegisterOfficeScheduleForm() {
       },
     });
 
-    // Flatpickr para timeEnd
     flatpickr(timeEndPicker!, {
       enableTime: true,
       noCalendar: true,
@@ -90,7 +98,6 @@ function RegisterOfficeScheduleForm() {
       },
     });
 
-    // Flatpickr para timeDuration
     flatpickr(timeDurationPicker!, {
       enableTime: true,
       noCalendar: true,
@@ -125,7 +132,8 @@ function RegisterOfficeScheduleForm() {
     e: Event & { currentTarget: HTMLSelectElement | HTMLInputElement }
   ) => {
     const { name, value } = e.currentTarget;
-    setFormData({ ...formData(), [name]: value });
+    const newValue = name === "officeID" && value !== "" ? Number(value) : value;
+    setFormData({ ...formData(), [name]: newValue });
   };
 
   const handleSubmit = (e: Event): void => {
@@ -201,6 +209,25 @@ function RegisterOfficeScheduleForm() {
         </div>
 
         <div class="form-group">
+          <label for="doctorID">Doctor</label>
+          <select
+            id="doctorID"
+            name="doctorID"
+            required
+            value={formData().doctorID}
+            onInput={(e) => handleSelectChange(e as any)}
+          >
+            <option value="">Select a doctor...</option>
+            {doctors() &&
+              doctors()!.map((doc) => (
+                <option value={doc.account_id}>
+                  {doc.first_name} {doc.last_name_1} {doc.last_name_2}
+                </option>
+              ))}
+          </select>
+        </div>
+
+        <div class="form-group">
           <label for="officeID">Office</label>
           <select
             id="officeID"
@@ -216,8 +243,104 @@ function RegisterOfficeScheduleForm() {
           </select>
         </div>
 
-        <button type="submit">Submit</button>
+        <button type="submit" class="submit-button">Submit</button>
       </form>
+
+      <style>
+        {`
+          .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 2em;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          }
+
+          .form-group {
+            margin-bottom: 1.5em;
+          }
+
+          label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5em;
+            font-size: 1.1em;
+            color: #333;
+          }
+
+          input,
+          select {
+            width: 100%;
+            padding: 0.7em;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+          }
+
+          .day-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+          }
+
+          .day-button {
+            padding: 0.6em 1em;
+            border: 1px solid #007bff;
+            border-radius: 6px;
+            background-color: white;
+            color: #007bff;
+            cursor: pointer;
+            font-weight: bold;
+          }
+
+          .day-button.selected {
+            background-color: #007bff;
+            color: white;
+          }
+
+          .day-button:hover {
+            background-color: #0056b3;
+            color: white;
+          }
+
+          .submit-button {
+            width: 100%;
+            padding: 0.8em;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: white;
+            background-color: #28a745;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+          }
+
+          .submit-button:hover {
+            background-color: #218838;
+          }
+
+          @media (max-width: 600px) {
+            .form-container {
+              padding: 1.5em;
+            }
+
+            label {
+              font-size: 1em;
+            }
+
+            input,
+            select {
+              font-size: 0.9em;
+            }
+
+            .submit-button {
+              font-size: 1em;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 }

@@ -1,38 +1,45 @@
-// Modelo para un día de la semana
 export interface DayOfWeek {
     id: number;
     name: string;
   }
   
-  // Modelo para un turno
   export interface CatShift {
     id: number;
     name: string;
   }
   
-  // Modelo para un servicio
   export interface CatService {
     id: number;
     name: string;
   }
   
-  // Modelo para una oficina
   export interface Office {
     office_id: number;
     office_name: string;
   }
   
-  // Modelo para la respuesta principal del servicio
-  export interface GetOfficeScheduleInfoResponse {
-    status: string; // "success" o "error"
-    message: string; // Mensaje de la respuesta
-    data: {
-      day_of_week: DayOfWeek[];
-      cat_shift: CatShift[];
-      cat_services: CatService[];
-      doctor: null | any; // Doctor puede ser null u otro modelo en el futuro
-      office: Office[];
-    };
-    errors?: any; // Campo opcional para errores
+  export interface Doctor {
+    account_id: string;
+    first_name: string;
+    last_name_1: string;
+    last_name_2: string;
   }
+  
+  export interface GetOfficeScheduleInfoResponse {
+    day_of_week: DayOfWeek[];
+    cat_shift: CatShift[];
+    cat_services: CatService[];
+    doctor: Doctor[] | null; // Puede ser null según el ejemplo proporcionado
+    office: Office[];
+  }
+  
+  export interface ApiResponse<T> {
+    status: string;
+    message?: string;
+    data?: T;
+    errors?: any;
+  }
+  
+  // Tipo específico para la respuesta de este endpoint
+  export type GetOfficeScheduleApiResponse = ApiResponse<GetOfficeScheduleInfoResponse>;
   
