@@ -32,9 +32,9 @@ func (u *usecase) RegisterOfficeSchedule(ctx context.Context, request models.Reg
 
 	// Definir el formato de hora
 	layout := "15:04"
+	var messages []string
 
 	// Procesar `SelectedDays` y `TimeSlots`
-	var messages []string
 	for _, day := range request.SelectedDays {
 		for _, slot := range request.TimeSlots {
 			// Dividir el `timeSlot` en inicio y fin
@@ -43,6 +43,7 @@ func (u *usecase) RegisterOfficeSchedule(ctx context.Context, request models.Reg
 				return "", fmt.Errorf("invalid time slot format: %s", slot)
 			}
 
+			// Convertir las horas al formato de tiempo
 			timeStart, err := time.Parse(layout, times[0])
 			if err != nil {
 				return "", fmt.Errorf("invalid time format for TimeStart in slot: %w", err)
@@ -52,6 +53,7 @@ func (u *usecase) RegisterOfficeSchedule(ctx context.Context, request models.Reg
 				return "", fmt.Errorf("invalid time format for TimeEnd in slot: %w", err)
 			}
 
+			// Calcular la duración del horario
 			duration := timeEnd.Sub(timeStart)
 
 			// Crear la entidad Schedule
@@ -84,10 +86,13 @@ func (u *usecase) RegisterOfficeSchedule(ctx context.Context, request models.Reg
 			if err != nil {
 				return "", fmt.Errorf("failed to register schedule for day %d, slot %s: %w", day, slot, err)
 			}
+
+			// Agregar mensaje de éxito
 			messages = append(messages, message)
 		}
 	}
 
+	// Retornar un resumen de los registros realizados
 	return fmt.Sprintf("Schedules registered: %s", strings.Join(messages, "; ")), nil
 }
 
