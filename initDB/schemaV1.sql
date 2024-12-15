@@ -280,16 +280,7 @@ CREATE TABLE IF NOT EXISTS office (
 );
 
 -- Tabla de horarios
-CREATE TABLE IF NOT EXISTS schedule (
-    id SERIAL PRIMARY KEY,
-    day_of_week INT NOT NULL,
-    time_start TIME NOT NULL,
-    time_end TIME NOT NULL,
-    time_duration INTERVAL NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    deleted_at TIMESTAMP
-);
+
 
 CREATE TABLE IF NOT EXISTS cat_shift(
     id SERIAL PRIMARY KEY,
@@ -299,21 +290,22 @@ CREATE TABLE IF NOT EXISTS cat_shift(
     deleted_at TIMESTAMP
 );
 
--- Tabla de oficinas y horarios
 CREATE TABLE IF NOT EXISTS office_schedule (
     id SERIAL PRIMARY KEY,
-    schedule_id INTEGER NOT NULL,
     office_id INTEGER NOT NULL,
     shift_id INTEGER NOT NULL,
     service_id INTEGER NOT NULL,
     doctor_id UUID NOT NULL,
     status_id INTEGER NOT NULL,
+    day_of_week INT NOT NULL, -- Día de la semana (1 = Lunes, 7 = Domingo)
+    time_start TIME NOT NULL, -- Hora de inicio
+    time_end TIME NOT NULL,   -- Hora de fin
+    time_duration INTERVAL NOT NULL, -- Duración
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
-    UNIQUE (office_id, shift_id, service_id, doctor_id)
+    UNIQUE (office_id, shift_id, service_id, doctor_id, day_of_week, time_start)
 );
-
 
 CREATE TABLE IF NOT EXISTS schedule_block (
     id SERIAL PRIMARY KEY,
@@ -435,10 +427,6 @@ ALTER TABLE office_schedule
 ADD CONSTRAINT fk_status_office
 FOREIGN KEY (status_id) REFERENCES office_status(id);
 
--- Foreign keys para la tabla schedule
-ALTER TABLE schedule
-ADD CONSTRAINT fk_schedule_day
-FOREIGN KEY (day_of_week) REFERENCES days(day_of_week);
 
 -- Foreign keys para la tabla office_schedule
 ALTER TABLE office_schedule
@@ -456,6 +444,10 @@ FOREIGN KEY (service_id) REFERENCES services(id);
 ALTER TABLE office_schedule
 ADD CONSTRAINT fk_office_schedule_doctor_id
 FOREIGN KEY (doctor_id) REFERENCES doctor(account_id);
+
+ALTER TABLE office_schedule
+ADD CONSTRAINT fk_schedule_day
+FOREIGN KEY (day_of_week) REFERENCES days(day_of_week);
 
 ALTER TABLE office_schedule 
 ADD CONSTRAINT fk_office_schedule_id

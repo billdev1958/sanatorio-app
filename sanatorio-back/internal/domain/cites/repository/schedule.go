@@ -11,11 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (cr *citesRepository) RegisterOfficeSchedule(ctx context.Context, schedules []entities.Schedule, officeSchedule entities.OfficeSchedule) (string, error) {
-	if len(schedules) == 0 {
-		return "", fmt.Errorf("schedules cannot be empty")
-	}
-
+func (cr *citesRepository) RegisterOfficeSchedule(ctx context.Context, officeSchedule []entities.OfficeSchedule) (string, error) {
 	// Inicia la transacción
 	tx, err := cr.storage.DbPool.Begin(ctx)
 	if err != nil {
@@ -25,22 +21,20 @@ func (cr *citesRepository) RegisterOfficeSchedule(ctx context.Context, schedules
 
 	var messages []string
 
-	// Iterar sobre los horarios generados
-	for _, schedule := range schedules {
-		scheduleID, err := cr.insertSchedule(ctx, tx, schedule)
+	for _, os := range officeSchedule {
+		query := `
+			INSERT INTO office_schedule (office_id, shift_id, service_id, doctor_id, status_id, day_of_week, time_start, time_end, time_duration)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+			ON CONFLICT (office_id, shift_id, service_id, doctor_id, day_of_week, time_start)
+			DO NOTHING
+		`
+		_, err := tx.Exec(ctx, query, os.Office.ID, os.ShiftID, os.Services.ID, os.DoctorUser.AccountID, os.OfficeStatus.ID, os.Schedule.DayOfWeek, os.Schedule.TimeStart, os.Schedule.TimeEnd, os.Schedule.TimeDuration)
 		if err != nil {
-			return "", fmt.Errorf("failed to insert schedule for day %d: %w", schedule.DayOfWeek, err)
+			log.Printf("Error al registrar programación: Oficina '%d', Turno '%d', Servicio '%d', Día '%d', Inicio '%s': %v", os.Office.ID, os.ShiftID, os.Services.ID, os.Schedule.DayOfWeek, os.Schedule.TimeStart, err)
+			return "", fmt.Errorf("failed to register office schedule: %w", err)
 		}
 
-		// Crear un registro de `office_schedule` para este `schedule`
-		officeSchedule := officeSchedule
-		officeSchedule.Schedule.ID = scheduleID
-
-		if err := cr.insertOfficeSchedule(ctx, tx, officeSchedule); err != nil {
-			return "", fmt.Errorf("failed to insert office schedule for office %d: %w", officeSchedule.Office.ID, err)
-		}
-
-		messages = append(messages, fmt.Sprintf("Horario registrado para oficina '%d', día '%d'", officeSchedule.Office.ID, schedule.DayOfWeek))
+		messages = append(messages, fmt.Sprintf("Horario registrado: Oficina '%d', Día '%d', Inicio '%s'", os.Office.ID, os.Schedule.DayOfWeek, os.Schedule.TimeStart))
 	}
 
 	if err := tx.Commit(ctx); err != nil {

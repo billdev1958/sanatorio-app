@@ -14,7 +14,7 @@ type CitesRepository interface {
 
 type Register interface {
 	RegisterOffice(ctx context.Context, of entities.Office) (string, error)
-	RegisterOfficeSchedule(ctx context.Context, schedules []entities.Schedule, officeSchedule entities.OfficeSchedule) (string, error)
+	RegisterOfficeSchedule(ctx context.Context, officeSchedule []entities.OfficeSchedule) (string, error)
 	RegisterAppointment(ctx context.Context, ap entities.Appointment) (string, error)
 }
 
