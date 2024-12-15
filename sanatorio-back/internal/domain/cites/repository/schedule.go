@@ -6,11 +6,16 @@ import (
 	"log"
 	"sanatorioApp/internal/domain/cites/entities"
 	"sanatorioApp/pkg"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 )
 
-func (cr *citesRepository) RegisterOfficeSchedule(ctx context.Context, sc entities.Schedule, os entities.OfficeSchedule) (string, error) {
+func (cr *citesRepository) RegisterOfficeSchedule(ctx context.Context, schedules []entities.Schedule, officeSchedule entities.OfficeSchedule) (string, error) {
+	if len(schedules) == 0 {
+		return "", fmt.Errorf("schedules cannot be empty")
+	}
+
 	// Inicia la transacción
 	tx, err := cr.storage.DbPool.Begin(ctx)
 	if err != nil {
@@ -18,24 +23,31 @@ func (cr *citesRepository) RegisterOfficeSchedule(ctx context.Context, sc entiti
 	}
 	defer tx.Rollback(ctx)
 
-	// Inserta el nuevo horario en la tabla `schedule` y obtén el `scheduleID`
-	scheduleID, err := cr.insertSchedule(ctx, tx, sc)
-	if err != nil {
-		return "", fmt.Errorf("failed to insert schedule: %w", err)
+	var messages []string
+
+	// Iterar sobre los horarios generados
+	for _, schedule := range schedules {
+		scheduleID, err := cr.insertSchedule(ctx, tx, schedule)
+		if err != nil {
+			return "", fmt.Errorf("failed to insert schedule for day %d: %w", schedule.DayOfWeek, err)
+		}
+
+		// Crear un registro de `office_schedule` para este `schedule`
+		officeSchedule := officeSchedule
+		officeSchedule.Schedule.ID = scheduleID
+
+		if err := cr.insertOfficeSchedule(ctx, tx, officeSchedule); err != nil {
+			return "", fmt.Errorf("failed to insert office schedule for office %d: %w", officeSchedule.Office.ID, err)
+		}
+
+		messages = append(messages, fmt.Sprintf("Horario registrado para oficina '%d', día '%d'", officeSchedule.Office.ID, schedule.DayOfWeek))
 	}
 
-	// Inserta el nuevo registro en la tabla `office_schedule`, incluyendo el `scheduleID`
-	os.Schedule.ID = scheduleID
-	if err := cr.insertOfficeSchedule(ctx, tx, os); err != nil {
-		return "", fmt.Errorf("failed to insert office schedule: %w", err)
-	}
-
-	// Confirma la transacción
 	if err := tx.Commit(ctx); err != nil {
 		return "", fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	return fmt.Sprintf("Horario registrado con éxito para la oficina '%d' el día '%d'", os.Office.ID, sc.DayOfWeek), nil
+	return strings.Join(messages, "; "), nil
 }
 
 func (cr *citesRepository) insertSchedule(ctx context.Context, tx pgx.Tx, sc entities.Schedule) (int, error) {
