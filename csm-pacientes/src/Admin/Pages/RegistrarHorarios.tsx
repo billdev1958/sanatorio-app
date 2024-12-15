@@ -14,24 +14,23 @@ import {
 
 type FormData = {
   selectedDays: number[];
-  timeStart: string;
-  timeEnd: string;
-  timeDuration: string; // Duración en formato hh:mm
+  timeStart: string;    // ISO 8601, generado por flatpickr
+  timeEnd: string;      // ISO 8601, generado por flatpickr
+  timeDuration: string; // hh:mm
   shiftID: number | "";
   serviceID: number | "";
   doctorID: string;
-  officeID: number | ""; // Campo para seleccionar oficina
-  timeSlots: string[]; // Horarios generados
+  officeID: number | ""; 
+  timeSlots: string[];
 };
 
-// Definimos el tipo para el request del endpoint POST /v1/schedule
 interface RegisterOfficeScheduleRequest {
   selectedDays: number[];
-  timeStart: string;    // Formato HH:MM, ej: "09:00"
-  timeEnd: string;      // Formato HH:MM, ej: "12:00"
-  timeDuration: string; // Formato hh:mm, ej: "01:00"
-  shiftID: string;      
-  serviceID: string;    
+  timeStart: string;    // ISO 8601
+  timeEnd: string;      // ISO 8601
+  timeDuration: string; // hh:mm
+  shiftID: number;      
+  serviceID: number;    
   doctorID: string;     
   officeID: number;     
   timeSlots: string[];  
@@ -60,7 +59,6 @@ function RegisterOfficeScheduleForm() {
   let timeEndPicker: HTMLInputElement | undefined;
   let timeDurationPicker: HTMLInputElement | undefined;
 
-  // Función para generar horarios (time slots)
   const generateTimeSlots = () => {
     const { timeStart, timeEnd, timeDuration } = formData();
 
@@ -92,7 +90,6 @@ function RegisterOfficeScheduleForm() {
     setFormData({ ...formData(), timeSlots: slots });
   };
 
-  // Formatea una hora en formato hh:mm
   const formatTime = (date: Date) => {
     return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
   };
@@ -122,11 +119,12 @@ function RegisterOfficeScheduleForm() {
       }
     }
 
+    // Estas funciones guardan las horas en ISO 8601 ya
     flatpickr(timeStartPicker!, {
       enableTime: true,
       noCalendar: true,
-      dateFormat: "H:i",
-      defaultDate: "08:00",
+      dateFormat: "Y-m-d H:i", 
+      defaultDate: "2024-01-01 08:00",
       onChange: (selectedDates) => {
         setFormData({
           ...formData(),
@@ -138,8 +136,8 @@ function RegisterOfficeScheduleForm() {
     flatpickr(timeEndPicker!, {
       enableTime: true,
       noCalendar: true,
-      dateFormat: "H:i",
-      defaultDate: "17:00",
+      dateFormat: "Y-m-d H:i",
+      defaultDate: "2024-01-01 17:00",
       onChange: (selectedDates) => {
         setFormData({
           ...formData(),
@@ -182,13 +180,23 @@ function RegisterOfficeScheduleForm() {
     e: Event & { currentTarget: HTMLSelectElement | HTMLInputElement }
   ) => {
     const { name, value } = e.currentTarget;
-    const newValue = name === "officeID" && value !== "" ? Number(value) : value;
+    let newValue: string | number = value;
+    if (name === "officeID" && value !== "") {
+      newValue = Number(value);
+    }
+    if (name === "shiftID" && value !== "") {
+      newValue = Number(value);
+    }
+    if (name === "serviceID" && value !== "") {
+      newValue = Number(value);
+    }
     setFormData({ ...formData(), [name]: newValue });
   };
 
   const submitSchedule = async (data: RegisterOfficeScheduleRequest) => {
     try {
-      const response = await api.post("/v1/schedule", data);
+      // Ajusta la URL a "/v1/schedule" si ese es tu endpoint correcto
+      const response = await api.post("/schedule", data);
       console.log("Respuesta del servidor:", response.data);
       alert("Horario registrado con éxito");
     } catch (error: any) {
@@ -203,17 +211,15 @@ function RegisterOfficeScheduleForm() {
 
     const currentFormData = formData();
 
-    // Convertir timeStart, timeEnd a formato HH:MM
-    const timeStartFormatted = new Date(currentFormData.timeStart).toTimeString().slice(0, 5);
-    const timeEndFormatted = new Date(currentFormData.timeEnd).toTimeString().slice(0, 5);
-
+    // Aquí NO convertimos a HH:MM porque el backend quiere ISO 8601
+    // El backend dice en el comentario que TimeStart y TimeEnd son ISO 8601.
     const payload: RegisterOfficeScheduleRequest = {
       selectedDays: currentFormData.selectedDays,
-      timeStart: timeStartFormatted,
-      timeEnd: timeEndFormatted,
+      timeStart: currentFormData.timeStart,   // ISO 8601
+      timeEnd: currentFormData.timeEnd,       // ISO 8601
       timeDuration: currentFormData.timeDuration,
-      shiftID: String(currentFormData.shiftID),
-      serviceID: String(currentFormData.serviceID),
+      shiftID: Number(currentFormData.shiftID),
+      serviceID: Number(currentFormData.serviceID),
       doctorID: currentFormData.doctorID,
       officeID: Number(currentFormData.officeID),
       timeSlots: currentFormData.timeSlots,
@@ -228,6 +234,11 @@ function RegisterOfficeScheduleForm() {
   return (
     <div class="form-container">
       <form onSubmit={handleSubmit}>
+        {/* ... el resto del formulario queda igual ... */}
+        {/* Solo asegúrate de que shiftID, serviceID y officeID se hayan convertido a número antes de enviar */}
+        
+        {/* Tu formulario, sin cambios adicionales */}
+        
         <div class="form-group">
           <label>Select Days</label>
           <div class="day-selector">
