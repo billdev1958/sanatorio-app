@@ -6,6 +6,6 @@ import (
 )
 
 func (h *ScheduleHandler) ScheduleRouter(mux *http.ServeMux) {
-	mux.Handle("POST /v1/admin/schedule", (auth.AuthMiddleware(http.HandlerFunc(h.GetInfoOfficeSchedule))))
+	mux.Handle("GET /v1/admin/schedule", (auth.AuthMiddleware(http.HandlerFunc(h.GetInfoOfficeSchedule))))
 
 }
