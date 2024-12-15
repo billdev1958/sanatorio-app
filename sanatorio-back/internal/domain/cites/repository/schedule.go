@@ -18,11 +18,6 @@ func (cr *citesRepository) RegisterOfficeSchedule(ctx context.Context, sc entiti
 	}
 	defer tx.Rollback(ctx)
 
-	// Primero actualiza el estado de la oficina a "asignado"
-	if err := cr.updateOfficeStatus(ctx, tx, os.Office.ID, 1); err != nil {
-		return "", fmt.Errorf("failed to update office status: %w", err)
-	}
-
 	// Inserta el nuevo horario en la tabla `schedule` y obtén el `scheduleID`
 	scheduleID, err := cr.insertSchedule(ctx, tx, sc)
 	if err != nil {
@@ -41,16 +36,6 @@ func (cr *citesRepository) RegisterOfficeSchedule(ctx context.Context, sc entiti
 	}
 
 	return fmt.Sprintf("Horario registrado con éxito para la oficina '%d' el día '%d'", os.Office.ID, sc.DayOfWeek), nil
-}
-
-func (cr *citesRepository) updateOfficeStatus(ctx context.Context, tx pgx.Tx, officeID int, statusID int) error {
-	queryUpdate := "UPDATE office SET status_id = $1 WHERE id = $2"
-	_, err := tx.Exec(ctx, queryUpdate, statusID, officeID)
-	if err != nil {
-		log.Printf("error al actualizar el estado de la oficina '%d' a '%d': %v", officeID, statusID, err)
-		return err
-	}
-	return nil
 }
 
 func (cr *citesRepository) insertSchedule(ctx context.Context, tx pgx.Tx, sc entities.Schedule) (int, error) {
