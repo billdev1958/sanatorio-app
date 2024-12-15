@@ -27,10 +27,8 @@ func (u *usecase) RegisterOfficeSchedule(ctx context.Context, request models.Reg
 	}
 
 	layout := "15:04"
+	var officeSchedules []entities.OfficeSchedule
 
-	var schedules []entities.Schedule
-
-	// Procesar dinámicamente los días y horarios
 	for _, day := range request.SelectedDays {
 		for _, slot := range request.TimeSlots {
 			times := strings.Split(slot, " - ")
@@ -40,41 +38,40 @@ func (u *usecase) RegisterOfficeSchedule(ctx context.Context, request models.Reg
 
 			timeStart, err := time.Parse(layout, times[0])
 			if err != nil {
-				return "", fmt.Errorf("invalid time format for TimeStart in slot: %w", err)
+				return "", fmt.Errorf("invalid time format for TimeStart: %w", err)
 			}
 			timeEnd, err := time.Parse(layout, times[1])
 			if err != nil {
-				return "", fmt.Errorf("invalid time format for TimeEnd in slot: %w", err)
+				return "", fmt.Errorf("invalid time format for TimeEnd: %w", err)
 			}
 
 			duration := timeEnd.Sub(timeStart)
 
-			schedules = append(schedules, entities.Schedule{
-				DayOfWeek:    day,
-				TimeStart:    timeStart,
-				TimeEnd:      timeEnd,
-				TimeDuration: duration,
+			officeSchedules = append(officeSchedules, entities.OfficeSchedule{
+				Office: entities.Office{
+					ID: request.OfficeID,
+				},
+				ShiftID: request.ShiftID,
+				Services: entities.Services{
+					ID: request.ServiceID,
+				},
+				DoctorUser: users.DoctorUser{
+					AccountID: request.DoctorID,
+				},
+				OfficeStatus: entities.OfficeStatus{
+					ID: int(entities.OfficeStatusAvailable),
+				},
+				Schedule: entities.Schedule{
+					DayOfWeek:    day,
+					TimeStart:    timeStart,
+					TimeEnd:      timeEnd,
+					TimeDuration: duration,
+				},
 			})
 		}
 	}
 
-	officeScheduleTemplate := entities.OfficeSchedule{
-		Office: entities.Office{
-			ID: request.OfficeID,
-		},
-		ShiftID: request.ShiftID,
-		Services: entities.Services{
-			ID: request.ServiceID,
-		},
-		DoctorUser: users.DoctorUser{
-			AccountID: request.DoctorID,
-		},
-		OfficeStatus: entities.OfficeStatus{
-			ID: int(entities.OfficeStatusAvailable),
-		},
-	}
-
-	message, err := u.repo.RegisterOfficeSchedule(ctx, schedules, officeScheduleTemplate)
+	message, err := u.repo.RegisterOfficeSchedule(ctx, officeSchedules)
 	if err != nil {
 		return "", err
 	}
