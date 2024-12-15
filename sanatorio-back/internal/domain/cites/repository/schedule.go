@@ -55,7 +55,7 @@ func (cr *citesRepository) insertSchedule(ctx context.Context, tx pgx.Tx, sc ent
 func (cr *citesRepository) insertOfficeSchedule(ctx context.Context, tx pgx.Tx, sc entities.OfficeSchedule) error {
 	queryInsert := `
 		INSERT INTO office_schedule (schedule_id, office_id, shift_id, service_id, doctor_id, status_id)
-		VALUES ($1, $2, $3, $4, $5)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		ON CONFLICT (office_id, shift_id, service_id, doctor_id)
 		DO NOTHING
 	`
