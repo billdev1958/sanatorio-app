@@ -23,6 +23,7 @@ type Usecase interface {
 
 	// EDIT
 	UpdateUser(ctx context.Context, userUpdate models.UpdateUser) (string, error)
+	UpdatedDoctor(ctx context.Context, request models.DoctorUpdateRequest) (message string, err error)
 
 	CompleteMedicalHistory(ctx context.Context, request models.CompleteMedicalHistoryRequest) (string, error)
 

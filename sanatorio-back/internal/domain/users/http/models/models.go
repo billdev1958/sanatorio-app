@@ -109,6 +109,15 @@ type DoctorRequest struct {
 	AccountID        uuid.UUID `json:"account_id"`
 }
 
+type DoctorUpdateRequest struct {
+	AccountID      uuid.UUID `json:"account_id"`
+	MedicalLicense string    `json:"medical_license,omitempty"`
+	Firstname      string    `json:"firstname,omitempty"`
+	Lastname1      string    `json:"lastname1,omitempty"`
+	Lastname2      string    `json:"lastname2,omitempty"`
+	Sex            string    `json:"sex,omitempty"`
+}
+
 type PatientRequest struct {
 	AccountID  string `json:"account_id"`
 	ID         int    `json:"id"`
@@ -130,18 +139,6 @@ type UpdateUser struct {
 	Password      string    `json:"password,omitempty"`
 	Curp          string    `json:"curp,omitempty"`
 	AdminPassword string    `json:"admin_password"`
-}
-
-type UpdateDoctor struct {
-	AccountID      uuid.UUID `json:"account_id"`
-	Name           string    `json:"name,omitempty"`
-	Lastname1      string    `json:"lastname1,omitempty"`
-	Lastname2      string    `json:"lastname2,omitempty"`
-	Email          string    `json:"email,omitempty"`
-	Password       string    `json:"password,omitempty"`
-	SpecialtyID    int       `json:"specialty_id,omitempty"`
-	MedicalLicense string    `json:"medical_license,omitempty"`
-	AdminPassword  string    `json:"admin_password"`
 }
 
 type CheckPermission struct {

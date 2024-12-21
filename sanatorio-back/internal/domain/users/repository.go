@@ -31,6 +31,7 @@ type GetU interface {
 }
 
 type UpdateU interface {
+	UpdateDoctor(ctx context.Context, d entities.DoctorUser) (message string, err error)
 	UpdatePatient(ctx context.Context, patientAccount entities.Account, patientUpdate entities.PatientUser) (string, error)
 	CompleteMedicalHistory(ctx context.Context, md entities.MedicalHistory) (bool, error)
 }
