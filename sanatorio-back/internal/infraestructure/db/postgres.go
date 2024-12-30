@@ -101,7 +101,7 @@ func (storage *PgxStorage) SeedRolePermissions(ctx context.Context) (err error) 
 	}
 
 	patientPermissions := []int{
-		22, 23, 24, 26,
+		6, 22, 23, 24, 26,
 	}
 
 	var count int
