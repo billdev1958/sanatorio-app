@@ -7,6 +7,7 @@ import (
 	"sanatorioApp/internal/domain/catalogs"
 	"sanatorioApp/internal/domain/catalogs/models"
 	postgres "sanatorioApp/internal/infraestructure/db"
+	"sanatorioApp/pkg"
 )
 
 type catalogRepository struct {
@@ -136,4 +137,73 @@ func (cr *catalogRepository) GetOffices(ctx context.Context) ([]models.Office, e
 		return nil, err
 	}
 	return offices, nil
+}
+
+func (cr *catalogRepository) GetSchedulesForAppointment(ctx context.Context, filters map[string]interface{}) ([]models.OfficeSchedule, error) {
+	columnMapping := map[string]string{
+		"shiftID":   "shift_id",
+		"serviceID": "service_id",
+		"dayOfWeek": "day_of_week",
+	}
+
+	dbFilters, err := pkg.MapFiltersToColumns(filters, columnMapping)
+	if err != nil {
+		return nil, fmt.Errorf("error translating filters: %w", err)
+	}
+
+	// Build dynamic WHERE clause
+	whereClause, args, err := pkg.BuildWhereClause(dbFilters)
+	if err != nil {
+		return nil, fmt.Errorf("error building WHERE clause: %w", err)
+	}
+
+	query := fmt.Sprintf(`
+		SELECT 
+			id,
+			office_id,
+			shift_id,
+			service_id,
+			doctor_id,
+			status_id,
+			day_of_week,
+			time_start,
+			time_end,
+			time_duration
+		FROM office_schedule
+		%s
+	`, whereClause)
+
+	rows, err := cr.storage.DbPool.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %w", err)
+	}
+	defer rows.Close()
+
+	// Parse query results
+	var schedules []models.OfficeSchedule
+	for rows.Next() {
+		var schedule models.OfficeSchedule
+		if err := rows.Scan(
+			&schedule.ID,
+			&schedule.OfficeID,
+			&schedule.ShiftID,
+			&schedule.ServiceID,
+			&schedule.DoctorID,
+			&schedule.StatusID,
+			&schedule.DayOfWeek,
+			&schedule.TimeStart,
+			&schedule.TimeEnd,
+			&schedule.TimeDuration,
+		); err != nil {
+			return nil, fmt.Errorf("error scanning schedule row: %w", err)
+		}
+		schedules = append(schedules, schedule)
+	}
+
+	// Check for iteration errors
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("row iteration error: %w", err)
+	}
+
+	return schedules, nil
 }

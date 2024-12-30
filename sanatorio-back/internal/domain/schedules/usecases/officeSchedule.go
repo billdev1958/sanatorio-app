@@ -20,6 +20,7 @@ func NewUsecase(catalogRepo catalogs.CatalogsRepository) schedule.OfficeSchedule
 		catalogRepo: catalogRepo,
 	}
 }
+
 func (u *usecase) GetInfoOfficeSchedule(ctx context.Context) (models.GetInfoOfficeSchedule, error) {
 	days, err := u.catalogRepo.GetDays(ctx)
 	if err != nil {

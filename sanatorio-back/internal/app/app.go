@@ -98,6 +98,10 @@ func (app *App) Run() error {
 		return fmt.Errorf("failed to start schedule service: %w", err) // Devuelve un error si no se pudo iniciar el servicio
 	}
 
+	if err := AppointmentService(context.Background(), app.DB, app.router); err != nil {
+		return fmt.Errorf("failed to start appointment service: %w", err) // Devuelve un error si no se pudo iniciar el servicio
+	}
+
 	// Canal para escuchar señales del sistema (SIGTERM, SIGINT)
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT) // Notifica al canal cuando el sistema recibe la señal de apagado
