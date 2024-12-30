@@ -141,9 +141,9 @@ func (cr *catalogRepository) GetOffices(ctx context.Context) ([]models.Office, e
 
 func (cr *catalogRepository) GetSchedulesForAppointment(ctx context.Context, filters map[string]interface{}) ([]models.OfficeSchedule, error) {
 	columnMapping := map[string]string{
-		"shiftID":   "shift_id",
-		"serviceID": "service_id",
-		"dayOfWeek": "day_of_week",
+		"shift":   "shift_id",
+		"service": "service_id",
+		"day":     "day_of_week",
 	}
 
 	dbFilters, err := pkg.MapFiltersToColumns(filters, columnMapping)
