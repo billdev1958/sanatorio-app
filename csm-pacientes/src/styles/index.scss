@@ -74,11 +74,19 @@ input, textarea {
 
 /* Configuración adicional para el root (tema, colores, etc.) */
 :root {
+
   --color-primary: #284C34;
   --color-secondary: #9C8414;
   --color-box: #E9E9E9;
   --color-text: #000000;
   --font-size-default: 16px;
+
+  --color-background: #f8f9fa; // Gris de fondo suave
+  --color-accent: #CDBB68; // Dorado claro para botones (similar a --color-secondary)
+  --color-accent-hover: #B8A350; // Dorado más oscuro para hover
+  --color-error: #A63A3A; // Rojo oscuro, con tono cálido
+  --color-error-hover: #8A2F2F; // Rojo más oscuro para hover
+
 }
 
 /* Ajuste en enlaces, foco y seleccion de texto */
