@@ -463,12 +463,6 @@ ALTER TABLE office_schedule
 ADD CONSTRAINT fk_schedule_day
 FOREIGN KEY (day_of_week) REFERENCES days(day_of_week);
 
-ALTER TABLE office_schedule 
-ADD CONSTRAINT fk_office_schedule_id
-FOREIGN KEY (schedule_id) REFERENCES schedule(id)
-ON UPDATE CASCADE
-ON DELETE CASCADE;
-
 
 -- Foreign keys para la tabla schedule_block
 ALTER TABLE schedule_block
