@@ -1,5 +1,4 @@
 
-import Calendario from '../components/Calendario';
 import CardInfo from '../components/CardInfo';
 
 const HomePage = () => {
@@ -14,7 +13,6 @@ const HomePage = () => {
           telefono="555-123-4567" 
           cuenta={accountNumber}
         />
-        <Calendario/>
       </>
     );
   };
