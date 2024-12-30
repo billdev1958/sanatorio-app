@@ -9,10 +9,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *handler) RegisterReceptionist(w http.ResponseWriter, r *http.Request) {
+func (h *handler) RegisterSuperAdmin(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// Decodificar el payload de la solicitud
-	var request models.RegisterReceptionistRequest
+	var request models.RegisterSuperAdminRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
@@ -22,7 +22,7 @@ func (h *handler) RegisterReceptionist(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Decoded request: %+v", request)
 
 	// Llamar al caso de uso para manejar el registro
-	patientData, err := h.uc.RegisterReceptionist(r.Context(), request)
+	patientData, err := h.uc.RegisterSuperAdmin(r.Context(), request)
 	if err != nil {
 		response := models.Response{
 			Status:  "error",
@@ -36,7 +36,7 @@ func (h *handler) RegisterReceptionist(w http.ResponseWriter, r *http.Request) {
 	// Preparar la respuesta formateada
 	response := models.Response{
 		Status:  "success",
-		Message: "Receptionist registered successfully",
+		Message: "SuperAdmin registered successfully",
 		Data:    patientData,
 	}
 
@@ -47,7 +47,7 @@ func (h *handler) RegisterReceptionist(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *handler) UpdateReceptionist(w http.ResponseWriter, r *http.Request) {
+func (h *handler) UpdateSuperAdmin(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var request models.UpdateUser
@@ -65,9 +65,9 @@ func (h *handler) UpdateReceptionist(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Decoded request: %+v", request)
 
-	message, err := h.uc.UpdatedReceptionist(r.Context(), request)
+	message, err := h.uc.UpdatedAdmin(r.Context(), request)
 	if err != nil {
-		log.Printf("Failed to update receptionist with account_id: %s. Error: %v", request.AccountID, err)
+		log.Printf("Failed to update super_admin with account_id: %s. Error: %v", request.AccountID, err)
 		response := models.Response{
 			Status:  "error",
 			Message: err.Error(),
@@ -91,10 +91,10 @@ func (h *handler) UpdateReceptionist(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Successfully updated receptionist with account_id: %s", request.AccountID)
+	log.Printf("Successfully updated super_admin with account_id: %s", request.AccountID)
 }
 
-func (h *handler) SoftDeleteReceptionist(w http.ResponseWriter, r *http.Request) {
+func (h *handler) SoftDeleteSuperAdmin(w http.ResponseWriter, r *http.Request) {
 	var request struct {
 		AccountID uuid.UUID `json:"account_id"`
 	}
@@ -104,13 +104,13 @@ func (h *handler) SoftDeleteReceptionist(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	message, err := h.uc.SoftDeleteReceptionist(r.Context(), request.AccountID)
+	message, err := h.uc.SoftDeleteSuperAdmin(r.Context(), request.AccountID)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "error",
-			"message": "Failed to soft delete receptionist",
+			"message": "Failed to soft delete super_admin",
 			"errors":  err.Error(),
 		})
 		return

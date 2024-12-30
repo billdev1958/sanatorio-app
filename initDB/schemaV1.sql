@@ -131,6 +131,20 @@ CREATE TABLE IF NOT EXISTS super_admin (
     deleted_at TIMESTAMP
 );
 
+-- Tabla de admin
+CREATE TABLE IF NOT EXISTS admin (
+    account_id UUID NOT NULL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name1 VARCHAR(50) NOT NULL,
+    last_name2 VARCHAR(50) NOT NULL,
+    curp CHAR(18) NOT NULL,
+    sex VARCHAR(1),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+
+
 -- ====================================
 -- Tablas relacionadas con historiales médicos
 -- ====================================
@@ -534,9 +548,12 @@ ADD CONSTRAINT fk_patient_consultation
 FOREIGN KEY (patient_id) REFERENCES patient(account_id);
 
 -- Foreign keys para la tabla super_admin
--- **Corrección aplicada aquí**
 ALTER TABLE super_admin
 ADD CONSTRAINT fk_account_super_admin
+FOREIGN KEY (account_id) REFERENCES account(id);
+
+ALTER TABLE admin
+ADD CONSTRAINT fk_account_admin
 FOREIGN KEY (account_id) REFERENCES account(id);
 
 -- ====================================

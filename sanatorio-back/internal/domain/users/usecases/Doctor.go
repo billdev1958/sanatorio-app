@@ -90,3 +90,18 @@ func (u *usecase) UpdatedDoctor(ctx context.Context, request models.DoctorUpdate
 	log.Printf("Successfully updated doctor with account_id: %s", request.AccountID)
 	return message, nil
 }
+
+func (u *usecase) SoftDeleteDoctor(ctx context.Context, accountID uuid.UUID) (message string, err error) {
+	delete := entities.Account{
+		ID: accountID,
+	}
+
+	_, err = u.repo.SoftDeleteUserDoctor(ctx, delete)
+	if err != nil {
+		log.Printf("Failed to delete doctor with account_id: %s. Error: %v", accountID, err)
+		return "", fmt.Errorf("failed to delete doctor with account_id %s: %w", accountID, err)
+	}
+
+	log.Printf("Successfully delete doctor with account_id: %s", accountID)
+	return message, nil
+}

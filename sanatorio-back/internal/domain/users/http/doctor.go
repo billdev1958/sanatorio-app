@@ -132,3 +132,33 @@ func (h *handler) GetDoctorByID(w http.ResponseWriter, r *http.Request) {
 		"data":    doctorData,
 	})
 }
+
+func (h *handler) SoftDeleteDoctor(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		AccountID uuid.UUID `json:"account_id"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	message, err := h.uc.SoftDeleteDoctor(r.Context(), request.AccountID)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{
+			"status":  "error",
+			"message": "Failed to soft delete doctor",
+			"errors":  err.Error(),
+		})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"status":  "success",
+		"message": message,
+	})
+}

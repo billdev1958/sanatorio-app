@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sanatorioApp/internal/auth"
+	"sanatorioApp/internal/domain/auth"
 	"sanatorioApp/internal/domain/users/entities"
 	"sanatorioApp/internal/domain/users/http/models"
 	password "sanatorioApp/pkg/pass"

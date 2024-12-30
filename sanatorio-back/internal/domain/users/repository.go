@@ -18,7 +18,8 @@ type Autenticador interface {
 }
 
 type RegisterU interface {
-	RegisterAdminTransaction(ctx context.Context, account entities.Account, su entities.SuperAdminUser) (entities.SuperAdminUser, error)
+	RegisterSuperAdminTransaction(ctx context.Context, account entities.Account, su entities.SuperAdminUser) (entities.SuperAdminUser, error)
+	RegisterAdminTransaction(ctx context.Context, account entities.Account, au entities.AdminUser) (entities.AdminUser, error)
 	RegisterReceptionistTransaction(ctx context.Context, account entities.Account, ru entities.ReceptionistUser) (entities.ReceptionistUser, error)
 	RegisterDoctorTransaction(ctx context.Context, account entities.Account, du entities.DoctorUser) (entities.DoctorUser, error)
 	RegisterPatientTransaction(ctx context.Context, account entities.Account, pu entities.PatientUser) (entities.PatientUser, error)
@@ -31,12 +32,19 @@ type GetU interface {
 }
 
 type UpdateU interface {
+	UpdateSuperAdmin(ctx context.Context, d entities.SuperAdminUser) (message string, err error)
+	UpdateAdmin(ctx context.Context, d entities.AdminUser) (message string, err error)
 	UpdateDoctor(ctx context.Context, d entities.DoctorUser) (message string, err error)
-	UpdatePatient(ctx context.Context, patientAccount entities.Account, patientUpdate entities.PatientUser) (string, error)
+	UpdateReceptionist(ctx context.Context, d entities.ReceptionistUser) (message string, err error)
+	UpdatePatient(ctx context.Context, d entities.PatientUser) (message string, err error)
 	CompleteMedicalHistory(ctx context.Context, md entities.MedicalHistory) (bool, error)
 }
 
 type DeleteU interface {
 	DeleteUser(ctx context.Context, accountID string) (string, error)
-	SoftDeleteUser(ctx context.Context, accountID string) (string, error)
+	SoftDeleteUserSuperAdmin(ctx context.Context, a entities.Account) (bool, error)
+	SoftDeleteUserAdmin(ctx context.Context, au entities.Account) (bool, error)
+	SoftDeleteUserDoctor(ctx context.Context, a entities.Account) (bool, error)
+	SoftDeleteUserReceptionist(ctx context.Context, a entities.Account) (bool, error)
+	SoftDeleteUserPatient(ctx context.Context, a entities.Account) (bool, error)
 }

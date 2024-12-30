@@ -45,7 +45,17 @@ func (storage *PgxStorage) SeedRoles(ctx context.Context) (err error) {
 }
 
 func (storage *PgxStorage) SeedPermissions(ctx context.Context) (err error) {
-	permissionsValues := [16]string{"CreateUsers", "ViewUsers", "EditUsers", "DeleteUsers", "CreateSchedule", "ViewSchedule", "EditSchedule", "DeleteSchedule", "CreateAppointment", "ViewAppointment", "EditAppointment", "DeleteAppointment", "CreateMedicalHistory", "ViewMedicalHistory", "EditMedicalHistory", "DeleteMedicalHistory"}
+	permissionsValues := [39]string{
+		"CreateSuperAdmin", "CreateAdmin", "CreateDoctor", "CreateReceptionist", "CreatePatient",
+		"ViewUsers", "EditSuperAdmin", "EditAdmin", "EditDoctor", "EditReceptionist", "EditPatient",
+		"DeleteSuperAdmin", "DeleteAdmin", "DeleteDoctor", "DeleteReceptionist", "DeletePatient",
+		"CreateSchedule", "ViewSchedule", "EditSchedule", "DeleteSchedule",
+		"CreateAppointment", "ViewAppointment", "EditAppointment", "DeleteAppointment", "CancelAppointment",
+		"CreateLaboratory", "EditLaboratory", "ViewLaboratory", "DeleteLaboratory",
+		"CreateMedicalHistory", "ViewMedicalHistory", "EditMedicalHistory",
+		"CreateEvolutionNote", "ViewEvolutionNote", "EditEvolutionNote",
+		"CreatePrescription", "CreateIncapacity", "ViewIncapacity", "EditIncapacity",
+	}
 
 	var count int
 	err = storage.DbPool.QueryRow(ctx, "SELECT COUNT(*) FROM permissions").Scan(&count)
@@ -73,19 +83,25 @@ func (storage *PgxStorage) SeedPermissions(ctx context.Context) (err error) {
 func (storage *PgxStorage) SeedRolePermissions(ctx context.Context) (err error) {
 	// superAdmin = 1
 	superAdminPermissions := []int{
-		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+		21, 22, 23, 24, 25,
 	}
 
 	adminPermissions := []int{
-		1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+		2, 3, 4, 5, 6, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20,
+		21, 22, 23, 24, 25, 31,
 	}
 
 	doctorPermissions := []int{
-		10, 11, 12, 13, 14, 15, 16,
+		22, 23, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+	}
+
+	receptionistPermissions := []int{
+		17, 18, 19, 20, 22,
 	}
 
 	patientPermissions := []int{
-		9, 10, 11, 12, 14,
+		21, 22, 23, 25,
 	}
 
 	var count int
@@ -114,7 +130,12 @@ func (storage *PgxStorage) SeedRolePermissions(ctx context.Context) (err error) 
 		return err
 	}
 
-	err = insertPermissions(ctx, storage, 4, patientPermissions)
+	err = insertPermissions(ctx, storage, 4, receptionistPermissions)
+	if err != nil {
+		return err
+	}
+
+	err = insertPermissions(ctx, storage, 5, patientPermissions)
 	if err != nil {
 		return err
 	}
