@@ -54,8 +54,8 @@ func (pr *userRepository) registerAccount(ctx context.Context, tx pgx.Tx, ru ent
 }
 
 func (pr *userRepository) registerMedicalHistory(ctx context.Context, tx pgx.Tx, medicalHistoryID string, pt entities.PatientUser) error {
-	query := "INSERT INTO medical_history (id, medical_history_id, patient_name, curp, gender, status_md) VALUES ($1, $2, $3, $4, $5, $6)"
-	_, err := tx.Exec(ctx, query, uuid.New(), medicalHistoryID, pt.FirstName, pt.Curp, pt.Sex, false)
+	query := "INSERT INTO medical_history (id, medical_history_id, patient_name, lastname_1, lastname_2, curp, gender, status_md) VALUES ($1, $2, $3, $4, $5, $6)"
+	_, err := tx.Exec(ctx, query, uuid.New(), medicalHistoryID, pt.FirstName, pt.LastName1, pt.LastName2, pt.Curp, pt.Sex, false)
 	if err != nil {
 		return fmt.Errorf("insert into medical_history table: %w", err)
 	}
@@ -64,7 +64,7 @@ func (pr *userRepository) registerMedicalHistory(ctx context.Context, tx pgx.Tx,
 
 func (pr *userRepository) registerMedicalHistoryB(ctx context.Context, tx pgx.Tx, medicalHistoryID string, bu entities.BeneficiaryUser) error {
 	query := "INSERT INTO medical_history (id, medical_history_id, patient_name, curp, gender) VALUES ($1, $2, $3, $4, $5)"
-	_, err := tx.Exec(ctx, query, uuid.New(), medicalHistoryID, bu.Firstname, bu.Curp, bu.Sex)
+	_, err := tx.Exec(ctx, query, uuid.New(), medicalHistoryID, bu.Firstname, bu.Lastname1, bu.Lastname2, bu.Curp, bu.Sex)
 	if err != nil {
 		return fmt.Errorf("insert into medical_history table: %w", err)
 	}
