@@ -97,22 +97,18 @@ func (u *usecase) RegisterAppointment(ctx context.Context, request models.Regist
 }
 
 func (u *usecase) GetSchedules(ctx context.Context, filtersRequest models.OfficeSCheduleFiltersRequest) ([]models.OfficeScheduleResponse, error) {
-	// Convertir la estructura en filtros dinámicos
 	filters, err := pkg.Filter(filtersRequest)
 	if err != nil {
 		return nil, fmt.Errorf("failed to process filters: %w", err)
 	}
 
-	// Llamar al repositorio con los filtros
 	schedules, err := u.repo.GetSchedules(ctx, filters)
 	if err != nil {
 		return nil, err
 	}
 
-	// Crear un slice para almacenar los modelos transformados
 	var responses []models.OfficeScheduleResponse
 
-	// Transformar cada entidad en un modelo de respuesta
 	for _, schedule := range schedules {
 		response := models.OfficeScheduleResponse{
 			OfficeScheduleID: schedule.ID,
@@ -136,7 +132,6 @@ func (u *usecase) GetSchedules(ctx context.Context, filtersRequest models.Office
 			MedicalLicense:   schedule.DoctorUser.MedicalLicense,
 		}
 
-		// Agregar al slice de respuestas
 		responses = append(responses, response)
 	}
 

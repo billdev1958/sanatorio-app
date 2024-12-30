@@ -4,16 +4,23 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"sanatorioApp/internal/domain/auth"
 	user "sanatorioApp/internal/domain/users"
 	"sanatorioApp/internal/domain/users/http/models"
 )
 
 type handler struct {
-	uc user.Usecase
+	uc         user.Usecase
+	authUc     auth.AuthUsecases
+	middleware *auth.Middleware
 }
 
-func NewHandler(uc user.Usecase) *handler {
-	return &handler{uc: uc}
+func NewHandler(uc user.Usecase, authUc auth.AuthUsecases) *handler {
+	return &handler{
+		uc:         uc,
+		authUc:     authUc,
+		middleware: auth.NewMiddleware(authUc),
+	}
 }
 
 func (h *handler) LoginUser(w http.ResponseWriter, r *http.Request) {

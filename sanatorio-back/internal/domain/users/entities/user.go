@@ -39,6 +39,17 @@ type SuperAdminUser struct {
 	Updated_At time.Time
 }
 
+type AdminUser struct {
+	AccountID  uuid.UUID
+	FirstName  string
+	LastName1  string
+	LastName2  string
+	Curp       string
+	Sex        string
+	Created_At time.Time
+	Updated_At time.Time
+}
+
 type ReceptionistUser struct {
 	AccountID  uuid.UUID
 	FirstName  string

@@ -2,7 +2,7 @@ package v1
 
 import (
 	"net/http"
-	"sanatorioApp/internal/auth"
+	"sanatorioApp/internal/domain/auth"
 )
 
 func (h *handler) CitesRoutes(mux *http.ServeMux) {

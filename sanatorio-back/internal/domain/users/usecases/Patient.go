@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"sanatorioApp/internal/auth"
+	"sanatorioApp/internal/domain/auth"
+	"sanatorioApp/internal/domain/catalogs"
 	user "sanatorioApp/internal/domain/users"
 	"sanatorioApp/internal/domain/users/entities"
 	"sanatorioApp/internal/domain/users/http/models"
@@ -94,8 +95,6 @@ func (u *usecase) RegisterBeneficiary(ctx context.Context, request models.Regist
 		return "models.UserData{}", err // Manejar el error devolviendo un valor vacío o adecuado
 	}
 
-
-
 	registerBeneficiary := entities.BeneficiaryUser{
 		ID:               uuid.New(),
 		AccountHolder:    claims.AccountID,
@@ -111,5 +110,43 @@ func (u *usecase) RegisterBeneficiary(ctx context.Context, request models.Regist
 		return "", fmt.Errorf("failed to register beneficiary: %w", err)
 	}
 
+	return message, nil
+}
+
+func (u *usecase) UpdatedPatient(ctx context.Context, request models.UpdateUser) (message string, err error) {
+	update := entities.PatientUser{
+		AccountID: request.AccountID,
+		LastName1: request.Lastname1,
+		LastName2: request.Lastname2,
+		Curp:      request.Curp,
+		Sex:       request.Sex,
+	}
+
+	if request.Sex == catalogs.Male || request.Sex == catalogs.Female {
+		update.Sex = request.Sex
+	}
+
+	message, err = u.repo.UpdatePatient(ctx, update)
+	if err != nil {
+		log.Printf("Failed to update patient with account_id: %s. Error: %v", request.AccountID, err)
+		return "", fmt.Errorf("failed to update patient with account_id %s: %w", request.AccountID, err)
+	}
+
+	log.Printf("Successfully updated patient with account_id: %s", request.AccountID)
+	return message, nil
+}
+
+func (u *usecase) SoftDeletePatient(ctx context.Context, accountID uuid.UUID) (message string, err error) {
+	delete := entities.Account{
+		ID: accountID,
+	}
+
+	_, err = u.repo.SoftDeleteUserPatient(ctx, delete)
+	if err != nil {
+		log.Printf("Failed to delete patient with account_id: %s. Error: %v", accountID, err)
+		return "", fmt.Errorf("failed to delete patient with account_id %s: %w", accountID, err)
+	}
+
+	log.Printf("Successfully delete patient with account_id: %s", accountID)
 	return message, nil
 }

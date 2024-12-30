@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sanatorioApp/internal/domain/catalogs"
 	"sanatorioApp/internal/domain/users/entities"
 	"sanatorioApp/internal/domain/users/http/models"
 	password "sanatorioApp/pkg/pass"
@@ -22,14 +23,13 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 	}
 
 	registerAccount := entities.Account{
-		ID:           uuid.New(), // Asignar un nuevo UUID
+		ID:           uuid.New(),
 		AfiliationID: request.AfiliationID,
 		Email:        request.Email,
 		Password:     hashedPassword,
 		Rol:          entities.Doctor,
 	}
 
-	// Crear la entidad PatientUser con los datos de la solicitud
 	registerDoctor := entities.DoctorUser{
 		MedicalLicense:   request.MedicalLicense,
 		SpecialtyLicense: request.SpecialtyLicense,
@@ -39,26 +39,22 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 		Sex:              request.Sex,
 	}
 
-	// Intentar registrar al paciente en una transacción
 	doctorResponse, err := u.repo.RegisterDoctorTransaction(ctx, registerAccount, registerDoctor)
 	if err != nil {
 		return models.UserData{}, fmt.Errorf("failed to register doctor: %w", err)
 	}
 
-	// Retornar los datos del paciente registrado
 	return models.UserData{
 		Name: doctorResponse.FirstName,
 	}, nil
 }
 
 func (u *usecase) GetDoctorByID(ctx context.Context, userID int) (models.DoctorRequest, error) {
-	// Llamar al repositorio para obtener el doctor por ID
 	doctorEntity, err := u.repo.GetDoctorByID(ctx, userID)
 	if err != nil {
 		return models.DoctorRequest{}, err
 	}
 
-	// Crear el objeto DoctorRequest con los datos del doctor
 	doctorData := models.DoctorRequest{
 		ID:               doctorEntity.AccountID,
 		Name:             doctorEntity.FirstName,
@@ -70,4 +66,42 @@ func (u *usecase) GetDoctorByID(ctx context.Context, userID int) (models.DoctorR
 	}
 
 	return doctorData, nil
+}
+
+func (u *usecase) UpdatedDoctor(ctx context.Context, request models.DoctorUpdateRequest) (message string, err error) {
+	update := entities.DoctorUser{
+		AccountID:      request.AccountID,
+		MedicalLicense: request.MedicalLicense,
+		FirstName:      request.Firstname,
+		LastName1:      request.Lastname1,
+		LastName2:      request.Lastname2,
+	}
+
+	if request.Sex == catalogs.Male || request.Sex == catalogs.Female {
+		update.Sex = request.Sex
+	}
+
+	message, err = u.repo.UpdateDoctor(ctx, update)
+	if err != nil {
+		log.Printf("Failed to update doctor with account_id: %s. Error: %v", request.AccountID, err)
+		return "", fmt.Errorf("failed to update doctor with account_id %s: %w", request.AccountID, err)
+	}
+
+	log.Printf("Successfully updated doctor with account_id: %s", request.AccountID)
+	return message, nil
+}
+
+func (u *usecase) SoftDeleteDoctor(ctx context.Context, accountID uuid.UUID) (message string, err error) {
+	delete := entities.Account{
+		ID: accountID,
+	}
+
+	_, err = u.repo.SoftDeleteUserDoctor(ctx, delete)
+	if err != nil {
+		log.Printf("Failed to delete doctor with account_id: %s. Error: %v", accountID, err)
+		return "", fmt.Errorf("failed to delete doctor with account_id %s: %w", accountID, err)
+	}
+
+	log.Printf("Successfully delete doctor with account_id: %s", accountID)
+	return message, nil
 }

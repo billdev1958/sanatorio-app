@@ -3,11 +3,14 @@ package user
 import (
 	"context"
 	"sanatorioApp/internal/domain/users/http/models"
+
+	"github.com/google/uuid"
 )
 
 type Usecase interface {
 	//REGISTER
 	RegisterSuperAdmin(ctx context.Context, request models.RegisterSuperAdminRequest) (models.UserData, error)
+	RegisterAdmin(ctx context.Context, request models.RegisterAdminRequest) (models.UserData, error)
 	RegisterReceptionist(ctx context.Context, request models.RegisterReceptionistRequest) (models.UserData, error)
 	RegisterDoctor(ctx context.Context, request models.RegisterDoctorRequest) (models.UserData, error)
 	RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.UserData, error)
@@ -22,11 +25,18 @@ type Usecase interface {
 	GetMedicalHistoryByID(ctx context.Context, md models.MedicalHistoryRequest) (models.MedicalHistoryResponse, error)
 
 	// EDIT
-	UpdateUser(ctx context.Context, userUpdate models.UpdateUser) (string, error)
+	UpdatedSuperAdmin(ctx context.Context, request models.UpdateUser) (message string, err error)
+	UpdatedAdmin(ctx context.Context, request models.UpdateUser) (message string, err error)
+	UpdatedDoctor(ctx context.Context, request models.DoctorUpdateRequest) (message string, err error)
+	UpdatedReceptionist(ctx context.Context, request models.UpdateUser) (message string, err error)
+	UpdatedPatient(ctx context.Context, request models.UpdateUser) (message string, err error)
 
 	CompleteMedicalHistory(ctx context.Context, request models.CompleteMedicalHistoryRequest) (string, error)
 
 	// deletes
-	DeleteUser(ctx context.Context, accountID string) (string, error)
-	SoftDeleteUser(ctx context.Context, accountID string) (string, error)
+	SoftDeleteSuperAdmin(ctx context.Context, accountID uuid.UUID) (message string, err error)
+	SoftDeleteAdmin(ctx context.Context, accountID uuid.UUID) (message string, err error)
+	SoftDeleteDoctor(ctx context.Context, accountID uuid.UUID) (message string, err error)
+	SoftDeleteReceptionist(ctx context.Context, accountID uuid.UUID) (message string, err error)
+	SoftDeletePatient(ctx context.Context, accountID uuid.UUID) (message string, err error)
 }
