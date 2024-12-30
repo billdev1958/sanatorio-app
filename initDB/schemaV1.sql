@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS medical_history (
     birth_date DATE , -- 'Fecha nacimiento'
     age VARCHAR(3) , -- 'Edad'
     gender VARCHAR(1) NOT NULL, -- 'Sexo'
-    adress VARCHAR(100) NOT NULL, -- 'Domicilio'
+    adress VARCHAR(100), -- 'Domicilio'
     dependency_id INTEGER, -- 'Procedencia'
     derecho_habiencia_id INTEGER,
     ethnic_group VARCHAR(20) , -- 'Grupo étnico'
