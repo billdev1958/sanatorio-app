@@ -7,7 +7,7 @@ import (
 )
 
 func (h *handler) AppointmentRouter(mux *http.ServeMux) {
-	mux.Handle("PUT /v1/appointment/schedules",
+	mux.Handle("POST /v1/appointment/schedules",
 		auth.AuthMiddleware(
 			h.middleware.RequiredPermission(user.ViewAppointment)(
 				http.HandlerFunc(h.GetSchedulesForAppointment))))
