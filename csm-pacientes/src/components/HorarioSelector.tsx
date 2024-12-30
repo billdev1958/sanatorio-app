@@ -1,44 +1,34 @@
-import { createSignal } from 'solid-js';
+import { createSignal, For } from 'solid-js';
+import { ScheduleData } from '../models/Horarios'; // Modelo para el horario de la API
 
-const HorarioSelector = () => {
-  const [selectedTime, setSelectedTime] = createSignal<string | null>(null);
+interface HorarioSelectorProps {
+  horarios: ScheduleData[]; // Lista de horarios disponibles
+  onHorarioSeleccionado: (horario: ScheduleData) => void; // Callback para el horario seleccionado
+}
 
-  // Generar horarios con intervalos de 35 minutos
-  const generarHorarios = () => {
-    const horarios = [
-      { inicio: '08:00 AM', fin: '08:35 AM' },
-      { inicio: '08:35 AM', fin: '09:10 AM' },
-      { inicio: '09:10 AM', fin: '09:45 AM' },
-      { inicio: '09:45 AM', fin: '10:20 AM' },
-      { inicio: '10:20 AM', fin: '10:55 AM' },
-      { inicio: '10:55 AM', fin: '11:30 AM' },
-      { inicio: '11:30 AM', fin: '12:05 PM' },
-      { inicio: '12:05 PM', fin: '12:40 PM' },
-      { inicio: '12:40 PM', fin: '01:15 PM' },
-      { inicio: '01:15 PM', fin: '01:50 PM' },
-      { inicio: '01:50 PM', fin: '02:25 PM' },
-      { inicio: '02:25 PM', fin: '03:00 PM' },
-      { inicio: '03:00 PM', fin: '03:35 PM' },
-      { inicio: '03:35 PM', fin: '04:10 PM' },
-      { inicio: '04:10 PM', fin: '04:45 PM' }
-    ];
+const HorarioSelector = (props: HorarioSelectorProps) => {
+  const [selectedHorario, setSelectedHorario] = createSignal<ScheduleData | null>(null);
 
-    return horarios;
+  const seleccionarHorario = (horario: ScheduleData) => {
+    setSelectedHorario(horario);
+    props.onHorarioSeleccionado(horario); // Llama al callback con el horario seleccionado
   };
-
-  const horarios = generarHorarios();
 
   return (
     <div class="horario-container">
       <div class="horarios-grid">
-        {horarios.map(({ inicio, fin }) => (
-          <div
-            class={`horario-card ${selectedTime() === `${inicio} - ${fin}` ? 'selected' : ''}`} 
-            onClick={() => setSelectedTime(`${inicio} - ${fin}`)}
-          >
-            {`${inicio} - ${fin}`}
-          </div>
-        ))}
+        <For each={props.horarios}>
+          {(horario) => (
+            <div
+              class={`horario-card ${
+                selectedHorario()?.ID === horario.ID ? 'selected' : ''
+              }`}
+              onClick={() => seleccionarHorario(horario)}
+            >
+              {`${horario.time_start} - ${horario.time_end}`}
+            </div>
+          )}
+        </For>
       </div>
     </div>
   );
