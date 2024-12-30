@@ -12,9 +12,9 @@ type Response struct {
 }
 
 type SchedulesAppointmentRequest struct {
-	Shift     int `json:"shift"`
-	Service   int `json:"service"`
-	DayOfWeek int `json:"day"`
+	Shift     int `json:"shift,omitempty"`
+	Service   int `json:"service,omitempty"`
+	DayOfWeek int `json:"day,omitempty"`
 }
 
 type OfficeScheduleResponse struct {
