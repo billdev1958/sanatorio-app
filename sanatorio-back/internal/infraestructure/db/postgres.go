@@ -45,8 +45,8 @@ func (storage *PgxStorage) SeedRoles(ctx context.Context) (err error) {
 }
 
 func (storage *PgxStorage) SeedPermissions(ctx context.Context) (err error) {
-	permissionsValues := [39]string{
-		"CreateSuperAdmin", "CreateAdmin", "CreateDoctor", "CreateReceptionist", "CreatePatient",
+	permissionsValues := [40]string{
+		"CreateSuperAdmin", "CreateAdmin", "CreateDoctor", "CreateReceptionist", "CreatePatient", "CreateBeneficairy",
 		"ViewUsers", "EditSuperAdmin", "EditAdmin", "EditDoctor", "EditReceptionist", "EditPatient",
 		"DeleteSuperAdmin", "DeleteAdmin", "DeleteDoctor", "DeleteReceptionist", "DeletePatient",
 		"CreateSchedule", "ViewSchedule", "EditSchedule", "DeleteSchedule",
@@ -84,24 +84,24 @@ func (storage *PgxStorage) SeedRolePermissions(ctx context.Context) (err error) 
 	// superAdmin = 1
 	superAdminPermissions := []int{
 		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-		21, 22, 23, 24, 25,
+		21, 22, 23, 24, 25, 26,
 	}
 
 	adminPermissions := []int{
-		2, 3, 4, 5, 6, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20,
-		21, 22, 23, 24, 25, 31,
+		2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20,
+		21, 22, 23, 24, 25, 26, 32,
 	}
 
 	doctorPermissions := []int{
-		22, 23, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39,
+		23, 24, 25, 26, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
 	}
 
 	receptionistPermissions := []int{
-		17, 18, 19, 20, 22,
+		18, 19, 20, 21, 23,
 	}
 
 	patientPermissions := []int{
-		21, 22, 23, 25,
+		22, 23, 24, 26,
 	}
 
 	var count int
