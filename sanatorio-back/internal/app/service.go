@@ -20,6 +20,7 @@ func UserService(ctx context.Context, db *pgxpool.Pool, router *http.ServeMux) e
 	authUc := AuthService(ctx, db)
 
 	h := v1.NewHandler(uc, authUc)
+	h.AdminRoutes(router)
 	h.UserRoutes(router)
 
 	return nil
