@@ -11,4 +11,5 @@ type CatalogsRepository interface {
 	GetDays(ctx context.Context) ([]models.DayOfWeek, error)
 	GetDoctors(ctx context.Context) ([]models.Doctor, error)
 	GetOffices(ctx context.Context) ([]models.Office, error)
+	GetSchedulesForAppointment(ctx context.Context, filters map[string]interface{}) ([]models.OfficeSchedule, error)
 }
