@@ -18,6 +18,34 @@ func NewUsecase(repo appointment.AppointmentRepository, catalogRepo catalogs.Cat
 	return &usecase{repo: repo, catalogRepo: catalogRepo}
 }
 
+func (u *usecase) GetParamsForAppointments(ctx context.Context) (models.Response, error) {
+	services, err := u.catalogRepo.GetServices(ctx)
+	if err != nil {
+		return models.Response{
+			Status:  "error",
+			Message: "Error al obtener los servicios",
+			Errors:  err.Error(),
+		}, nil
+	}
+
+	shifts, err := u.catalogRepo.GetShifts(ctx)
+	if err != nil {
+		return models.Response{
+			Status:  "error",
+			Message: "Error al obtener los turnos",
+			Errors:  err.Error(),
+		}, nil
+	}
+
+	return models.Response{
+		Status: "success",
+		Data: map[string]interface{}{
+			"services": services,
+			"shifts":   shifts,
+		},
+	}, nil
+}
+
 func (u *usecase) GetSchedulesForAppointment(ctx context.Context, filtersRequest models.SchedulesAppointmentRequest) ([]models.OfficeScheduleResponse, error) {
 	filters, err := pkg.Filter(filtersRequest)
 	if err != nil {

@@ -52,3 +52,23 @@ func (h *handler) GetSchedulesForAppointment(w http.ResponseWriter, r *http.Requ
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }
+
+func (h *handler) GetParamsForAppointments(w http.ResponseWriter, r *http.Request) {
+	params, err := h.uc.GetParamsForAppointments(r.Context())
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(models.Response{
+			Status:  "error",
+			Message: "Failed to retrieve params for register appointment",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+	response := params
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}

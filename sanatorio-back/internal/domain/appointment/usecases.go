@@ -6,5 +6,6 @@ import (
 )
 
 type Usecase interface {
+	GetParamsForAppointments(ctx context.Context) (models.Response, error)
 	GetSchedulesForAppointment(ctx context.Context, filtersRequest models.SchedulesAppointmentRequest) ([]models.OfficeScheduleResponse, error)
 }

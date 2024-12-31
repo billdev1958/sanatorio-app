@@ -11,4 +11,9 @@ func (h *handler) AppointmentRouter(mux *http.ServeMux) {
 		auth.AuthMiddleware(
 			h.middleware.RequiredPermission(user.ViewAppointment)(
 				http.HandlerFunc(h.GetSchedulesForAppointment))))
+
+	mux.Handle("GET /v1/appointment/schedules",
+		auth.AuthMiddleware(
+			h.middleware.RequiredPermission(user.ViewAppointment)(
+				http.HandlerFunc(h.GetParamsForAppointments))))
 }
