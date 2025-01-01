@@ -1,9 +1,9 @@
 export interface Services{
-    ID: number 
-    Name: string
+    id: number 
+    name: string
 }
 
 export interface Shift{
-    ID: number 
-    Name: string
+    id: number 
+    name: string
 }

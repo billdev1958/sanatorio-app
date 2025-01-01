@@ -1,7 +1,7 @@
 import { render } from "solid-js/web";
 import { Router, Route } from "@solidjs/router";
 import App from "./App"; // Layout principal
-import Citas from "./pages/Citas";
+import Citas from "./Citas/Pages/Citas";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
