@@ -14,10 +14,10 @@ type SchedulesAppointmentRequest struct {
 }
 
 type OfficeScheduleResponse struct {
-	ID           int
-	TimeStart    string `json:"time_start"`
-	TimeEnd      string `json:"time_end"`
-	TimeDuration string `json:"time_duration"`
-	OfficeName   string
-	StatusID     int
+	ID           int    `json:"id"`
+	TimeStart    string `json:"timeStart"`
+	TimeEnd      string `json:"timeEnd"`
+	TimeDuration string `json:"timeDuration"`
+	OfficeName   string `json:"officeName"`
+	StatusID     int    `json:"statusID"`
 }
