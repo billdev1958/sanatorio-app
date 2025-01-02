@@ -246,6 +246,7 @@ CREATE TABLE IF NOT EXISTS days (
 -- Tabla de citas
 CREATE TABLE IF NOT EXISTS appointment (
     id UUID PRIMARY KEY,
+    schedule_id INTEGER NOT NULL, -- ID del horario en office_schedule
     doctor_id UUID NOT NULL,
     patient_account_id UUID NOT NULL,
     office_id INTEGER NOT NULL,
@@ -497,6 +498,17 @@ FOREIGN KEY (office_id) REFERENCES office(id);
 ALTER TABLE appointment
 ADD CONSTRAINT fk_status_appointment
 FOREIGN KEY (status_id) REFERENCES appointment_status(id);
+
+-- Relación con office_schedule
+ALTER TABLE appointment
+ADD CONSTRAINT fk_schedule
+FOREIGN KEY (schedule_id) REFERENCES office_schedule (id);
+
+-- Relación con appointment_status
+ALTER TABLE appointment
+ADD CONSTRAINT fk_status
+FOREIGN KEY (status_id) REFERENCES appointment_status (id);
+
 
 -- Foreign keys para la tabla beneficiary
 ALTER TABLE beneficiary
