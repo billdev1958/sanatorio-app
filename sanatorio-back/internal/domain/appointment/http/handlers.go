@@ -29,7 +29,7 @@ func (h *handler) GetSchedulesForAppointment(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	schedules, err := h.uc.GetSchedulesForAppointment(r.Context(), filtersRequest)
+	schedules, err := h.uc.GetAvaliableSchedules(r.Context(), filtersRequest)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)

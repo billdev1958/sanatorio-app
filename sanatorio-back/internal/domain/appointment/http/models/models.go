@@ -1,9 +1,5 @@
 package models
 
-import (
-	"github.com/google/uuid"
-)
-
 type Response struct {
 	Status  string      `json:"status"`
 	Message string      `json:"message,omitempty"`
@@ -12,20 +8,16 @@ type Response struct {
 }
 
 type SchedulesAppointmentRequest struct {
-	Shift     int `json:"shift,omitempty"`
-	Service   int `json:"service,omitempty"`
-	DayOfWeek int `json:"day,omitempty"`
+	Shift           int    `json:"shift,omitempty"`
+	Service         int    `json:"service,omitempty"`
+	AppointmentDate string `json:"appointmentDate,omitempty"`
 }
 
 type OfficeScheduleResponse struct {
 	ID           int
-	OfficeID     int
-	ShiftID      int
-	ServiceID    int
-	DoctorID     uuid.UUID
-	StatusID     int
-	DayOfWeek    int
 	TimeStart    string `json:"time_start"`
 	TimeEnd      string `json:"time_end"`
 	TimeDuration string `json:"time_duration"`
+	OfficeName   string
+	StatusID     int
 }
