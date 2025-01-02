@@ -32,11 +32,14 @@ func (ar *appointmentRepository) GetAvaliableSchedules(ctx context.Context, date
 		    office_schedule os
 		JOIN office o ON os.office_id = o.id
 		LEFT JOIN appointment a ON
-		    os.id = a.schedule_id AND a.date = $1
+		    os.id = a.schedule_id AND DATE(a.time_start) = $1 -- Comparar fecha completa en citas
 		LEFT JOIN schedule_block sb ON
-		    os.id = sb.schedule_id AND sb.block_date = $1
+		    os.id = sb.schedule_id AND sb.block_date = $1 -- Comparar fecha completa en bloqueos
 		WHERE
-		    os.service_id = $2 AND os.shift_id = $3 AND os.day_of_week = $4 AND os.status_id = 1
+		    os.service_id = $2 -- Filtrar por servicio
+		    AND os.shift_id = $3 -- Filtrar por turno
+		    AND os.day_of_week = $4 -- Filtrar por día de la semana
+		    AND os.status_id = 1 -- Solo horarios activos
 		ORDER BY os.time_start ASC;
     `
 
