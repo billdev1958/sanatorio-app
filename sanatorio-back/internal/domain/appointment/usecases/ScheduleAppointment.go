@@ -2,11 +2,11 @@ package usecases
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"sanatorioApp/internal/domain/appointment"
 	"sanatorioApp/internal/domain/appointment/http/models"
 	"sanatorioApp/internal/domain/catalogs"
-	"sanatorioApp/pkg"
+	"time"
 )
 
 type usecase struct {
@@ -46,32 +46,34 @@ func (u *usecase) GetParamsForAppointments(ctx context.Context) (models.Response
 	}, nil
 }
 
-func (u *usecase) GetSchedulesForAppointment(ctx context.Context, filtersRequest models.SchedulesAppointmentRequest) ([]models.OfficeScheduleResponse, error) {
-	filters, err := pkg.Filter(filtersRequest)
-	if err != nil {
-		return nil, fmt.Errorf("failed to process filters: %w", err)
+func (u *usecase) GetAvaliableSchedules(ctx context.Context, params models.SchedulesAppointmentRequest) ([]models.OfficeScheduleResponse, error) {
+	if params.AppointmentDate == "" {
+		return nil, errors.New("appointmentDate is required")
 	}
 
-	schedules, err := u.catalogRepo.GetSchedulesForAppointment(ctx, filters)
+	appointmentDate, err := time.Parse("2006-01-02", params.AppointmentDate)
+	if err != nil {
+		return nil, errors.New("invalid appointmentDate format, expected YYYY-MM-DD")
+	}
+
+	dayOfWeek := int(appointmentDate.Weekday())
+
+	schedules, err := u.repo.GetAvaliableSchedules(ctx, params.AppointmentDate, dayOfWeek, params.Service, params.Shift)
 	if err != nil {
 		return nil, err
 	}
 
-	var responses []models.OfficeScheduleResponse
+	var response []models.OfficeScheduleResponse
 	for _, schedule := range schedules {
-		response := models.OfficeScheduleResponse{
+		response = append(response, models.OfficeScheduleResponse{
 			ID:           schedule.ID,
-			OfficeID:     schedule.OfficeID,
-			ShiftID:      schedule.ShiftID,
-			DoctorID:     schedule.DoctorID,
+			TimeStart:    schedule.TimeStart.Format("15:04:05"),
+			TimeEnd:      schedule.TimeEnd.Format("15:04:05"),
+			TimeDuration: schedule.TimeDuration,
+			OfficeName:   schedule.OfficeName,
 			StatusID:     schedule.StatusID,
-			DayOfWeek:    schedule.DayOfWeek,
-			TimeStart:    schedule.TimeStart.Format("15:04"),
-			TimeEnd:      schedule.TimeEnd.Format("15:04"),
-			TimeDuration: schedule.TimeDuration.String(),
-		}
-		responses = append(responses, response)
+		})
 	}
 
-	return responses, nil
+	return response, nil
 }
