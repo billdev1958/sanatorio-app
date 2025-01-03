@@ -69,7 +69,7 @@ func (u *usecase) GetAvaliableSchedules(ctx context.Context, params models.Sched
 			ID:           schedule.ID,
 			TimeStart:    schedule.TimeStart.Format("15:04:05"),
 			TimeEnd:      schedule.TimeEnd.Format("15:04:05"),
-			TimeDuration: schedule.TimeDuration,
+			TimeDuration: schedule.TimeDuration.String(),
 			OfficeName:   schedule.OfficeName,
 			StatusID:     schedule.StatusID,
 		})
