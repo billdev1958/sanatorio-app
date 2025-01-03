@@ -13,7 +13,7 @@ type OfficeSchedule struct {
 	DayOfWeek    int
 	TimeStart    time.Time
 	TimeEnd      time.Time
-	TimeDuration string
+	TimeDuration time.Duration
 	CreatedAt    time.Time
 	UpdatedAt    *time.Time
 	DeletedAt    *time.Time
