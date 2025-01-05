@@ -247,9 +247,8 @@ CREATE TABLE IF NOT EXISTS days (
 CREATE TABLE IF NOT EXISTS appointment (
     id UUID PRIMARY KEY,
     schedule_id INTEGER NOT NULL, -- ID del horario en office_schedule
-    doctor_id UUID NOT NULL,
-    patient_account_id UUID NOT NULL,
-    office_id INTEGER NOT NULL,
+    patient_id UUID NOT NULL,
+    beneficiary_id UUID,
     time_start TIMESTAMP NOT NULL,
     time_end TIMESTAMP NOT NULL,
     status_id INTEGER NOT NULL,
@@ -259,12 +258,13 @@ CREATE TABLE IF NOT EXISTS appointment (
     CONSTRAINT chk_time_validity CHECK (time_start < time_end)
 );
 
+
 -- Tabla de consultas
 CREATE TABLE IF NOT EXISTS consultation (
     id SERIAL PRIMARY KEY,
     patient_id UUID NOT NULL,
-    date DATE NOT NULL,
-    time TIME NOT NULL,
+    beneficiary_id UUID,
+    appointment_id UUID NOT NULL,
     reason TEXT NOT NULL,
     symptoms TEXT NOT NULL,
     doctor_notes TEXT,
@@ -582,3 +582,18 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trigger_validate_schedule_status
 BEFORE INSERT OR UPDATE ON office_schedule
 FOR EACH ROW EXECUTE FUNCTION validate_schedule_status();
+
+CREATE OR REPLACE FUNCTION check_appointment_overlap()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 
+        FROM appointment 
+        WHERE schedule_id = NEW.schedule_id 
+        AND (NEW.time_start, NEW.time_end) OVERLAPS (time_start, time_end)
+    ) THEN
+        RAISE EXCEPTION 'Conflicto de horarios en la cita';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
