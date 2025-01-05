@@ -16,7 +16,7 @@ export interface Beneficiary {
   export interface PatientAndBeneficiaries {
     accountHolderID: string; // Corresponde a uuid.UUID en Go
     fullName: string;
-    beneficiaries: Beneficiary[];
+    benefeciaries: Beneficiary[];
   }
 
 export interface SchedulesAppointmentRequest {

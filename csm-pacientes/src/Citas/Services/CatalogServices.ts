@@ -1,29 +1,31 @@
 import api from '../../Api/Api';
 import { Response } from '../../Api/Model';
 import { Services, Shift } from '../Models/Catalogs';
-import { SchedulesAppointmentRequest, OfficeScheduleResponse } from '../Models/Catalogs';
+import { SchedulesAppointmentRequest, OfficeScheduleResponse , PatientAndBeneficiaries} from '../Models/Catalogs';
 
 export const getParamsForAppointment = async (
-token?: string
-): Promise<Response<{ services: Services[]; shifts: Shift[] }>> => {
-console.log('getParamsForAppointment - Starting request with token:', token ? 'Present' : 'Missing');
-try {
+  token?: string
+): Promise<Response<{ patients: PatientAndBeneficiaries; services: Services[]; shifts: Shift[] }>> => {
+  console.log('getParamsForAppointment - Starting request with token:', token ? 'Present' : 'Missing');
+  try {
     const response = await api.get('/appointment/schedules', {
-    headers: {
+      headers: {
         Authorization: token ? `Bearer ${token}` : '',
-    },
+      },
     });
+
     console.log('getParamsForAppointment - Success response:', response.data);
-    return response.data as Response<{ services: Services[]; shifts: Shift[] }>;
-} catch (error: any) {
+
+    return response.data as Response<{ patients: PatientAndBeneficiaries; services: Services[]; shifts: Shift[] }>;
+  } catch (error: any) {
     console.error('getParamsForAppointment - Error:', error);
     console.error('Error details:', {
-    message: error.message,
-    response: error.response?.data,
-    status: error.response?.status
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
     });
     throw new Error(error.message || 'Error al obtener los parámetros');
-}
+  }
 };
 
 export const getOfficeSchedules = async (
