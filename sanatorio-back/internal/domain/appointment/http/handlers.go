@@ -54,7 +54,12 @@ func (h *handler) GetSchedulesForAppointment(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *handler) GetParamsForAppointments(w http.ResponseWriter, r *http.Request) {
-	params, err := h.uc.GetParamsForAppointments(r.Context())
+	claims := auth.ExtractClaims(r.Context())
+	if claims == nil {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	params, err := h.uc.GetParamsForAppointments(r.Context(), claims.AccountID)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
