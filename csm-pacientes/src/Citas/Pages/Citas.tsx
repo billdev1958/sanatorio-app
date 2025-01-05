@@ -1,8 +1,18 @@
 import { createSignal, createEffect } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import Calendario from '../../components/Calendario';
-import { getParamsForAppointment, getOfficeSchedules } from '../Services/CatalogServices';
-import { Services, Shift, SchedulesAppointmentRequest, OfficeScheduleResponse } from '../Models/Catalogs';
+import {
+  getParamsForAppointment,
+  getOfficeSchedules,
+} from '../Services/CatalogServices';
+import {
+  Services,
+  Shift,
+  SchedulesAppointmentRequest,
+  OfficeScheduleResponse,
+  PatientAndBeneficiaries,
+  Beneficiary,
+} from '../Models/Catalogs';
 import { useAuth } from '../../services/AuthContext';
 
 const Citas = () => {
@@ -11,7 +21,12 @@ const Citas = () => {
   const [fullDate, setFullDate] = createSignal<string | null>(null);
   const [schedules, setSchedules] = createSignal<OfficeScheduleResponse[]>([]);
   const [selectedSchedule, setSelectedSchedule] = createSignal<OfficeScheduleResponse | null>(null);
-  const [params, setParams] = createSignal<{ services: Services[]; shifts: Shift[] } | null>(null);
+  const [selectedPatient, setSelectedPatient] = createSignal<string | null>(null);
+  const [params, setParams] = createSignal<{
+    patients: PatientAndBeneficiaries;
+    services: Services[];
+    shifts: Shift[];
+  } | null>(null);
   const [scheduleError, setScheduleError] = createSignal<string | null>(null);
   const [loading, setLoading] = createSignal(false);
 
@@ -22,21 +37,40 @@ const Citas = () => {
     try {
       const response = await getParamsForAppointment(token() ?? undefined);
       if (response.data) {
-        setParams(response.data);
+        const { patients, services, shifts } = response.data;
+
+
+        const normalizedPatients: PatientAndBeneficiaries = {
+          ...patients,
+          benefeciaries: patients?.benefeciaries ?? [],
+        };
+
+        setParams({
+          patients: normalizedPatients,
+          services,
+          shifts,
+        });
+
       } else {
-        throw new Error('No se encontraron servicios o turnos disponibles.');
+        throw new Error('No se encontraron servicios, turnos o pacientes disponibles.');
       }
     } catch (error: any) {
-      console.error('Error al obtener servicios y turnos:', error);
-      setScheduleError(error.message || 'Error al obtener los parámetros.');
+      console.error('Error al obtener datos:', error);
+      setScheduleError(error.message || 'Error al obtener los datos.');
     }
   });
+
+  const handlePatientChange = (e: InputEvent) => {
+    setSelectedPatient((e.target as HTMLSelectElement).value);
+  };
 
   const handleServiceChange = (e: InputEvent) => {
     const selectedServiceId = parseInt((e.target as HTMLSelectElement).value);
     const currentParams = params();
     if (currentParams) {
-      const selectedService = currentParams.services.find((service) => service.id === selectedServiceId);
+      const selectedService = currentParams.services.find(
+        (svc) => svc.id === selectedServiceId
+      );
       setService(selectedService || null);
     }
   };
@@ -45,13 +79,15 @@ const Citas = () => {
     const selectedShiftId = parseInt((e.target as HTMLSelectElement).value);
     const currentParams = params();
     if (currentParams) {
-      const selectedShift = currentParams.shifts.find((shift) => shift.id === selectedShiftId);
+      const selectedShift = currentParams.shifts.find(
+        (sft) => sft.id === selectedShiftId
+      );
       setShift(selectedShift || null);
     }
   };
 
   createEffect(async () => {
-    if (!service() || !shift() || !fullDate()) {
+    if (!service() || !shift() || !fullDate() || !selectedPatient()) {
       return;
     }
 
@@ -63,8 +99,10 @@ const Citas = () => {
 
     try {
       setLoading(true);
-      setScheduleError(null); // Reiniciar errores
+      setScheduleError(null);
+
       const response = await getOfficeSchedules(appointmentData, token() ?? undefined);
+
       if (response.data && Array.isArray(response.data)) {
         setSchedules(response.data);
       } else {
@@ -88,19 +126,41 @@ const Citas = () => {
         <div class="cita-sections">
           <div class="left-section">
             <div class="form-section">
+              <h2>Selecciona Paciente</h2>
+              <select id="patient" required onInput={handlePatientChange}>
+              <option value="">-- Pacientes --</option>
+
+                {params()?.patients && (
+                  <option value={params()?.patients.accountHolderID}>
+                    {params()?.patients.fullName}
+                  </option>
+                )}
+
+                {params()?.patients?.benefeciaries?.length ? (
+                  params()
+                    ?.patients?.benefeciaries.map((beneficiary: Beneficiary) => (
+                      <option value={beneficiary.beneficiaryID}>
+                        {beneficiary.fullName}
+                      </option>
+                    ))
+                ) : (
+                  <option disabled>No hay beneficiarios disponibles</option>
+                )}
+              </select>
+
               <h2>Selecciona Servicio</h2>
               <select id="service" required onInput={handleServiceChange}>
                 <option value="">Servicios --</option>
-                {params()?.services.map((service) => (
-                  <option value={service.id}>{service.name}</option>
+                {params()?.services.map((srv) => (
+                  <option value={srv.id}>{srv.name}</option>
                 ))}
               </select>
 
               <h2>Selecciona Turno</h2>
               <select id="turno" required onInput={handleShiftChange}>
                 <option value="">Turno --</option>
-                {params()?.shifts.map((shift) => (
-                  <option value={shift.id}>{shift.name}</option>
+                {params()?.shifts.map((sft) => (
+                  <option value={sft.id}>{sft.name}</option>
                 ))}
               </select>
             </div>
@@ -119,6 +179,7 @@ const Citas = () => {
           <div class="right-section">
             <div class="schedules-section">
               <h2>Horarios Disponibles</h2>
+
               {loading() && <div class="loading-message">Cargando horarios...</div>}
 
               {!loading() && scheduleError() && (
@@ -132,7 +193,9 @@ const Citas = () => {
                   {schedules().map((schedule) => (
                     <div
                       class={`schedule-card ${
-                        selectedSchedule() && selectedSchedule()!.id === schedule.id ? 'selected' : ''
+                        selectedSchedule() && selectedSchedule()!.id === schedule.id
+                          ? 'selected'
+                          : ''
                       }`}
                       onClick={() => setSelectedSchedule(schedule)}
                     >
@@ -153,6 +216,7 @@ const Citas = () => {
                 onClick={() => {
                   if (selectedSchedule()) {
                     console.log('Horario seleccionado:', selectedSchedule());
+                    console.log('Paciente seleccionado:', selectedPatient());
                   } else {
                     alert('Debe seleccionar un horario antes de continuar.');
                   }
@@ -160,7 +224,12 @@ const Citas = () => {
               >
                 Confirmar Horario
               </button>
-              <button type="button" class="cancel-button" onClick={() => navigate('/')}>
+
+              <button
+                type="button"
+                class="cancel-button"
+                onClick={() => navigate('/')}
+              >
                 Cancelar
               </button>
             </div>
