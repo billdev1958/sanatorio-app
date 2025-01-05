@@ -8,6 +8,8 @@ import (
 	"sanatorioApp/internal/domain/catalogs/models"
 	postgres "sanatorioApp/internal/infraestructure/db"
 	"sanatorioApp/pkg"
+
+	"github.com/google/uuid"
 )
 
 type catalogRepository struct {
@@ -206,4 +208,59 @@ func (cr *catalogRepository) GetSchedulesForAppointment(ctx context.Context, fil
 	}
 
 	return schedules, nil
+}
+
+func (cr *catalogRepository) GetPatientAndBeneficiaries(ctx context.Context, accountID uuid.UUID) (models.PatientAndBenefeciaries, error) {
+	query := `
+        SELECT 
+            b.id AS beneficiary_id,
+            CONCAT(b.first_name, ' ', b.last_name1, ' ', b.last_name2) AS beneficiary_full_name,
+            b.account_holder AS account_holder_id,
+            CONCAT(p.first_name, ' ', p.last_name1, ' ', p.last_name2) AS account_holder_full_name
+        FROM 
+            beneficiary b
+        JOIN 
+            patient p ON b.account_holder = p.account_id
+        WHERE 
+            b.account_holder = $1
+    `
+
+	rows, err := cr.storage.DbPool.Query(ctx, query, accountID)
+	if err != nil {
+		return models.PatientAndBenefeciaries{}, fmt.Errorf("error fetching beneficiaries: %w", err)
+	}
+	defer rows.Close()
+
+	var result models.PatientAndBenefeciaries
+	var beneficiaries []models.Beneficiary
+
+	for rows.Next() {
+		var beneficiary models.Beneficiary
+		var accountHolderID uuid.UUID
+		var accountHolderFullName string
+
+		if err := rows.Scan(
+			&beneficiary.ID,
+			&beneficiary.FullName,
+			&accountHolderID,
+			&accountHolderFullName,
+		); err != nil {
+			return models.PatientAndBenefeciaries{}, fmt.Errorf("error scanning row: %w", err)
+		}
+
+		if result.AccountHolderID == uuid.Nil {
+			result.AccountHolderID = accountHolderID
+			result.FullName = accountHolderFullName
+		}
+
+		beneficiaries = append(beneficiaries, beneficiary)
+	}
+
+	if err := rows.Err(); err != nil {
+		return models.PatientAndBenefeciaries{}, fmt.Errorf("error iterating rows: %w", err)
+	}
+
+	result.Beneficiaries = beneficiaries
+
+	return result, nil
 }

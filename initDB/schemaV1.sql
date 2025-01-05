@@ -262,8 +262,6 @@ CREATE TABLE IF NOT EXISTS appointment (
 -- Tabla de consultas
 CREATE TABLE IF NOT EXISTS consultation (
     id SERIAL PRIMARY KEY,
-    patient_id UUID NOT NULL,
-    beneficiary_id UUID,
     appointment_id UUID NOT NULL,
     reason TEXT NOT NULL,
     symptoms TEXT NOT NULL,

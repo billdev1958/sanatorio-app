@@ -8,6 +8,17 @@ export interface Shift{
     name: string
 }
 
+export interface Beneficiary {
+    beneficiaryID: string; // Corresponde a uuid.UUID en Go
+    fullName: string;
+  }
+  
+  export interface PatientAndBeneficiaries {
+    accountHolderID: string; // Corresponde a uuid.UUID en Go
+    fullName: string;
+    beneficiaries: Beneficiary[];
+  }
+
 export interface SchedulesAppointmentRequest {
     shift: number; // ID del turno (matutino, vespertino, etc.)
     service: number; // ID del servicio (Medicina General, etc.)
@@ -22,3 +33,5 @@ export interface OfficeScheduleResponse {
     officeName: string;
     statusID: number;
   }
+
+ 

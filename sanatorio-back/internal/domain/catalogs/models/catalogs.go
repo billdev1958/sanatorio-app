@@ -26,6 +26,17 @@ type Services struct {
 	Name string `json:"name"`
 }
 
+type Beneficiary struct {
+	ID       uuid.UUID `json:"beneficiaryID"`
+	FullName string    `json:"fullName"`
+}
+
+type PatientAndBenefeciaries struct {
+	AccountHolderID uuid.UUID     `json:"accountHolderID"`
+	FullName        string        `json:"fullName"`
+	Beneficiaries   []Beneficiary `json:"benefeciaries"`
+}
+
 type Doctor struct {
 	AccountID uuid.UUID `json:"account_id"`
 	FirstName string    `json:"first_name"`

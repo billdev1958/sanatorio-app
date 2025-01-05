@@ -86,7 +86,6 @@ const Citas = () => {
         <h1>Selecciona tu Cita</h1>
 
         <div class="cita-sections">
-          {/* Columna izquierda: Formulario y calendario */}
           <div class="left-section">
             <div class="form-section">
               <h2>Selecciona Servicio</h2>
@@ -117,7 +116,6 @@ const Citas = () => {
             </div>
           </div>
 
-          {/* Columna derecha: Horarios */}
           <div class="right-section">
             <div class="schedules-section">
               <h2>Horarios Disponibles</h2>
@@ -148,7 +146,6 @@ const Citas = () => {
               )}
             </div>
 
-            {/* Botones debajo de los horarios */}
             <div class="action-buttons">
               <button
                 type="button"

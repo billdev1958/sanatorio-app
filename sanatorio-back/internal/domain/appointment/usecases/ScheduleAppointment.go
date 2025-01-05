@@ -7,6 +7,8 @@ import (
 	"sanatorioApp/internal/domain/appointment/http/models"
 	"sanatorioApp/internal/domain/catalogs"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type usecase struct {
@@ -18,7 +20,16 @@ func NewUsecase(repo appointment.AppointmentRepository, catalogRepo catalogs.Cat
 	return &usecase{repo: repo, catalogRepo: catalogRepo}
 }
 
-func (u *usecase) GetParamsForAppointments(ctx context.Context) (models.Response, error) {
+func (u *usecase) GetParamsForAppointments(ctx context.Context, accountID uuid.UUID) (models.Response, error) {
+	patients, err := u.catalogRepo.GetPatientAndBeneficiaries(ctx, accountID)
+	if err != nil {
+		return models.Response{
+			Status:  "error",
+			Message: "Error al obtener los pacientes",
+			Errors:  err.Error(),
+		}, nil
+	}
+
 	services, err := u.catalogRepo.GetServices(ctx)
 	if err != nil {
 		return models.Response{
@@ -40,6 +51,7 @@ func (u *usecase) GetParamsForAppointments(ctx context.Context) (models.Response
 	return models.Response{
 		Status: "success",
 		Data: map[string]interface{}{
+			"patients": patients,
 			"services": services,
 			"shifts":   shifts,
 		},
