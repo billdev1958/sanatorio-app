@@ -15,6 +15,7 @@ const Calendario = (props: CalendarioProps) => {
       const calendar = flatpickr(calendarRef, {
         inline: true, // Hace que el calendario siempre esté visible
         dateFormat: 'Y-m-d', // Formato de la fecha
+        minDate: 'today', // Deshabilita los días anteriores a hoy
         defaultDate: new Date(), // Fecha por defecto (hoy)
         onChange: (selectedDates) => {
           if (selectedDates.length > 0) {
