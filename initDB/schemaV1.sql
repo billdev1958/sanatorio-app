@@ -246,6 +246,7 @@ CREATE TABLE IF NOT EXISTS days (
 -- Tabla de citas
 CREATE TABLE IF NOT EXISTS appointment (
     id UUID PRIMARY KEY,
+    account_id UUID NOT NULL,
     schedule_id INTEGER NOT NULL, -- ID del horario en office_schedule
     patient_id UUID NOT NULL,
     beneficiary_id UUID,
@@ -267,7 +268,9 @@ CREATE TABLE IF NOT EXISTS consultation (
     symptoms TEXT NOT NULL,
     doctor_notes TEXT,
     requested_tests TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP,
 );
 
 -- ====================================
@@ -564,34 +567,31 @@ FOREIGN KEY (account_id) REFERENCES account(id);
 -- Funciones y triggers
 -- ====================================
 
--- Función para validar el estado del horario (status_id)
-CREATE OR REPLACE FUNCTION validate_schedule_status()
+CREATE OR REPLACE FUNCTION validate_appointment()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Verificar que el horario está activo (status_id = 1)
-    IF NEW.status_id != 1 THEN
-        RAISE EXCEPTION 'El horario no está activo y no puede ser asignado.';
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+  -- Verificar que el status_id del schedule sea 1
+  IF NOT EXISTS (
+    SELECT 1
+    FROM office_schedule
+    WHERE id = NEW.schedule_id AND status_id = 1
+  ) THEN
+    RAISE EXCEPTION 'El schedule no está disponible para registrar appointments.';
+  END IF;
 
--- Asociar el trigger con la tabla `office_schedule`
-CREATE TRIGGER trigger_validate_schedule_status
-BEFORE INSERT OR UPDATE ON office_schedule
-FOR EACH ROW EXECUTE FUNCTION validate_schedule_status();
+  -- Verificar conflictos de horarios en la misma fecha y horario
+  IF EXISTS (
+    SELECT 1
+    FROM appointment
+    WHERE schedule_id = NEW.schedule_id
+      AND DATE(time_start) = DATE(NEW.time_start) -- Misma fecha
+      AND (
+        time_start < NEW.time_end AND time_end > NEW.time_start -- Solapamiento
+      )
+  ) THEN
+    RAISE EXCEPTION 'Ya existe un appointment en el mismo horario y fecha.';
+  END IF;
 
-CREATE OR REPLACE FUNCTION check_appointment_overlap()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF EXISTS (
-        SELECT 1 
-        FROM appointment 
-        WHERE schedule_id = NEW.schedule_id 
-        AND (NEW.time_start, NEW.time_end) OVERLAPS (time_start, time_end)
-    ) THEN
-        RAISE EXCEPTION 'Conflicto de horarios en la cita';
-    END IF;
-    RETURN NEW;
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

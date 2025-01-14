@@ -13,6 +13,11 @@ func (h *handler) AdminRoutes(mux *http.ServeMux) {
 			h.middleware.RequiredPermission(user.CreateSuperAdmin)(
 				http.HandlerFunc(h.RegisterSuperAdmin))))
 
+	mux.Handle("POST /v1/admin/admin",
+		auth.AuthMiddleware(
+			h.middleware.RequiredPermission(user.CreateAdmin)(
+				http.HandlerFunc(h.RegisterAdmin))))
+
 	mux.Handle("POST /v1/admin/receptionist",
 		auth.AuthMiddleware(
 			h.middleware.RequiredPermission(user.CreateReceptionist)(

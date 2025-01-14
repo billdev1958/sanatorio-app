@@ -2,9 +2,13 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"sanatorioApp/internal/domain/appointment"
 	"sanatorioApp/internal/domain/appointment/entities"
 	postgres "sanatorioApp/internal/infraestructure/db"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 type appointmentRepository struct {
@@ -72,4 +76,64 @@ func (ar *appointmentRepository) GetAvaliableSchedules(ctx context.Context, date
 	}
 
 	return schedules, nil
+}
+
+func (ar *appointmentRepository) RegisterAppointment(ctx context.Context, a entities.Appointment, c entities.Consultation) (bool, error) {
+	tx, err := ar.storage.DbPool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return false, fmt.Errorf("error al iniciar la transacción: %v", err)
+	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback(ctx)
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback(ctx)
+		} else {
+			if commitErr := tx.Commit(ctx); commitErr != nil {
+				err = fmt.Errorf("error al confirmar la transacción: %v", commitErr)
+			}
+		}
+	}()
+
+	queryRegisterAppointment := `
+		INSERT INTO appointment (
+			id, account_id, schedule_id, patient_id, beneficiary_id, 
+			time_start, time_end, status_id
+		) 
+		VALUES (
+			$1, $2, $3, $4, COALESCE($5, NULL), 
+			$6, $7, $8
+		) RETURNING id
+	`
+
+	var appointmentID uuid.UUID
+	err = tx.QueryRow(
+		ctx,
+		queryRegisterAppointment,
+		a.ID,
+		a.AccountID,
+		a.ScheduleID,
+		a.PatientID,
+		a.BeneficiaryID,
+		a.TimeStart,
+		a.TimeEnd,
+		a.StatusID,
+	).Scan(&appointmentID)
+	if err != nil {
+		return false, fmt.Errorf("error al registrar el appointment: %w", err)
+	}
+
+	queryRegisterConsultation := `
+		INSERT INTO consultation (appointment_id, reason, symptoms)
+		VALUES ($1, $2, $3)
+	`
+
+	_, err = tx.Exec(ctx, queryRegisterConsultation, appointmentID, c.Reason, c.Symptoms)
+	if err != nil {
+		return false, fmt.Errorf("error al registrar la consulta médica: %w", err)
+	}
+
+	return true, nil
 }

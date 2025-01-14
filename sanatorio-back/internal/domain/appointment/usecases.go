@@ -10,4 +10,5 @@ import (
 type Usecase interface {
 	GetParamsForAppointments(ctx context.Context, accountID uuid.UUID) (models.Response, error)
 	GetAvaliableSchedules(ctx context.Context, params models.SchedulesAppointmentRequest) ([]models.OfficeScheduleResponse, error)
+	RegisterAppointment(ctx context.Context, accountID uuid.UUID, request models.RegisterAppointmentRequest) (message string, err error)
 }

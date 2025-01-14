@@ -34,4 +34,13 @@ export interface OfficeScheduleResponse {
     statusID: number;
   }
 
- 
+export interface RegisterAppointmentRequest {
+    scheduleID: number; // ID del horario
+    patientID: string; // UUID del paciente
+    beneficiaryID?: string; // UUID del beneficiario (opcional)
+    timeStart: string; // Fecha y hora de inicio en formato ISO 8601
+    timeEnd: string; // Fecha y hora de fin en formato ISO 8601
+    reason?: string; // Motivo de la cita (opcional)
+    symptoms?: string; // Síntomas (opcional)
+  }
+  

@@ -188,3 +188,37 @@ select:focus {
     font-size: 0.9rem;
   }
 }
+
+.text-input {
+  width: 100%;
+  min-height: 3rem; /* Altura mínima */
+  padding: 0.8rem;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  background-color: #fff;
+  resize: none; /* Desactiva el ajuste manual por el usuario */
+  overflow: hidden; /* Oculta scrollbars mientras crece */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.text-input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(44, 62, 80, 0.25);
+}
+
+.text-input::placeholder {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+
+@media (max-width: 768px) {
+  .text-input {
+    font-size: 1.1rem; /* Texto ligeramente más grande en móviles */
+    padding: 1rem;
+  }
+}
