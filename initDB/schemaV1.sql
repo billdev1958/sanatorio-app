@@ -270,7 +270,7 @@ CREATE TABLE IF NOT EXISTS consultation (
     requested_tests TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    deleted_at TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
 -- ====================================
