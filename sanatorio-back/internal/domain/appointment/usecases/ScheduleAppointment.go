@@ -66,20 +66,15 @@ func (u *usecase) GetAvaliableSchedules(ctx context.Context, params models.Sched
 		return nil, errors.New("appointmentDate is required")
 	}
 
-	// Parsear la fecha en formato UTC (ISO 8601)
 	appointmentDate, err := time.Parse(time.RFC3339, params.AppointmentDate)
 	if err != nil {
 		return nil, errors.New("invalid appointmentDate format, expected ISO 8601 (e.g., 2025-01-14T06:00:00.000Z)")
 	}
 
-	// Convertir la fecha al formato local si es necesario
-	appointmentDateUTC := appointmentDate.UTC()    // Asegurar que trabajemos con UTC
-	dayOfWeek := int(appointmentDateUTC.Weekday()) // Obtener el día de la semana basado en UTC
+	dayOfWeek := int(appointmentDate.Weekday())
 
-	// Formatear la fecha para el repositorio en formato "2006-01-02"
-	formattedDate := appointmentDateUTC.Format("2006-01-02")
+	formattedDate := appointmentDate.Format("2006-01-02")
 
-	// Llamar al repositorio con la fecha en UTC y otros parámetros
 	schedules, err := u.repo.GetAvaliableSchedules(ctx, formattedDate, dayOfWeek, params.Service, params.Shift)
 	if err != nil {
 		return nil, err
@@ -87,11 +82,10 @@ func (u *usecase) GetAvaliableSchedules(ctx context.Context, params models.Sched
 
 	var response []models.OfficeScheduleResponse
 	for _, schedule := range schedules {
-		// Construir la respuesta con los horarios en formato HH:mm:ss
 		response = append(response, models.OfficeScheduleResponse{
 			ID:           schedule.ID,
-			TimeStart:    schedule.TimeStart.UTC().Format("15:04:05"), // Convertir a UTC y formatear
-			TimeEnd:      schedule.TimeEnd.UTC().Format("15:04:05"),   // Convertir a UTC y formatear
+			TimeStart:    schedule.TimeStart.Format("15:04:05"),
+			TimeEnd:      schedule.TimeEnd.Format("15:04:05"),
 			TimeDuration: schedule.TimeDuration.String(),
 			OfficeName:   schedule.OfficeName,
 			StatusID:     schedule.StatusID,
