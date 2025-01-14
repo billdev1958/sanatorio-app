@@ -485,16 +485,12 @@ FOREIGN KEY (service_id) REFERENCES services(id);
 -- Foreign keys para la tabla appointment
 
 ALTER TABLE appointment
-ADD CONSTRAINT fk_doctor_appointment
-FOREIGN KEY (doctor_id) REFERENCES doctor(account_id);
+ADD CONSTRAINT fk_patient_id
+FOREIGN KEY (patient_id) REFERENCES patient(account_id);
 
 ALTER TABLE appointment
-ADD CONSTRAINT fk_patient_appointment
-FOREIGN KEY (patient_account_id) REFERENCES patient(account_id);
-
-ALTER TABLE appointment
-ADD CONSTRAINT fk_office_appointment
-FOREIGN KEY (office_id) REFERENCES office(id);
+ADD CONSTRAINT fk_account_id_appointment
+FOREIGN KEY (account_id) REFERENCES account(id);
 
 ALTER TABLE appointment
 ADD CONSTRAINT fk_status_appointment
@@ -516,7 +512,7 @@ ALTER TABLE beneficiary
 ADD CONSTRAINT fk_account_holder_beneficiary
 FOREIGN KEY (account_holder) REFERENCES patient(account_id);
 
-ALTER TABLE beneficiary
+ALTER TABLE beneficiary|    
 ADD CONSTRAINT fk_record_beneficiary
 FOREIGN KEY (medical_history_id) REFERENCES medical_history(medical_history_id);
 

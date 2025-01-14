@@ -4,6 +4,7 @@ import Calendario from "../../components/Calendario";
 import {
   getParamsForAppointment,
   getOfficeSchedules,
+  registerAppointment,
 } from "../Services/CatalogServices";
 import {
   Services,
@@ -12,6 +13,7 @@ import {
   OfficeScheduleResponse,
   PatientAndBeneficiaries,
   Beneficiary,
+  RegisterAppointmentRequest,
 } from "../Models/Catalogs";
 import { useAuth } from "../../services/AuthContext";
 
@@ -126,7 +128,7 @@ const Citas = () => {
     }
   });
 
-  const confirmAppointment = () => {
+  const confirmAppointment = async () => {
     if (!selectedSchedule() || !selectedPatient()) {
       alert("Debe seleccionar un horario y un paciente antes de continuar.");
       return;
@@ -140,17 +142,24 @@ const Citas = () => {
 
     try {
       const date = new Date(fullDate()!);
-      const timeStart = new Date(date.toISOString().split("T")[0] + `T${selectedSchedule()!.timeStart}Z`);
-      const timeEnd = new Date(date.toISOString().split("T")[0] + `T${selectedSchedule()!.timeEnd}Z`);
+      const timeStart = new Date(
+        date.toISOString().split("T")[0] +
+          `T${selectedSchedule()!.timeStart}Z`
+      );
+      const timeEnd = new Date(
+        date.toISOString().split("T")[0] + `T${selectedSchedule()!.timeEnd}Z`
+      );
 
       if (isNaN(timeStart.getTime()) || isNaN(timeEnd.getTime())) {
-        throw new Error("Los valores de timeStart o timeEnd no son válidos.");
+        throw new Error(
+          "Los valores de timeStart o timeEnd no son válidos."
+        );
       }
 
-      const appointmentData = {
+      const appointmentData: RegisterAppointmentRequest = {
         scheduleID: selectedSchedule()!.id,
         patientID: params()!.patients.accountHolderID,
-        beneficiaryID: selectedPatient(),
+        beneficiaryID: selectedPatient()!,
         timeStart: timeStart.toISOString(),
         timeEnd: timeEnd.toISOString(),
         reason: notes(),
@@ -158,9 +167,24 @@ const Citas = () => {
       };
 
       console.log("Datos de la cita:", appointmentData);
-    } catch (error) {
-      console.error("Error al construir los datos de la cita:", error);
-      alert("Ocurrió un error al procesar la cita. Revise la consola para más detalles.");
+
+      // Llamada al servicio para registrar la cita
+      const response = await registerAppointment(
+        appointmentData,
+        token() ?? undefined
+      );
+
+      if (response.data) {
+        alert("Cita registrada exitosamente! ID de la cita: ");
+        navigate("/");
+      } else {
+        alert("Error al registrar la cita.");
+      }
+    } catch (error: any) {
+      console.error("Error al registrar la cita:", error);
+      alert(
+        "Ocurrió un error al registrar la cita. Revise la consola para más detalles."
+      );
     }
   };
 
@@ -182,17 +206,15 @@ const Citas = () => {
                   </option>
                 )}
 
-                {params()?.patients?.benefeciaries?.length ? (
-                  params()?.patients?.benefeciaries.map(
-                    (beneficiary: Beneficiary) => (
-                      <option value={beneficiary.beneficiaryID}>
-                        {beneficiary.fullName}
-                      </option>
+                {params()?.patients?.benefeciaries?.length
+                  ? params()?.patients?.benefeciaries.map(
+                      (beneficiary: Beneficiary) => (
+                        <option value={beneficiary.beneficiaryID}>
+                          {beneficiary.fullName}
+                        </option>
+                      )
                     )
-                  )
-                ) : (
-                  <option disabled>No hay beneficiarios disponibles</option>
-                )}
+                  : <option disabled>No hay beneficiarios disponibles</option>}
               </select>
 
               <h2>Selecciona Servicio</h2>
@@ -237,7 +259,7 @@ const Citas = () => {
               <h2>Selecciona una Fecha</h2>
               <Calendario
                 onDateChange={(utcDate: string) => {
-                  console.log('Fecha en UTC:', utcDate);
+                  console.log("Fecha en UTC:", utcDate);
                   setFullDate(utcDate);
                 }}
               />
