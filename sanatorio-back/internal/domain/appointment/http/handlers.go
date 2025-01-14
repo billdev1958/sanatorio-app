@@ -77,3 +77,34 @@ func (h *handler) GetParamsForAppointments(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }
+
+func (h *handler) RegisterAppointment(w http.ResponseWriter, r *http.Request) {
+	var data models.RegisterAppointmentRequest
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	claims := auth.ExtractClaims(r.Context())
+	if claims == nil {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	params, err := h.uc.RegisterAppointment(r.Context(), claims.AccountID, data)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(models.Response{
+			Status:  "error",
+			Message: "Failed register appointment",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+	response := params
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}

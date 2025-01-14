@@ -1,5 +1,11 @@
 package models
 
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
 type Response struct {
 	Status  string      `json:"status"`
 	Message string      `json:"message,omitempty"`
@@ -20,4 +26,14 @@ type OfficeScheduleResponse struct {
 	TimeDuration string `json:"timeDuration"`
 	OfficeName   string `json:"officeName"`
 	StatusID     int    `json:"statusID"`
+}
+
+type RegisterAppointmentRequest struct {
+	ScheduleID    int       `json:"scheduleID"`
+	PatientID     uuid.UUID `json:"patientID"`
+	BeneficiaryID uuid.UUID `json:"beneficiaryID,omitempty"`
+	TimeStart     time.Time `json:"timeStart"`
+	TimeEnd       time.Time `json:"timeEnd"`
+	Reason        string    `json:"reason,omitempty"`
+	Symptoms      string    `json:"symptoms,omitempty"`
 }

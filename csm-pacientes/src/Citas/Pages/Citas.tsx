@@ -1,10 +1,10 @@
-import { createSignal, createEffect } from 'solid-js';
-import { useNavigate } from '@solidjs/router';
-import Calendario from '../../components/Calendario';
+import { createSignal, createEffect } from "solid-js";
+import { useNavigate } from "@solidjs/router";
+import Calendario from "../../components/Calendario";
 import {
   getParamsForAppointment,
   getOfficeSchedules,
-} from '../Services/CatalogServices';
+} from "../Services/CatalogServices";
 import {
   Services,
   Shift,
@@ -12,16 +12,21 @@ import {
   OfficeScheduleResponse,
   PatientAndBeneficiaries,
   Beneficiary,
-} from '../Models/Catalogs';
-import { useAuth } from '../../services/AuthContext';
+} from "../Models/Catalogs";
+import { useAuth } from "../../services/AuthContext";
 
 const Citas = () => {
   const [shift, setShift] = createSignal<Shift | null>(null);
   const [service, setService] = createSignal<Services | null>(null);
   const [fullDate, setFullDate] = createSignal<string | null>(null);
   const [schedules, setSchedules] = createSignal<OfficeScheduleResponse[]>([]);
-  const [selectedSchedule, setSelectedSchedule] = createSignal<OfficeScheduleResponse | null>(null);
-  const [selectedPatient, setSelectedPatient] = createSignal<string | null>(null);
+  const [selectedSchedule, setSelectedSchedule] =
+    createSignal<OfficeScheduleResponse | null>(null);
+  const [selectedPatient, setSelectedPatient] = createSignal<string | null>(
+    null
+  );
+  const [notes, setNotes] = createSignal<string | null>(null);
+  const [symptoms, setSymptoms] = createSignal<string | null>(null);
   const [params, setParams] = createSignal<{
     patients: PatientAndBeneficiaries;
     services: Services[];
@@ -39,7 +44,6 @@ const Citas = () => {
       if (response.data) {
         const { patients, services, shifts } = response.data;
 
-
         const normalizedPatients: PatientAndBeneficiaries = {
           ...patients,
           benefeciaries: patients?.benefeciaries ?? [],
@@ -50,13 +54,14 @@ const Citas = () => {
           services,
           shifts,
         });
-
       } else {
-        throw new Error('No se encontraron servicios, turnos o pacientes disponibles.');
+        throw new Error(
+          "No se encontraron servicios, turnos o pacientes disponibles."
+        );
       }
     } catch (error: any) {
-      console.error('Error al obtener datos:', error);
-      setScheduleError(error.message || 'Error al obtener los datos.');
+      console.error("Error al obtener datos:", error);
+      setScheduleError(error.message || "Error al obtener los datos.");
     }
   });
 
@@ -101,22 +106,44 @@ const Citas = () => {
       setLoading(true);
       setScheduleError(null);
 
-      const response = await getOfficeSchedules(appointmentData, token() ?? undefined);
+      const response = await getOfficeSchedules(
+        appointmentData,
+        token() ?? undefined
+      );
 
       if (response.data && Array.isArray(response.data)) {
         setSchedules(response.data);
       } else {
         setSchedules([]);
-        setScheduleError('No se encontraron horarios disponibles.');
+        setScheduleError("No se encontraron horarios disponibles.");
       }
     } catch (error: any) {
-      console.error('Error al obtener horarios:', error);
+      console.error("Error al obtener horarios:", error);
       setSchedules([]);
-      setScheduleError(error.message || 'Error al obtener los horarios.');
+      setScheduleError(error.message || "Error al obtener los horarios.");
     } finally {
       setLoading(false);
     }
   });
+
+  const confirmAppointment = () => {
+    if (!selectedSchedule() || !selectedPatient()) {
+      alert("Debe seleccionar un horario y un paciente antes de continuar.");
+      return;
+    }
+
+    const appointmentData = {
+      scheduleID: selectedSchedule()!.id,
+      patientID: params()!.patients.accountHolderID, // Siempre se envía el accountHolderID como patientID
+      beneficiaryID: selectedPatient(), // ID del beneficiario seleccionado
+      timeStart: selectedSchedule()!.timeStart,
+      timeEnd: selectedSchedule()!.timeEnd,
+      reason: notes(), // Notas opcionales
+      symptoms: symptoms(), // Síntomas opcionales
+    };
+
+    console.log("Datos de la cita:", appointmentData);
+  };
 
   return (
     <div class="citas-container">
@@ -128,7 +155,7 @@ const Citas = () => {
             <div class="form-section">
               <h2>Selecciona Paciente</h2>
               <select id="patient" required onInput={handlePatientChange}>
-              <option value="">-- Pacientes --</option>
+                <option value="">-- Pacientes --</option>
 
                 {params()?.patients && (
                   <option value={params()?.patients.accountHolderID}>
@@ -137,12 +164,13 @@ const Citas = () => {
                 )}
 
                 {params()?.patients?.benefeciaries?.length ? (
-                  params()
-                    ?.patients?.benefeciaries.map((beneficiary: Beneficiary) => (
+                  params()?.patients?.benefeciaries.map(
+                    (beneficiary: Beneficiary) => (
                       <option value={beneficiary.beneficiaryID}>
                         {beneficiary.fullName}
                       </option>
-                    ))
+                    )
+                  )
                 ) : (
                   <option disabled>No hay beneficiarios disponibles</option>
                 )}
@@ -163,16 +191,41 @@ const Citas = () => {
                   <option value={sft.id}>{sft.name}</option>
                 ))}
               </select>
+
+              <h2>Notas</h2>
+              <textarea
+                id="notes"
+                class="text-input"
+                placeholder="Agrega una nota opcional"
+                onInput={(e) => {
+                  setNotes((e.target as HTMLTextAreaElement).value);
+                  autoResizeTextarea(e);
+                }}
+              ></textarea>
+
+              <textarea
+                id="symptoms"
+                class="text-input"
+                placeholder="Describe los síntomas opcionales"
+                onInput={(e) => {
+                  setSymptoms((e.target as HTMLTextAreaElement).value);
+                  autoResizeTextarea(e);
+                }}
+              ></textarea>
             </div>
 
             <div class="calendario-section">
               <h2>Selecciona una Fecha</h2>
               <Calendario
-                onDateChange={(selectedDate: Date) =>
-                  setFullDate(selectedDate.toISOString().split('T')[0])
-                }
-              />
-              {fullDate() && <p class="selected-date">Fecha seleccionada: {fullDate()}</p>}
+  onDateChange={(utcDate: string) => {
+    console.log('Fecha en UTC:', utcDate); // Ejemplo de salida: "2025-01-14T00:00:00.000Z"
+    setFullDate(utcDate);
+  }}
+/>
+
+              {fullDate() && (
+                <p class="selected-date">Fecha seleccionada: {fullDate()}</p>
+              )}
             </div>
           </div>
 
@@ -180,7 +233,9 @@ const Citas = () => {
             <div class="schedules-section">
               <h2>Horarios Disponibles</h2>
 
-              {loading() && <div class="loading-message">Cargando horarios...</div>}
+              {loading() && (
+                <div class="loading-message">Cargando horarios...</div>
+              )}
 
               {!loading() && scheduleError() && (
                 <div class="error-message">
@@ -193,9 +248,10 @@ const Citas = () => {
                   {schedules().map((schedule) => (
                     <div
                       class={`schedule-card ${
-                        selectedSchedule() && selectedSchedule()!.id === schedule.id
-                          ? 'selected'
-                          : ''
+                        selectedSchedule() &&
+                        selectedSchedule()!.id === schedule.id
+                          ? "selected"
+                          : ""
                       }`}
                       onClick={() => setSelectedSchedule(schedule)}
                     >
@@ -213,22 +269,15 @@ const Citas = () => {
               <button
                 type="button"
                 class="confirm-button"
-                onClick={() => {
-                  if (selectedSchedule()) {
-                    console.log('Horario seleccionado:', selectedSchedule());
-                    console.log('Paciente seleccionado:', selectedPatient());
-                  } else {
-                    alert('Debe seleccionar un horario antes de continuar.');
-                  }
-                }}
+                onClick={confirmAppointment}
               >
-                Confirmar Horario
+                Confirmar Cita
               </button>
 
               <button
                 type="button"
                 class="cancel-button"
-                onClick={() => navigate('/')}
+                onClick={() => navigate("/")}
               >
                 Cancelar
               </button>
@@ -238,6 +287,12 @@ const Citas = () => {
       </div>
     </div>
   );
+};
+
+const autoResizeTextarea = (event: InputEvent) => {
+  const target = event.target as HTMLTextAreaElement;
+  target.style.height = "auto";
+  target.style.height = `${target.scrollHeight}px`;
 };
 
 export default Citas;

@@ -1,6 +1,10 @@
 package entities
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type OfficeSchedule struct {
 	ID           int
@@ -17,4 +21,29 @@ type OfficeSchedule struct {
 	CreatedAt    time.Time
 	UpdatedAt    *time.Time
 	DeletedAt    *time.Time
+}
+
+type Appointment struct {
+	ID            uuid.UUID
+	AccountID     uuid.UUID
+	ScheduleID    int
+	PatientID     uuid.UUID
+	BeneficiaryID uuid.UUID
+	TimeStart     time.Time
+	TimeEnd       time.Time
+	StatusID      int
+	CreatedAt     time.Time
+	UpdatedAt     *time.Time
+	DeletedAt     *time.Time
+}
+
+type Consultation struct {
+	ID            int
+	AppointmentID uuid.UUID
+	Reason        string
+	Symptoms      string
+	DoctorNotes   string
+	CreatedAt     time.Time
+	UpdatedAt     *time.Time
+	DeletedAt     *time.Time
 }
