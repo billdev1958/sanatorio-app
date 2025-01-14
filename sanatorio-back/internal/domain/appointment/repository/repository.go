@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"log"
 	"sanatorioApp/internal/domain/appointment"
 	"sanatorioApp/internal/domain/appointment/entities"
 	postgres "sanatorioApp/internal/infraestructure/db"
@@ -47,8 +48,12 @@ func (ar *appointmentRepository) GetAvaliableSchedules(ctx context.Context, date
 		ORDER BY os.time_start ASC;
     `
 
+	// Log de los parámetros de entrada
+	log.Printf("GetAvaliableSchedules - Ejecutando consulta con parámetros: date=%s, serviceID=%d, shiftID=%d, dayOfWeek=%d", date, serviceID, shiftID, dayOfWeek)
+
 	rows, err := ar.storage.DbPool.Query(ctx, query, date, serviceID, shiftID, dayOfWeek)
 	if err != nil {
+		log.Printf("GetAvaliableSchedules - Error ejecutando la consulta: %v", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -66,14 +71,20 @@ func (ar *appointmentRepository) GetAvaliableSchedules(ctx context.Context, date
 			&schedule.StatusID,
 		)
 		if err != nil {
+			log.Printf("GetAvaliableSchedules - Error escaneando fila: %v", err)
 			return nil, err
 		}
 		schedules = append(schedules, schedule)
 	}
 
+	// Verificar errores del iterador
 	if rows.Err() != nil {
+		log.Printf("GetAvaliableSchedules - Error durante la iteración de filas: %v", rows.Err())
 		return nil, rows.Err()
 	}
+
+	// Log de los resultados obtenidos
+	log.Printf("GetAvaliableSchedules - Total de horarios obtenidos: %d", len(schedules))
 
 	return schedules, nil
 }

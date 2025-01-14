@@ -62,24 +62,36 @@ func (u *usecase) GetParamsForAppointments(ctx context.Context, accountID uuid.U
 }
 
 func (u *usecase) GetAvaliableSchedules(ctx context.Context, params models.SchedulesAppointmentRequest) ([]models.OfficeScheduleResponse, error) {
+	log.Printf("GetAvaliableSchedules - Iniciando con parámetros: %+v", params)
+
 	if params.AppointmentDate == "" {
+		log.Printf("GetAvaliableSchedules - Error: appointmentDate is required")
 		return nil, errors.New("appointmentDate is required")
 	}
 
+	// Parsear la fecha en formato RFC3339
 	appointmentDate, err := time.Parse(time.RFC3339, params.AppointmentDate)
 	if err != nil {
+		log.Printf("GetAvaliableSchedules - Error al parsear la fecha: %v", err)
 		return nil, errors.New("invalid appointmentDate format, expected ISO 8601 (e.g., 2025-01-14T06:00:00.000Z)")
 	}
 
+	// Calcular el número del día de la semana
 	dayOfWeek := int(appointmentDate.Weekday())
+	log.Printf("GetAvaliableSchedules - Día de la semana calculado: %d", dayOfWeek)
 
+	// Formatear la fecha al formato YYYY-MM-DD para el repositorio
 	formattedDate := appointmentDate.Format("2006-01-02")
+	log.Printf("GetAvaliableSchedules - Fecha formateada para el repositorio: %s", formattedDate)
 
+	// Llamar al repositorio para obtener los horarios
 	schedules, err := u.repo.GetAvaliableSchedules(ctx, formattedDate, dayOfWeek, params.Service, params.Shift)
 	if err != nil {
+		log.Printf("GetAvaliableSchedules - Error al obtener horarios del repositorio: %v", err)
 		return nil, err
 	}
 
+	// Procesar los horarios obtenidos
 	var response []models.OfficeScheduleResponse
 	for _, schedule := range schedules {
 		response = append(response, models.OfficeScheduleResponse{
@@ -91,6 +103,7 @@ func (u *usecase) GetAvaliableSchedules(ctx context.Context, params models.Sched
 			StatusID:     schedule.StatusID,
 		})
 	}
+	log.Printf("GetAvaliableSchedules - Total de horarios procesados: %d", len(response))
 
 	return response, nil
 }
