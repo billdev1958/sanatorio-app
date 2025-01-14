@@ -132,17 +132,36 @@ const Citas = () => {
       return;
     }
 
-    const appointmentData = {
-      scheduleID: selectedSchedule()!.id,
-      patientID: params()!.patients.accountHolderID, // Siempre se envía el accountHolderID como patientID
-      beneficiaryID: selectedPatient(), // ID del beneficiario seleccionado
-      timeStart: selectedSchedule()!.timeStart,
-      timeEnd: selectedSchedule()!.timeEnd,
-      reason: notes(), // Notas opcionales
-      symptoms: symptoms(), // Síntomas opcionales
-    };
+    if (!fullDate()) {
+      alert("Debe seleccionar una fecha válida.");
+      console.error("Error: fullDate es nulo o indefinido.");
+      return;
+    }
 
-    console.log("Datos de la cita:", appointmentData);
+    try {
+      const date = new Date(fullDate()!);
+      const timeStart = new Date(date.toISOString().split("T")[0] + `T${selectedSchedule()!.timeStart}Z`);
+      const timeEnd = new Date(date.toISOString().split("T")[0] + `T${selectedSchedule()!.timeEnd}Z`);
+
+      if (isNaN(timeStart.getTime()) || isNaN(timeEnd.getTime())) {
+        throw new Error("Los valores de timeStart o timeEnd no son válidos.");
+      }
+
+      const appointmentData = {
+        scheduleID: selectedSchedule()!.id,
+        patientID: params()!.patients.accountHolderID,
+        beneficiaryID: selectedPatient(),
+        timeStart: timeStart.toISOString(),
+        timeEnd: timeEnd.toISOString(),
+        reason: notes(),
+        symptoms: symptoms(),
+      };
+
+      console.log("Datos de la cita:", appointmentData);
+    } catch (error) {
+      console.error("Error al construir los datos de la cita:", error);
+      alert("Ocurrió un error al procesar la cita. Revise la consola para más detalles.");
+    }
   };
 
   return (
@@ -217,12 +236,11 @@ const Citas = () => {
             <div class="calendario-section">
               <h2>Selecciona una Fecha</h2>
               <Calendario
-  onDateChange={(utcDate: string) => {
-    console.log('Fecha en UTC:', utcDate); // Ejemplo de salida: "2025-01-14T00:00:00.000Z"
-    setFullDate(utcDate);
-  }}
-/>
-
+                onDateChange={(utcDate: string) => {
+                  console.log('Fecha en UTC:', utcDate);
+                  setFullDate(utcDate);
+                }}
+              />
               {fullDate() && (
                 <p class="selected-date">Fecha seleccionada: {fullDate()}</p>
               )}
