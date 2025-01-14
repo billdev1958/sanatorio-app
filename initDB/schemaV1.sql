@@ -512,7 +512,7 @@ ALTER TABLE beneficiary
 ADD CONSTRAINT fk_account_holder_beneficiary
 FOREIGN KEY (account_holder) REFERENCES patient(account_id);
 
-ALTER TABLE beneficiary|    
+ALTER TABLE beneficiary
 ADD CONSTRAINT fk_record_beneficiary
 FOREIGN KEY (medical_history_id) REFERENCES medical_history(medical_history_id);
 
