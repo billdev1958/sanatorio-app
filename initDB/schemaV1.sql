@@ -545,10 +545,6 @@ ADD CONSTRAINT fk_role_permission_permission
 FOREIGN KEY (permission_id) REFERENCES permissions(id);
 
 -- Foreign keys para la tabla consultation
--- **Corrección aplicada aquí**
-ALTER TABLE consultation
-ADD CONSTRAINT fk_patient_consultation
-FOREIGN KEY (patient_id) REFERENCES patient(account_id);
 
 -- Foreign keys para la tabla super_admin
 ALTER TABLE super_admin
