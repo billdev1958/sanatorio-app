@@ -257,6 +257,8 @@ CREATE TABLE IF NOT EXISTS appointment (
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
     CONSTRAINT chk_time_validity CHECK (time_start < time_end)
+    CONSTRAINT unique_appointment_schedule_patient_time UNIQUE (schedule_id, patient_id, time_start, time_end)
+
 );
 
 
@@ -557,15 +559,17 @@ BEGIN
     RAISE EXCEPTION 'El schedule no está disponible para registrar appointments.';
   END IF;
 
-  -- Verificar conflictos de horarios en la misma fecha y horario
+  -- Verificar conflictos de horarios, excluyendo citas canceladas y bloqueando las filas relevantes
   IF EXISTS (
     SELECT 1
     FROM appointment
     WHERE schedule_id = NEW.schedule_id
-      AND DATE(time_start) = DATE(NEW.time_start) -- Misma fecha
+      AND DATE(time_start) = DATE(NEW.time_start)
       AND (
-        time_start < NEW.time_end AND time_end > NEW.time_start -- Solapamiento
+        time_start < NEW.time_end AND time_end > NEW.time_start
       )
+      AND status_id != 3 -- Aquí debes ajustar el ID de 'Cancelada' si es diferente a 3
+    FOR UPDATE -- Bloquea las filas seleccionadas
   ) THEN
     RAISE EXCEPTION 'Ya existe un appointment en el mismo horario y fecha.';
   END IF;
@@ -573,3 +577,8 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tr_validate_appointment
+BEFORE INSERT ON appointment
+FOR EACH ROW
+EXECUTE PROCEDURE validate_appointment();
