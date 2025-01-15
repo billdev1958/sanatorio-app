@@ -119,7 +119,7 @@ func (ar *appointmentRepository) RegisterAppointment(ctx context.Context, a enti
 			time_start, time_end, status_id
 		) 
 		VALUES (
-			$1, $2, $3, $4, COALESCE($5, NULL), 
+			$1, $2, $3, $4, $5, 
 			$6, $7, $8
 		) RETURNING id
 	`
