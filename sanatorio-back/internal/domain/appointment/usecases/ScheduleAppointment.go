@@ -127,7 +127,7 @@ func (u *usecase) RegisterAppointment(ctx context.Context, accountID uuid.UUID, 
 		StatusID:      int(appointment.AppointmentStatusPendiente),
 	}
 	log.Printf("Creado el objeto Appointment: %+v", appointment)
-
+	log.Printf("BeneficiaryID: %v, Type: %T", request.BeneficiaryID, request.BeneficiaryID)
 	consultation := entities.Consultation{
 		Reason:   request.Reason,
 		Symptoms: request.Symptoms,
