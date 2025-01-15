@@ -32,9 +32,9 @@ const Dashboard: Component = () => {
         />
         <Widget 
           icon="fas fa-flask" 
-          title="Laboratorio" 
-          description="Solicita y revisa los resultados de tus pruebas de laboratorio." 
-          link="/laboratorio" 
+          title="Revisar citas" 
+          description="Revisa todas tus citas y su status" 
+          link="/consultas" 
           buttonText="Acceder" 
         />
 

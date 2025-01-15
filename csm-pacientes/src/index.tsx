@@ -13,6 +13,7 @@ import DashboardAdmin from "./Admin/Pages/Menu";
 import RegisterOfficeForm from "./Admin/Pages/RegisterOffice";
 import RegisterOfficeScheduleForm from "./Admin/Pages/RegistrarHorarios";
 import RegisterDoctorForm from "./Admin/Pages/RegistrarDoctores";
+import ConsultasHome from "./Citas/Pages/ConsultasHome";
 
 const root = document.getElementById("root");
 
@@ -69,6 +70,13 @@ render(
           <ProtectedRoute>
             <App>
               <Citas />
+            </App>
+          </ProtectedRoute>
+        )} />
+          <Route path="/consultas" component={() => (
+          <ProtectedRoute>
+            <App>
+              <ConsultasHome />
             </App>
           </ProtectedRoute>
         )} />
