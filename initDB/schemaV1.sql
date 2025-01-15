@@ -258,7 +258,6 @@ CREATE TABLE IF NOT EXISTS appointment (
     deleted_at TIMESTAMP,
     CONSTRAINT chk_time_validity CHECK (time_start < time_end)
     CONSTRAINT unique_appointment_schedule_patient_time UNIQUE (schedule_id, patient_id, time_start, time_end)
-
 );
 
 
