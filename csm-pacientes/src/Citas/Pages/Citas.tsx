@@ -143,17 +143,14 @@ const Citas = () => {
     try {
       const date = new Date(fullDate()!);
       const timeStart = new Date(
-        date.toISOString().split("T")[0] +
-          `T${selectedSchedule()!.timeStart}Z`
+        date.toISOString().split("T")[0] + `T${selectedSchedule()!.timeStart}Z`
       );
       const timeEnd = new Date(
         date.toISOString().split("T")[0] + `T${selectedSchedule()!.timeEnd}Z`
       );
 
       if (isNaN(timeStart.getTime()) || isNaN(timeEnd.getTime())) {
-        throw new Error(
-          "Los valores de timeStart o timeEnd no son válidos."
-        );
+        throw new Error("Los valores de timeStart o timeEnd no son válidos.");
       }
 
       const appointmentData: RegisterAppointmentRequest = {
@@ -206,15 +203,17 @@ const Citas = () => {
                   </option>
                 )}
 
-                {params()?.patients?.benefeciaries?.length
-                  ? params()?.patients?.benefeciaries.map(
-                      (beneficiary: Beneficiary) => (
-                        <option value={beneficiary.beneficiaryID}>
-                          {beneficiary.fullName}
-                        </option>
-                      )
+                {params()?.patients?.benefeciaries?.length ? (
+                  params()?.patients?.benefeciaries.map(
+                    (beneficiary: Beneficiary) => (
+                      <option value={beneficiary.beneficiaryID}>
+                        {beneficiary.fullName}
+                      </option>
                     )
-                  : <option disabled>No hay beneficiarios disponibles</option>}
+                  )
+                ) : (
+                  <option disabled>No hay beneficiarios disponibles</option>
+                )}
               </select>
 
               <h2>Selecciona Servicio</h2>
@@ -285,22 +284,29 @@ const Citas = () => {
 
               {!loading() && schedules().length > 0 && (
                 <div class="schedules-grid">
-                  {schedules().map((schedule) => (
-                    <div
-                      class={`schedule-card ${
-                        selectedSchedule() &&
-                        selectedSchedule()!.id === schedule.id
-                          ? "selected"
-                          : ""
-                      }`}
-                      onClick={() => setSelectedSchedule(schedule)}
-                    >
-                      <p class="time-label">Inicio:</p>
-                      <p class="time-value">{schedule.timeStart}</p>
-                      <p class="time-label">Fin:</p>
-                      <p class="time-value">{schedule.timeEnd}</p>
-                    </div>
-                  ))}
+                  {schedules().map((schedule) => {
+                    const isDisabled = schedule.statusID !== 1;
+                    return (
+                      <div
+                        class={`schedule-card ${
+                          selectedSchedule() &&
+                          selectedSchedule()!.id === schedule.id
+                            ? "selected"
+                            : ""
+                        } ${isDisabled ? "disabled" : ""}`}
+                        onClick={(e) => {
+                          if (!isDisabled) {
+                            setSelectedSchedule(schedule);
+                          }
+                        }}
+                      >
+                        <p class="time-label">Inicio:</p>
+                        <p class="time-value">{schedule.timeStart}</p>
+                        <p class="time-label">Fin:</p>
+                        <p class="time-value">{schedule.timeEnd}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
