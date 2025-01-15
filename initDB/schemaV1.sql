@@ -325,20 +325,14 @@ CREATE TABLE IF NOT EXISTS office_schedule (
 
 CREATE TABLE IF NOT EXISTS schedule_block (
     id SERIAL PRIMARY KEY,
-    office_id INTEGER NOT NULL,
-    doctor_id UUID,
-    service_id INTEGER,
+    office_schedule_id INTEGER NOT NULL,
     block_date DATE NOT NULL,
     time_start TIME,
     time_end TIME,
     reason VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
-    deleted_at TIMESTAMP,
-    CHECK (
-        doctor_id IS NOT NULL OR
-        service_id IS NOT NULL
-    )
+    deleted_at TIMESTAMP
 );
 
 -- ====================================
@@ -468,19 +462,8 @@ FOREIGN KEY (day_of_week) REFERENCES days(day_of_week);
 
 -- Foreign keys para la tabla schedule_block
 ALTER TABLE schedule_block
-ADD CONSTRAINT fk_schedule_block_office
-FOREIGN KEY (office_id) REFERENCES office(id);
-
-
-ALTER TABLE schedule_block
-ADD CONSTRAINT fk_schedule_block_doctor
-FOREIGN KEY (doctor_id) REFERENCES doctor(account_id);
-
-ALTER TABLE schedule_block
-ADD CONSTRAINT fk_schedule_block_service
-FOREIGN KEY (service_id) REFERENCES services(id);
-
-
+ADD CONSTRAINT fk_schedule_block_office_schedule
+FOREIGN KEY (office_schedule_id) REFERENCES office_schedule(id);
 
 -- Foreign keys para la tabla appointment
 
@@ -545,6 +528,9 @@ ADD CONSTRAINT fk_role_permission_permission
 FOREIGN KEY (permission_id) REFERENCES permissions(id);
 
 -- Foreign keys para la tabla consultation
+ALTER TABLE consultation
+ADD CONSTRAINT fk_appointment_consultation
+FOREIGN KEY (appointment_id) REFERENCES appointment(id);
 
 -- Foreign keys para la tabla super_admin
 ALTER TABLE super_admin

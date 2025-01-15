@@ -22,30 +22,35 @@ func NewAppointmentRepository(storage *postgres.PgxStorage) appointment.Appointm
 
 func (ar *appointmentRepository) GetAvaliableSchedules(ctx context.Context, date string, dayOfWeek int, serviceID int, shiftID int) ([]entities.OfficeSchedule, error) {
 	query := `
-		SELECT 
-		    os.id AS schedule_id,
-		    os.time_start,
-		    os.time_end,
-		    os.time_duration,
-		    o.name AS office_name,
-		    CASE
-		        WHEN a.id IS NOT NULL THEN 2 -- Ocupado
-		        WHEN sb.id IS NOT NULL THEN 3 -- Bloqueado
-		        ELSE 1 -- Disponible
-		    END AS status_id
-		FROM
-		    office_schedule os
-		JOIN office o ON os.office_id = o.id
-		LEFT JOIN appointment a ON
-		    os.id = a.schedule_id AND DATE(a.time_start) = $1 -- Comparar fecha completa en citas
-		LEFT JOIN schedule_block sb ON
-		    os.id = sb.schedule_id AND sb.block_date = $1 -- Comparar fecha completa en bloqueos
-		WHERE
-		    os.service_id = $2 -- Filtrar por servicio
-		    AND os.shift_id = $3 -- Filtrar por turno
-		    AND os.day_of_week = $4 -- Filtrar por día de la semana
-		    AND os.status_id = 1 -- Solo horarios activos
-		ORDER BY os.time_start ASC;
+        SELECT
+            os.id AS schedule_id,
+            os.time_start,
+            os.time_end,
+            os.time_duration,
+            o.name AS office_name,
+            CASE
+                WHEN a.id IS NOT NULL THEN 2  -- Ocupado (cita)
+                WHEN sb.id IS NOT NULL THEN 3  -- Bloqueado
+                ELSE 1  -- Disponible
+            END AS status_id
+        FROM
+            office_schedule os
+        JOIN office o ON os.office_id = o.id
+        LEFT JOIN appointment a ON
+            os.id = a.schedule_id AND DATE(a.time_start) = $1
+        LEFT JOIN schedule_block sb ON
+            os.id = sb.office_schedule_id AND sb.block_date = $1
+            AND (
+                (sb.time_start IS NULL AND sb.time_end IS NULL) OR -- Bloqueo de día completo
+                (os.time_start >= sb.time_start AND os.time_end <= sb.time_end) OR
+                (os.time_start < sb.time_end AND os.time_end > sb.time_start)
+            )
+        WHERE
+            os.service_id = $2
+            AND os.shift_id = $3
+            AND os.day_of_week = $4
+            AND os.status_id = 1
+        ORDER BY os.time_start ASC;
     `
 
 	// Log de los parámetros de entrada
