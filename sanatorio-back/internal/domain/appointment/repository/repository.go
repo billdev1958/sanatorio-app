@@ -37,16 +37,16 @@ func (ar *appointmentRepository) GetAvaliableSchedules(ctx context.Context, date
                         WHERE os.id = a.schedule_id
                         AND DATE(a.time_start) = $1
                         AND a.status_id IN (SELECT id FROM appointment_status WHERE name IN ('Pendiente', 'Confirmada'))
-                        AND a.time_start <= os.time_start AND a.time_end >= os.time_end
+                        AND a.time_start::time <= os.time_start::time AND a.time_end::time >= os.time_end::time
                     ) IS NOT NULL THEN 2  -- Ocupado (cita)
                     WHEN (
                         SELECT 1
                         FROM schedule_block sb
                         WHERE os.id = sb.office_schedule_id AND sb.block_date = $1
                         AND (
-                            (sb.time_start IS NULL AND sb.time_end IS NULL) OR
-                            (os.time_start >= sb.time_start AND os.time_end <= sb.time_end) OR
-                            (os.time_start < sb.time_end AND os.time_end > sb.time_start)
+                            (sb.time_start IS NULL AND sb.time_end IS NULL) OR -- Bloqueo de día completo
+                            (os.time_start::time >= sb.time_start::time AND os.time_end::time <= sb.time_end::time) OR
+                            (os.time_start::time < sb.time_end::time AND os.time_end::time > sb.time_start::time)
                         )
                     ) IS NOT NULL THEN 3  -- Bloqueado
                     ELSE 1  -- Disponible
@@ -58,13 +58,13 @@ func (ar *appointmentRepository) GetAvaliableSchedules(ctx context.Context, date
             LEFT JOIN appointment a ON
                 os.id = a.schedule_id AND DATE(a.time_start) = $1
                 AND a.status_id IN (SELECT id FROM appointment_status WHERE name IN ('Pendiente', 'Confirmada'))
-                AND a.time_start <= os.time_start AND a.time_end >= os.time_end
+                AND a.time_start::time <= os.time_start::time AND a.time_end::time >= os.time_end::time
             LEFT JOIN schedule_block sb ON
                 os.id = sb.office_schedule_id AND sb.block_date = $1
                 AND (
                     (sb.time_start IS NULL AND sb.time_end IS NULL) OR
-                    (os.time_start >= sb.time_start AND os.time_end <= sb.time_end) OR
-                    (os.time_start < sb.time_end AND os.time_end > sb.time_start)
+                    (os.time_start::time >= sb.time_start::time AND os.time_end::time <= sb.time_end::time) OR
+                    (os.time_start::time < sb.time_end::time AND os.time_end::time > sb.time_start::time)
                 )
             WHERE
                 os.service_id = $2
@@ -90,7 +90,8 @@ func (ar *appointmentRepository) GetAvaliableSchedules(ctx context.Context, date
             time_start ASC;
     `
 
-	// ... (resto del código para ejecutar la consulta y escanear los resultados) ...
+	// Log de los parámetros de entrada
+	log.Printf("GetAvaliableSchedules - Ejecutando consulta con parámetros: date=%s, serviceID=%d, shiftID=%d, dayOfWeek=%d", date, serviceID, shiftID, dayOfWeek)
 
 	rows, err := ar.storage.DbPool.Query(ctx, query, date, serviceID, shiftID, dayOfWeek)
 	if err != nil {
@@ -109,7 +110,7 @@ func (ar *appointmentRepository) GetAvaliableSchedules(ctx context.Context, date
 			&schedule.TimeEnd,
 			&schedule.TimeDuration,
 			&schedule.OfficeName,
-			&schedule.StatusID, // Escanear en StatusID, que ahora representa el status calculado
+			&schedule.StatusID,
 		)
 		if err != nil {
 			log.Printf("GetAvaliableSchedules - Error escaneando fila: %v", err)
