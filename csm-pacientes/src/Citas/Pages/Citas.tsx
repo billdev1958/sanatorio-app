@@ -294,7 +294,7 @@ const Citas = () => {
                             ? "selected"
                             : ""
                         } ${isDisabled ? "disabled" : ""}`}
-                        onClick={(e) => {
+                        onClick={() => {
                           if (!isDisabled) {
                             setSelectedSchedule(schedule);
                           }
