@@ -12,3 +12,10 @@ showdb:
 
 dockeri:
 	@sudo dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+cloud:
+	@curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && 
+
+	@sudo dpkg -i cloudflared.deb && 
+
+	@sudo cloudflared service install eyJhIjoiMTQzYmNhMmRjZTk4NzA5MDk3ZTZmNjU4MmY5YjIzZGYiLCJ0IjoiMDlhMjQxMzItOTZhMi00NjFkLTliMTctZDJkZTcyYzkxYzU4IiwicyI6IlltSmhZVGhoWlRNdE0yTmtZUzAwWmpOaUxUaGxZakV0TkdRNE9UUTNZMlEwT1dKayJ9
