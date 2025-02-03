@@ -127,6 +127,8 @@ func (u *usecase) RegisterAppointment(ctx context.Context, accountID uuid.UUID, 
 	}
 	if request.BeneficiaryID != nil {
 		appointment.BeneficiaryID = *request.BeneficiaryID
+	} else {
+		appointment.BeneficiaryID = uuid.Nil
 	}
 	log.Printf("Creado el objeto Appointment: %+v", appointment)
 	log.Printf("BeneficiaryID: %v, Type: %T", request.BeneficiaryID, request.BeneficiaryID)
