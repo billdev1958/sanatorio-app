@@ -156,7 +156,7 @@ func (ar *appointmentRepository) RegisterAppointment(ctx context.Context, a enti
 			time_start, time_end, status_id
 		) 
 		VALUES (
-			$1, $2, $3, $4, $5, 
+			$1, $2, $3, $4, NULLIF($5, '00000000-0000-0000-0000-000000000000'), 
 			$6, $7, $8
 		) RETURNING id
 	`
