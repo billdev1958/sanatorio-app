@@ -211,11 +211,11 @@ func (ar *appointmentRepository) GetAppointmentForPatient(ctx context.Context, P
 		        ELSE 
 		            CONCAT(pat.first_name, ' ', pat.last_name1, ' ', pat.last_name2)
 		    END AS full_name,
+		    offc.name AS office_name,
+		    serv.name AS service_name,
 		    appt.time_start,
 		    appt.time_end,
-		    stat.name AS status_name,
-		    offc.name AS office_name,
-		    serv.name AS service_name
+		    stat.name AS status_name
 		FROM appointment AS appt
 		JOIN appointment_status AS stat ON appt.status_id = stat.id
 		JOIN patient AS pat ON appt.patient_id = pat.account_id
