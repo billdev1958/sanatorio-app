@@ -133,13 +133,13 @@ const Citas = () => {
       alert("Debe seleccionar un horario y un paciente antes de continuar.");
       return;
     }
-
+  
     if (!fullDate()) {
       alert("Debe seleccionar una fecha válida.");
       console.error("Error: fullDate es nulo o indefinido.");
       return;
     }
-
+  
     try {
       const date = new Date(fullDate()!);
       const timeStart = new Date(
@@ -148,31 +148,34 @@ const Citas = () => {
       const timeEnd = new Date(
         date.toISOString().split("T")[0] + `T${selectedSchedule()!.timeEnd}Z`
       );
-
+  
       if (isNaN(timeStart.getTime()) || isNaN(timeEnd.getTime())) {
         throw new Error("Los valores de timeStart o timeEnd no son válidos.");
       }
-
+  
+      const patientID = params()!.patients.accountHolderID;
+      const selectedPatientID = selectedPatient(); // ID del paciente seleccionado
+  
+      // Si el paciente seleccionado es el titular, beneficiaryID no debe enviarse
       const appointmentData: RegisterAppointmentRequest = {
         scheduleID: selectedSchedule()!.id,
-        patientID: params()!.patients.accountHolderID,
-        beneficiaryID: selectedPatient()!,
+        patientID,
+        ...(selectedPatientID !== patientID && { beneficiaryID: selectedPatientID }),
         timeStart: timeStart.toISOString(),
         timeEnd: timeEnd.toISOString(),
         reason: notes(),
         symptoms: symptoms(),
       };
-
+  
       console.log("Datos de la cita:", appointmentData);
-
-      // Llamada al servicio para registrar la cita
+  
       const response = await registerAppointment(
         appointmentData,
         token() ?? undefined
       );
-
+  
       if (response.data) {
-        alert("Cita registrada exitosamente! ID de la cita: ");
+        alert("Cita registrada exitosamente!");
         navigate("/");
       } else {
         alert("Error al registrar la cita.");
@@ -184,6 +187,7 @@ const Citas = () => {
       );
     }
   };
+  
 
   return (
     <div class="citas-container">

@@ -37,6 +37,15 @@ type Appointment struct {
 	DeletedAt     *time.Time
 }
 
+type AppointmentForPatient struct {
+	AccountID     uuid.UUID
+	PatientID     uuid.UUID
+	BeneficiaryID uuid.UUID
+	ScheduleID    int
+	TimeStart     time.Time
+	TimeEnd       time.Time
+}
+
 type Consultation struct {
 	ID            int
 	AppointmentID uuid.UUID
