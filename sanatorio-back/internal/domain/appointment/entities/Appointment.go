@@ -28,7 +28,7 @@ type Appointment struct {
 	AccountID     uuid.UUID
 	ScheduleID    int
 	PatientID     uuid.UUID
-	BeneficiaryID uuid.UUID
+	BeneficiaryID uuid.NullUUID
 	TimeStart     time.Time
 	TimeEnd       time.Time
 	StatusID      int

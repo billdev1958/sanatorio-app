@@ -117,19 +117,16 @@ func (u *usecase) RegisterAppointment(ctx context.Context, accountID uuid.UUID, 
 	}
 
 	appointment := entities.Appointment{
-		ID:         uuid.New(),
-		AccountID:  accountID,
-		ScheduleID: request.ScheduleID,
-		PatientID:  request.PatientID,
-		TimeStart:  request.TimeStart,
-		TimeEnd:    request.TimeEnd,
-		StatusID:   int(appointment.AppointmentStatusPendiente),
+		ID:            uuid.New(),
+		AccountID:     accountID,
+		ScheduleID:    request.ScheduleID,
+		PatientID:     request.PatientID,
+		TimeStart:     request.TimeStart,
+		TimeEnd:       request.TimeEnd,
+		StatusID:      int(appointment.AppointmentStatusPendiente),
+		BeneficiaryID: request.BeneficiaryID,
 	}
-	if request.BeneficiaryID.Valid {
-		appointment.BeneficiaryID = request.BeneficiaryID.UUID
-	} else {
-		appointment.BeneficiaryID = uuid.Nil
-	}
+
 	log.Printf("Creado el objeto Appointment: %+v", appointment)
 	log.Printf("BeneficiaryID: %v, Type: %T", request.BeneficiaryID, request.BeneficiaryID)
 	consultation := entities.Consultation{

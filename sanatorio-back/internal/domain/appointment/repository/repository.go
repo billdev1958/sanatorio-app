@@ -150,6 +150,13 @@ func (ar *appointmentRepository) RegisterAppointment(ctx context.Context, a enti
 		}
 	}()
 
+	var beneficiaryID interface{}
+	if a.BeneficiaryID.Valid {
+		beneficiaryID = a.BeneficiaryID.UUID
+	} else {
+		beneficiaryID = nil
+	}
+
 	queryRegisterAppointment := `
 		INSERT INTO appointment (
 			id, account_id, schedule_id, patient_id, beneficiary_id, 
@@ -169,7 +176,7 @@ func (ar *appointmentRepository) RegisterAppointment(ctx context.Context, a enti
 		a.AccountID,
 		a.ScheduleID,
 		a.PatientID,
-		a.BeneficiaryID,
+		beneficiaryID,
 		a.TimeStart,
 		a.TimeEnd,
 		a.StatusID,
