@@ -29,11 +29,11 @@ type OfficeScheduleResponse struct {
 }
 
 type RegisterAppointmentRequest struct {
-	ScheduleID    int        `json:"scheduleID"`
-	PatientID     uuid.UUID  `json:"patientID"`
-	BeneficiaryID *uuid.UUID `json:"beneficiaryID,omitempty"`
-	TimeStart     time.Time  `json:"timeStart"`
-	TimeEnd       time.Time  `json:"timeEnd"`
-	Reason        string     `json:"reason,omitempty"`
-	Symptoms      string     `json:"symptoms,omitempty"`
+	ScheduleID    int           `json:"scheduleID"`
+	PatientID     uuid.UUID     `json:"patientID"`
+	BeneficiaryID uuid.NullUUID `json:"beneficiaryID,omitempty"`
+	TimeStart     time.Time     `json:"timeStart"`
+	TimeEnd       time.Time     `json:"timeEnd"`
+	Reason        string        `json:"reason,omitempty"`
+	Symptoms      string        `json:"symptoms,omitempty"`
 }

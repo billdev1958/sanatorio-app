@@ -125,8 +125,8 @@ func (u *usecase) RegisterAppointment(ctx context.Context, accountID uuid.UUID, 
 		TimeEnd:    request.TimeEnd,
 		StatusID:   int(appointment.AppointmentStatusPendiente),
 	}
-	if request.BeneficiaryID != nil {
-		appointment.BeneficiaryID = *request.BeneficiaryID
+	if request.BeneficiaryID.Valid {
+		appointment.BeneficiaryID = request.BeneficiaryID.UUID
 	} else {
 		appointment.BeneficiaryID = uuid.Nil
 	}
