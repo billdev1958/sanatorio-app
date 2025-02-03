@@ -150,3 +150,27 @@ func (u *usecase) RegisterAppointment(ctx context.Context, accountID uuid.UUID, 
 	log.Println("No se pudo registrar el appointment por razones desconocidas.")
 	return "", fmt.Errorf("no se pudo registrar el appointment por razones desconocidas")
 }
+
+func (u *usecase) GetAppointmentForPatient(ctx context.Context, patientID uuid.UUID) (models.Response, error) {
+	appointments, err := u.repo.GetAppointmentForPatient(ctx, patientID)
+	if err != nil {
+		return models.Response{
+			Status: "error",
+			Errors: fmt.Sprintf("error obteniendo citas del paciente: %v", err),
+		}, err
+	}
+
+	if len(appointments) == 0 {
+		return models.Response{
+			Status:  "success",
+			Message: "No hay citas registradas para el paciente.",
+			Data:    []entities.AppointmentForPatient{},
+		}, nil
+	}
+
+	return models.Response{
+		Status:  "success",
+		Message: "Citas obtenidas exitosamente.",
+		Data:    appointments,
+	}, nil
+}

@@ -197,3 +197,64 @@ func (ar *appointmentRepository) RegisterAppointment(ctx context.Context, a enti
 
 	return true, nil
 }
+
+func (ar *appointmentRepository) GetAppointmentForPatient(ctx context.Context, PatientID uuid.UUID) ([]entities.AppointmentForPatient, error) {
+
+	query := `
+		SELECT
+		    appt.account_id,
+		    appt.patient_id,
+		    appt.beneficiary_id,
+		    CASE 
+		        WHEN appt.beneficiary_id IS NOT NULL THEN 
+		            CONCAT(bene.first_name, ' ', bene.last_name1, ' ', bene.last_name2)
+		        ELSE 
+		            CONCAT(pat.first_name, ' ', pat.last_name1, ' ', pat.last_name2)
+		    END AS full_name,
+		    appt.time_start,
+		    appt.time_end,
+		    stat.name AS status_name,
+		    offc.name AS office_name,
+		    serv.name AS service_name
+		FROM appointment AS appt
+		JOIN appointment_status AS stat ON appt.status_id = stat.id
+		JOIN patient AS pat ON appt.patient_id = pat.account_id
+		LEFT JOIN beneficiary AS bene ON appt.beneficiary_id = bene.id 
+		JOIN office_schedule AS osched ON appt.schedule_id = osched.id
+		JOIN office AS offc ON osched.office_id = offc.id
+		JOIN services AS serv ON osched.service_id = serv.id
+		WHERE appt.patient_id = $1;
+	`
+
+	rows, err := ar.storage.DbPool.Query(ctx, query, PatientID)
+	if err != nil {
+		return nil, fmt.Errorf("error ejecutando la consulta: %w", err)
+	}
+	defer rows.Close()
+
+	var appointments []entities.AppointmentForPatient
+
+	for rows.Next() {
+		var appt entities.AppointmentForPatient
+		err := rows.Scan(
+			&appt.AccountID,
+			&appt.PatientID,
+			&appt.BeneficiaryID,
+			&appt.PatientName,
+			&appt.OfficeName,
+			&appt.ServiceName,
+			&appt.TimeStart,
+			&appt.TimeEnd,
+			&appt.StatusName,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error escaneando fila: %w", err)
+		}
+		appointments = append(appointments, appt)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterando las filas: %w", err)
+	}
+	return appointments, nil
+
+}

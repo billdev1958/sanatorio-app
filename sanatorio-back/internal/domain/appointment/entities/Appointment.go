@@ -40,10 +40,13 @@ type Appointment struct {
 type AppointmentForPatient struct {
 	AccountID     uuid.UUID
 	PatientID     uuid.UUID
-	BeneficiaryID uuid.UUID
-	ScheduleID    int
+	BeneficiaryID uuid.NullUUID
+	PatientName   string
+	OfficeName    string
+	ServiceName   string
 	TimeStart     time.Time
 	TimeEnd       time.Time
+	StatusName    string
 }
 
 type Consultation struct {
