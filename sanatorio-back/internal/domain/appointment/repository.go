@@ -3,6 +3,8 @@ package appointment
 import (
 	"context"
 	"sanatorioApp/internal/domain/appointment/entities"
+
+	"github.com/google/uuid"
 )
 
 type AppointmentRepository interface {
@@ -10,5 +12,5 @@ type AppointmentRepository interface {
 
 	RegisterAppointment(ctx context.Context, a entities.Appointment, c entities.Consultation) (bool, error)
 
-	//GetAppointmentForPatient(ctx context.Context) ([])
+	GetAppointmentForPatient(ctx context.Context, PatientID uuid.UUID) ([]entities.AppointmentForPatient, error)
 }
