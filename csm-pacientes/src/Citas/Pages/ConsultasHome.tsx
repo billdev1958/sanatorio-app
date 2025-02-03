@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 import { For } from "solid-js";
 
-interface Appointments {
+/*interface Appointments {
   patient: string;
   beneficiary?: string;
   serviceName: string;
@@ -10,7 +10,7 @@ interface Appointments {
   timeEnd: string; 
   statusID: number;
   statusName: string;
-}
+}*/
 
 interface ConsultaMedica {
   timeStart: string;
