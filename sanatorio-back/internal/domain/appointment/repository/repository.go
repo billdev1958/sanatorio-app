@@ -223,7 +223,8 @@ func (ar *appointmentRepository) GetAppointmentForPatient(ctx context.Context, P
 		JOIN office_schedule AS osched ON appt.schedule_id = osched.id
 		JOIN office AS offc ON osched.office_id = offc.id
 		JOIN services AS serv ON osched.service_id = serv.id
-		WHERE appt.patient_id = $1;
+		WHERE appt.patient_id = $1
+		ORDER BY appt.created_at DESC;
 	`
 
 	rows, err := ar.storage.DbPool.Query(ctx, query, PatientID)
