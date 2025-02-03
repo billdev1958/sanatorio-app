@@ -22,4 +22,9 @@ func (h *handler) AppointmentRouter(mux *http.ServeMux) {
 		auth.AuthMiddleware(
 			h.middleware.RequiredPermission(user.CreateAppointment)(
 				http.HandlerFunc(h.RegisterAppointment))))
+
+	mux.Handle("POST /v1/appointments/patient",
+		auth.AuthMiddleware(
+			h.middleware.RequiredPermission(user.ViewAppointment)(
+				http.HandlerFunc(h.GetAppointmentsForPatient))))
 }
