@@ -309,7 +309,7 @@ func (storage *PgxStorage) SeedServices(ctx context.Context) (err error) {
 
 func (storage *PgxStorage) SeedAppointmentStatus(ctx context.Context) (err error) {
 	// Estados de la cita que vamos a insertar
-	statusValues := [3]string{"Pendiente", "Confirmada", "Cancelada"}
+	statusValues := [5]string{"Pendiente", "Confirmada", "Iniciada", "Concluida", "Cancelada"}
 
 	// Verificar si ya hay datos en la tabla appointment_status
 	var count int

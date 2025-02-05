@@ -49,6 +49,30 @@ type AppointmentForPatient struct {
 	StatusName    string
 }
 
+type AppointmentForReceptionist struct {
+	AccountID     uuid.UUID
+	PatientID     uuid.UUID
+	BeneficiaryID uuid.NullUUID
+	PatientName   string
+	OfficeName    string
+	ServiceName   string
+	TimeStart     time.Time
+	TimeEnd       time.Time
+	StatusID      int
+	StatusName    string
+}
+
+type AppointmentForDoctor struct {
+	AccountID     uuid.UUID
+	PatientID     uuid.UUID
+	BeneficiaryID uuid.NullUUID
+	TimeStart     time.Time
+	TimeEnd       time.Time
+	StatusID      string
+	StatusName    string
+	Consultation
+}
+
 type Consultation struct {
 	ID            int
 	AppointmentID uuid.UUID

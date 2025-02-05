@@ -43,3 +43,15 @@ export interface OfficeScheduleResponse {
     reason?: string | null;
     symptoms?: string | null;
 }
+
+export interface Appointment {
+  AccountID: string;
+  PatientID: string;
+  BeneficiaryID: string | null;
+  PatientName: string;
+  OfficeName: string;
+  ServiceName: string;
+  TimeStart: string; // Formato ISO 8601, por ejemplo: "2025-02-05T10:00:00Z"
+  TimeEnd: string;   // Formato ISO 8601, por ejemplo: "2025-02-05T11:00:00Z"
+  StatusName: string;
+}
