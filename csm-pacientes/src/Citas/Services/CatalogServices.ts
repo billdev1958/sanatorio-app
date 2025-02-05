@@ -1,6 +1,6 @@
 import api from '../../Api/Api';
 import { Response } from '../../Api/Model';
-import { Services, Shift } from '../Models/Catalogs';
+import { Appointment, Services, Shift } from '../Models/Catalogs';
 import { SchedulesAppointmentRequest, OfficeScheduleResponse , PatientAndBeneficiaries, RegisterAppointmentRequest} from '../Models/Catalogs';
 
 export const getParamsForAppointment = async (
@@ -89,7 +89,6 @@ export const registerAppointment = async (
 ): Promise<Response<{ success: boolean; appointmentID: string }>> => {
   console.log('registerAppointment - Datos de la cita a registrar:', appointmentData);
 
-  // Validar datos obligatorios
   if (
     !appointmentData.scheduleID ||
     !appointmentData.patientID ||
@@ -100,9 +99,11 @@ export const registerAppointment = async (
     throw new Error('Datos de cita incompletos. Por favor, complete todos los campos obligatorios.');
   }
 
-  // Validar formato de fecha y hora (ISO 8601)
   const isoDateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?$/;
-  if (!isoDateTimeRegex.test(appointmentData.timeStart) || !isoDateTimeRegex.test(appointmentData.timeEnd)) {
+  if (
+    !isoDateTimeRegex.test(appointmentData.timeStart) ||
+    !isoDateTimeRegex.test(appointmentData.timeEnd)
+  ) {
     console.error('registerAppointment - Formato de fecha/hora inválido:', {
       timeStart: appointmentData.timeStart,
       timeEnd: appointmentData.timeEnd,
@@ -122,22 +123,77 @@ export const registerAppointment = async (
       },
     });
 
-    console.log('registerAppointment - Respuesta exitosa:', response.data);
+    console.log('registerAppointment - Respuesta del servidor:', response.data);
 
-    // Retornar la respuesta tipada
-    return response.data as Response<{ success: boolean; appointmentID: string }>;
+    const data = response.data;
+
+    if (typeof data === 'string') {
+      console.log("registerAppointment - La respuesta es un string:", data);
+      return {
+        status: 'success',
+        message: data,
+        data: { success: true, appointmentID: '' }
+      } as Response<{ success: boolean; appointmentID: string }>;
+    } else {
+      console.log("registerAppointment - La respuesta es un objeto:", data);
+      const res = data as Response<{ success: boolean; appointmentID: string }>;
+      if (res.status !== 'success' || !res.data?.success) {
+        throw new Error(res.message || 'Error al registrar la cita.');
+      }
+      return res;
+    }
   } catch (error: any) {
     console.error('registerAppointment - Error al realizar la solicitud:', error);
-
-    const errorMessage =
-      error.response?.data?.message || 'Error al registrar la cita.';
     console.error('Detalles del error:', {
       message: error.message,
       response: error.response?.data,
       status: error.response?.status,
     });
-
-    // Crear y lanzar una instancia de Error con un mensaje personalizado
+    const errorMessage =
+      error.response?.data?.message || error.message || 'Error al registrar la cita.';
     throw new Error(errorMessage);
+  }
+};
+
+/**
+ * Obtiene el historial de citas médicas del paciente.
+ * @param token Token de autorización (opcional). Si se proporciona, se envía en el header.
+ * @returns Una promesa que resuelve en un arreglo de citas.
+ */
+export const getPatientAppointments = async (token?: string): Promise<Appointment[]> => {
+  console.log(
+    'getPatientAppointments - Iniciando solicitud con token:',
+    token ? 'Presente' : 'Missing'
+  );
+
+  try {
+    // Se envía un POST a la url '/appointments/patient'. 
+    // Como no se requiere enviar datos en el body, se pasa un objeto vacío {}.
+    const response = await api.post('/appointments/patient', {}, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+
+    console.log('getPatientAppointments - Respuesta exitosa:', response.data);
+
+    // Se asume que la respuesta tiene la estructura:
+    // { status: "success", message: "Citas obtenidas exitosamente.", data: Appointment[] }
+    const res = response.data as Response<Appointment[]>;
+
+    if (res.status !== 'success') {
+      throw new Error(res.message || 'Error al obtener citas');
+    }
+
+    // Retorna el arreglo de citas (o un arreglo vacío si no hay data)
+    return res.data || [];
+  } catch (error: any) {
+    console.error('getPatientAppointments - Error al obtener las citas:', error);
+    console.error('Detalles del error:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+    });
+    throw new Error(error.message || 'Error al obtener el historial de citas.');
   }
 };
