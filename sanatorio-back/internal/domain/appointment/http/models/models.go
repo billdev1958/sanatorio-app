@@ -37,3 +37,12 @@ type RegisterAppointmentRequest struct {
 	Reason        string        `json:"reason,omitempty"`
 	Symptoms      string        `json:"symptoms,omitempty"`
 }
+
+type AppointmentByID struct {
+	PatientID     uuid.UUID     `json:"patientID"`
+	BeneficiaryID uuid.NullUUID `json:"beneficiaryID,omitempty"`
+	TimeStart     time.Time     `json:"timeStart"`
+	TimeEnd       time.Time     `json:"timeEnd"`
+	Reason        string        `json:"reason,omitempty"`
+	Symptoms      string        `json:"symptoms,omitempty"`
+}
