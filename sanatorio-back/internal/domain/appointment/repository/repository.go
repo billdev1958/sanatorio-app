@@ -202,6 +202,7 @@ func (ar *appointmentRepository) GetAppointmentForPatient(ctx context.Context, P
 
 	query := `
 		SELECT
+			appt.id
 		    appt.account_id,
 		    appt.patient_id,
 		    appt.beneficiary_id,
@@ -238,6 +239,7 @@ func (ar *appointmentRepository) GetAppointmentForPatient(ctx context.Context, P
 	for rows.Next() {
 		var appt entities.AppointmentForPatient
 		err := rows.Scan(
+			&appt.AppointentID,
 			&appt.AccountID,
 			&appt.PatientID,
 			&appt.BeneficiaryID,

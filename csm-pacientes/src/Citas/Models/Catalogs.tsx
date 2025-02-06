@@ -45,6 +45,7 @@ export interface OfficeScheduleResponse {
 }
 
 export interface Appointment {
+  AppointmentID: string;  
   AccountID: string;
   PatientID: string;
   BeneficiaryID: string | null;
@@ -61,8 +62,8 @@ export interface AppointmentByID {
   beneficiaryID?: string | null;
   timeStart: string;
   timeEnd: string;
-  serviceID?: number;
-  shiftID?: number;
+  serviceID: number;
+  shiftID: number;
   reason?: string;
   symptoms?: string;
 }

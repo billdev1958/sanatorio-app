@@ -40,6 +40,7 @@ type Appointment struct {
 }
 
 type AppointmentForPatient struct {
+	AppointentID  uuid.UUID
 	AccountID     uuid.UUID
 	PatientID     uuid.UUID
 	BeneficiaryID uuid.NullUUID

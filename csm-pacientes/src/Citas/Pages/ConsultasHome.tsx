@@ -2,6 +2,7 @@ import { createSignal, createEffect } from "solid-js";
 import { getPatientAppointments } from "../Services/CatalogServices";
 import { Appointment } from "../Models/Catalogs";
 import { useAuth } from "../../services/AuthContext";
+import { useNavigate } from "@solidjs/router";
 
 const ConsultasHome = () => {
   const [appointments, setAppointments] = createSignal<Appointment[]>([]);
@@ -9,6 +10,7 @@ const ConsultasHome = () => {
   const [loading, setLoading] = createSignal<boolean>(false);
 
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   createEffect(async () => {
     setLoading(true);
@@ -77,7 +79,12 @@ const ConsultasHome = () => {
                     {appointment.StatusName}
                   </td>
                   <td>
-                    <button class="btn-editar">Editar</button>
+                    <button
+                      class="btn-editar"
+                      onClick={() => navigate("/citas/" + appointment.AppointmentID)}
+                    >
+                      Editar
+                    </button>
                     <button class="btn-confirmar">Confirmar</button>
                     <button class="btn-cancelar">Cancelar</button>
                   </td>
