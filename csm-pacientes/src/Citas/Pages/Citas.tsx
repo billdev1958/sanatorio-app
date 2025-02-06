@@ -144,8 +144,8 @@ const Citas = () => {
           setService(paramsData()!.services.find((s) => s.id === appointment.serviceID) || null);
           setShift(paramsData()!.shifts.find((s) => s.id === appointment.shiftID) || null);
         }
-        // Extrae solo la parte de la fecha (se asume que timeStart es un ISO string completo)
-        setFullDate(appointment.timeStart.split("T")[0]);
+        // Almacena el string ISO completo (incluyendo la parte horaria y milisegundos)
+        setFullDate(new Date(appointment.timeStart).toISOString());
         setNotes(appointment.reason || "");
         setSymptoms(appointment.symptoms || "");
       }
@@ -247,7 +247,12 @@ const Citas = () => {
               </select>
 
               <h2>Selecciona Servicio</h2>
-              <select id="service" required onChange={handleServiceChange}>
+              <select
+                id="service"
+                required
+                value={service()?.id ? service()?.id.toString() : ""}
+                onChange={handleServiceChange}
+              >
                 <option value="">Servicios --</option>
                 {paramsData()?.services.map((srv) => (
                   <option value={srv.id}>{srv.name}</option>
@@ -255,7 +260,12 @@ const Citas = () => {
               </select>
 
               <h2>Selecciona Turno</h2>
-              <select id="turno" required onChange={handleShiftChange}>
+              <select
+                id="turno"
+                required
+                value={shift()?.id ? shift()?.id.toString() : ""}
+                onChange={handleShiftChange}
+              >
                 <option value="">Turno --</option>
                 {paramsData()?.shifts.map((sft) => (
                   <option value={sft.id}>{sft.name}</option>
@@ -290,11 +300,12 @@ const Citas = () => {
             <div class="calendario-section">
               <h2>Selecciona una Fecha</h2>
               <Calendario
-                onDateChange={(utcDate: string) => {
-                  console.log("Fecha en UTC:", utcDate);
-                  setFullDate(utcDate);
-                }}
-              />
+  selectedDate={fullDate() || undefined}
+  onDateChange={(utcDate: string) => {
+    console.log("Fecha en UTC:", utcDate);
+    setFullDate(utcDate);
+  }}
+/>
               {fullDate() && (
                 <p class="selected-date">Fecha seleccionada: {fullDate()}</p>
               )}
