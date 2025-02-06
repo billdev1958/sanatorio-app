@@ -266,11 +266,14 @@ func (ar *appointmentRepository) GetAppointmentByID(ctx context.Context, appoint
 		appt.id AS appointment_id,
 		appt.patient_id,
 		appt.beneficiary_id,
+		os.service_id,
+		os.shift_id,
 		s.reason,
 		s.symptoms,
 		appt.time_start,
 		appt.time_end
 	FROM appointment AS appt
+	JOIN office_schedule AS os ON os.id = appt.schedule_id
 	JOIN consultation AS s ON s.appointment_id = appt.id
 	WHERE appt.id = $1;
 	`
@@ -281,6 +284,8 @@ func (ar *appointmentRepository) GetAppointmentByID(ctx context.Context, appoint
 		&appt.ID,
 		&appt.PatientID,
 		&appt.BeneficiaryID,
+		&appt.OfficeSchedule.ServiceID,
+		&appt.OfficeSchedule.ShiftID,
 		&appt.Consultation.Reason,
 		&appt.Consultation.Symptoms,
 		&appt.TimeStart,

@@ -186,6 +186,8 @@ func (u *usecase) GetAppointmentByID(ctx context.Context, appointmentID uuid.UUI
 		BeneficiaryID: appointment.BeneficiaryID,
 		TimeStart:     appointment.TimeStart,
 		TimeEnd:       appointment.TimeEnd,
+		ServiceID:     appointment.OfficeSchedule.ServiceID,
+		ShiftID:       appointment.OfficeSchedule.ShiftID,
 		Reason:        appointment.Consultation.Reason,
 		Symptoms:      appointment.Consultation.Symptoms,
 	}
