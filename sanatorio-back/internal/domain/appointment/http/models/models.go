@@ -43,6 +43,8 @@ type AppointmentByID struct {
 	BeneficiaryID uuid.NullUUID `json:"beneficiaryID,omitempty"`
 	TimeStart     time.Time     `json:"timeStart"`
 	TimeEnd       time.Time     `json:"timeEnd"`
+	ServiceID     int           `json:"serviceID"`
+	ShiftID       int           `json:"shiftID"`
 	Reason        string        `json:"reason,omitempty"`
 	Symptoms      string        `json:"symptoms,omitempty"`
 }

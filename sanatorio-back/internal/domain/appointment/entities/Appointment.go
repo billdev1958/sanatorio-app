@@ -32,6 +32,7 @@ type Appointment struct {
 	TimeStart     time.Time
 	TimeEnd       time.Time
 	StatusID      int
+	OfficeSchedule
 	Consultation
 	CreatedAt time.Time
 	UpdatedAt *time.Time
