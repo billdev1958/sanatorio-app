@@ -259,3 +259,40 @@ func (ar *appointmentRepository) GetAppointmentForPatient(ctx context.Context, P
 	return appointments, nil
 
 }
+
+func (ar *appointmentRepository) GetAppointmentByID(ctx context.Context, appointmentID uuid.UUID) (entities.Appointment, error) {
+	query := `
+	SELECT 
+		appt.id AS appointment_id,
+		appt.patient_id,
+		appt.beneficiary_id,
+		s.reason,
+		s.symptoms,
+		appt.time_start,
+		appt.time_end
+	FROM appointment AS appt
+	JOIN consultation AS s ON s.appointment_id = appt.id
+	WHERE appt.id = $1;
+	`
+
+	var appt entities.Appointment
+
+	err := ar.storage.DbPool.QueryRow(ctx, query, appointmentID).Scan(
+		&appt.ID,
+		&appt.PatientID,
+		&appt.BeneficiaryID,
+		&appt.Consultation.Reason,
+		&appt.Consultation.Symptoms,
+		&appt.TimeStart,
+		&appt.TimeEnd,
+	)
+
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return appt, fmt.Errorf("no se encontró la cita con el ID proporcionado: %v", appointmentID)
+		}
+		return appt, fmt.Errorf("error al ejecutar la consulta: %w", err)
+	}
+
+	return appt, nil
+}

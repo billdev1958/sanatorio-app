@@ -32,9 +32,10 @@ type Appointment struct {
 	TimeStart     time.Time
 	TimeEnd       time.Time
 	StatusID      int
-	CreatedAt     time.Time
-	UpdatedAt     *time.Time
-	DeletedAt     *time.Time
+	Consultation
+	CreatedAt time.Time
+	UpdatedAt *time.Time
+	DeletedAt *time.Time
 }
 
 type AppointmentForPatient struct {

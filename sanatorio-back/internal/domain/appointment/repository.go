@@ -13,4 +13,6 @@ type AppointmentRepository interface {
 	RegisterAppointment(ctx context.Context, a entities.Appointment, c entities.Consultation) (bool, error)
 
 	GetAppointmentForPatient(ctx context.Context, PatientID uuid.UUID) ([]entities.AppointmentForPatient, error)
+
+	GetAppointmentByID(ctx context.Context, appointmentID uuid.UUID) (entities.Appointment, error)
 }

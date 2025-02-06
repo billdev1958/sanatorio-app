@@ -1,11 +1,15 @@
 package v1
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"sanatorioApp/internal/domain/appointment"
 	"sanatorioApp/internal/domain/appointment/http/models"
 	"sanatorioApp/internal/domain/auth"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type handler struct {
@@ -123,6 +127,46 @@ func (h *handler) RegisterAppointment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := params
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
+func (h *handler) GetAppointmentByID(w http.ResponseWriter, r *http.Request) {
+	appointmentIDStr := r.PathValue("appointmentID")
+
+	if appointmentIDStr == "" {
+		http.Error(w, "Appointment ID is required", http.StatusBadRequest)
+		return
+	}
+
+	appointmentID, err := uuid.Parse(appointmentIDStr)
+	if err != nil {
+		http.Error(w, "Invalid appointment ID format", http.StatusBadRequest)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	defer cancel()
+
+	apptByID, err := h.uc.GetAppointmentByID(ctx, appointmentID)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(models.Response{
+			Status:  "error",
+			Message: "Failed to retrieve appointment",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+	response := models.Response{
+		Status:  "success",
+		Message: "Appointment retrieved successfully",
+		Data:    apptByID,
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

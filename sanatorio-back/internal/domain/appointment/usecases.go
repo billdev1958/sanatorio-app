@@ -12,4 +12,5 @@ type Usecase interface {
 	GetAvaliableSchedules(ctx context.Context, params models.SchedulesAppointmentRequest) ([]models.OfficeScheduleResponse, error)
 	RegisterAppointment(ctx context.Context, accountID uuid.UUID, request models.RegisterAppointmentRequest) (message string, err error)
 	GetAppointmentForPatient(ctx context.Context, patientID uuid.UUID) (models.Response, error)
+	GetAppointmentByID(ctx context.Context, appointmentID uuid.UUID) (models.AppointmentByID, error)
 }

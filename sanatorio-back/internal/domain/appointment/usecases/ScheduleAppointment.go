@@ -174,3 +174,21 @@ func (u *usecase) GetAppointmentForPatient(ctx context.Context, patientID uuid.U
 		Data:    appointments,
 	}, nil
 }
+
+func (u *usecase) GetAppointmentByID(ctx context.Context, appointmentID uuid.UUID) (models.AppointmentByID, error) {
+	appointment, err := u.repo.GetAppointmentByID(ctx, appointmentID)
+	if err != nil {
+		return models.AppointmentByID{}, fmt.Errorf("error al obtener la cita: %w", err)
+	}
+
+	apptByID := models.AppointmentByID{
+		PatientID:     appointment.PatientID,
+		BeneficiaryID: appointment.BeneficiaryID,
+		TimeStart:     appointment.TimeStart,
+		TimeEnd:       appointment.TimeEnd,
+		Reason:        appointment.Consultation.Reason,
+		Symptoms:      appointment.Consultation.Symptoms,
+	}
+
+	return apptByID, nil
+}
