@@ -81,7 +81,7 @@ const ConsultasHome = () => {
                   <td>
                     <button
                       class="btn-editar"
-                      onClick={() => navigate("/citas/" + appointment.AppointmentID)}
+                      onClick={() => navigate("/citas/" + appointment.AppointentID)}
                     >
                       Editar
                     </button>

@@ -45,7 +45,7 @@ export interface OfficeScheduleResponse {
 }
 
 export interface Appointment {
-  AppointmentID: string;  
+  AppointentID: string;
   AccountID: string;
   PatientID: string;
   BeneficiaryID: string | null;
