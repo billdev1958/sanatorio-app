@@ -202,7 +202,7 @@ func (ar *appointmentRepository) GetAppointmentForPatient(ctx context.Context, P
 
 	query := `
 		SELECT
-			appt.id
+			appt.id,
 		    appt.account_id,
 		    appt.patient_id,
 		    appt.beneficiary_id,
