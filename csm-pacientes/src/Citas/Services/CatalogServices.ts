@@ -1,6 +1,6 @@
 import api from '../../Api/Api';
 import { Response } from '../../Api/Model';
-import { Appointment, Services, Shift } from '../Models/Catalogs';
+import { Appointment, AppointmentByID, Services, Shift } from '../Models/Catalogs';
 import { SchedulesAppointmentRequest, OfficeScheduleResponse , PatientAndBeneficiaries, RegisterAppointmentRequest} from '../Models/Catalogs';
 
 export const getParamsForAppointment = async (
@@ -195,5 +195,37 @@ export const getPatientAppointments = async (token?: string): Promise<Appointmen
       status: error.response?.status,
     });
     throw new Error(error.message || 'Error al obtener el historial de citas.');
+  }
+};
+
+/**
+ * Obtiene los detalles de una cita médica por su ID.
+ * @param appointmentID - UUID de la cita a consultar.
+ * @param token - Token de autorización (opcional).
+ * @returns Promesa con los detalles de la cita.
+ */
+export const getAppointmentByID = async (
+  appointmentID: string,
+  token?: string
+): Promise<Response<AppointmentByID>> => {
+  console.log("getAppointmentByID - Solicitando cita con ID:", appointmentID);
+
+  if (!appointmentID) {
+    throw new Error("El ID de la cita es requerido.");
+  }
+
+  try {
+    const response = await api.get(`/appointment/${appointmentID}`, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+
+    console.log("getAppointmentByID - Respuesta exitosa:", response.data);
+
+    return response.data as Response<AppointmentByID>;
+  } catch (error: any) {
+    console.error("getAppointmentByID - Error al obtener la cita:", error);
+    throw new Error(error.response?.data?.message || "Error al obtener la cita.");
   }
 };

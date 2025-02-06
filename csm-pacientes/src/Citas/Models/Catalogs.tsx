@@ -55,3 +55,14 @@ export interface Appointment {
   TimeEnd: string;   // Formato ISO 8601, por ejemplo: "2025-02-05T11:00:00Z"
   StatusName: string;
 }
+
+export interface AppointmentByID {
+  patientID: string;
+  beneficiaryID?: string | null;
+  timeStart: string;
+  timeEnd: string;
+  serviceID?: number;
+  shiftID?: number;
+  reason?: string;
+  symptoms?: string;
+}
