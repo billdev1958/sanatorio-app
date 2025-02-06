@@ -66,7 +66,7 @@ render(
           </ProtectedRoute>
         )} />
 
-        <Route path="/citas" component={() => (
+        <Route path="/citas/:id?" component={() => (
           <ProtectedRoute>
             <App>
               <Citas />
