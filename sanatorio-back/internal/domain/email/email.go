@@ -72,8 +72,8 @@ func (e *EmailService) SendEmail(ctx context.Context, dd *model.DestinataryData)
 	m.EmbedFile("/app/email/logo_cms.png")
 
 	// Asignar manualmente los CIDs en la plantilla
-	dd.Logo1CID = "cid:logo.png"
-	dd.Logo2CID = "cid:logo_cms.png"
+	dd.Logo1CID = "logo.png"
+	dd.Logo2CID = "logo_cms.png"
 
 	// 🔹 Establecer el cuerpo del correo con la plantilla HTML
 	if err := m.SetBodyHTMLTemplate(tmpl, dd); err != nil {
