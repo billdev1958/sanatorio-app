@@ -28,6 +28,7 @@ func (u *usecase) RegisterDoctor(ctx context.Context, request models.RegisterDoc
 		Email:        request.Email,
 		Password:     hashedPassword,
 		Rol:          entities.Doctor,
+		IsVerified:   true,
 	}
 
 	registerDoctor := entities.DoctorUser{

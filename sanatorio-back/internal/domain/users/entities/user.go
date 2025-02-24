@@ -22,6 +22,7 @@ type Account struct {
 	Email               string
 	Password            string
 	Rol                 Roles
+	IsVerified          bool
 	Created_At          time.Time
 	Updated_At          time.Time
 	Password_Changed_At time.Time

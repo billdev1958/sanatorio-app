@@ -45,8 +45,8 @@ func (pr *userRepository) registerAccount(ctx context.Context, tx pgx.Tx, ru ent
 	log.Printf("Repository - Inserting account with ID: %s, dependency_id: %d, phone: %s, email: %s, role_id: %d", ru.ID, ru.AfiliationID, ru.PhoneNumber, ru.Email, ru.Rol)
 
 	var accountID uuid.UUID
-	query := "INSERT INTO account (id, dependency_id, phone, email, password, role_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
-	err := tx.QueryRow(ctx, query, ru.ID, ru.AfiliationID, ru.PhoneNumber, ru.Email, ru.Password, ru.Rol).Scan(&accountID)
+	query := "INSERT INTO account (id, dependency_id, phone, email, password, role_id, is_verified) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id"
+	err := tx.QueryRow(ctx, query, ru.ID, ru.AfiliationID, ru.PhoneNumber, ru.Email, ru.Password, ru.Rol, ru.IsVerified).Scan(&accountID)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("insert account: %w", err)
 	}

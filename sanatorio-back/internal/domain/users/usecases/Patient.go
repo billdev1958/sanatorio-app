@@ -56,6 +56,7 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 		Email:        request.Email,
 		Password:     hashedPassword,
 		Rol:          entities.Patient,
+		IsVerified:   false,
 	}
 
 	// Crear la entidad PatientUser con los datos de la solicitud
