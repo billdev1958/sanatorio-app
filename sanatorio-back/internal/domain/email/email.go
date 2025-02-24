@@ -13,7 +13,7 @@ import (
 )
 
 type EmailS interface {
-	SendEmail(ctx context.Context, dd *model.DestinataryData) (bool, error)
+	SendEmail(ctx context.Context, dd model.DestinataryData) (bool, error)
 	ConfirmAccount(ctx context.Context, cr models.ConfirmRequest) (bool, error)
 }
 
@@ -41,7 +41,7 @@ func LoadTemplate(filePath string) (*template.Template, error) {
 	return template, nil
 }
 
-func (e *EmailService) SendEmail(ctx context.Context, dd *model.DestinataryData) (bool, error) {
+func (e *EmailService) SendEmail(ctx context.Context, dd model.DestinataryData) (bool, error) {
 	tmpl, err := LoadTemplate("./plantillaConfirmacion.html")
 	if err != nil {
 		return false, fmt.Errorf("error loading template: %w", err)
