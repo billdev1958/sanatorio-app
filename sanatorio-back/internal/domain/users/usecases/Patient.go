@@ -23,8 +23,8 @@ type usecase struct {
 	email email.EmailS
 }
 
-func NewUsecase(repo user.Repository) user.Usecase {
-	return &usecase{repo: repo}
+func NewUsecase(repo user.Repository, email email.EmailS) user.Usecase {
+	return &usecase{repo: repo, email: email}
 }
 
 func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.UserData, error) {
