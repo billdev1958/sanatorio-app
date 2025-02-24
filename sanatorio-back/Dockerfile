@@ -1,4 +1,4 @@
-FROM golang:1.23.0 AS builder
+FROM golang:1.24.0 AS builder
 
 # Establecer el directorio de trabajo dentro del contenedor
 WORKDIR /app
