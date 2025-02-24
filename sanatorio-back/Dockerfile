@@ -24,9 +24,9 @@ WORKDIR /app
 # Copiar el binario desde la etapa de construcción
 COPY --from=builder /app/sanatorio-back /app/sanatorio-back
 
-COPY email/plantillaConfirmacion.html email/
-COPY email/logo.png email/
-COPY email/logo_cms.png email/
+COPY internal/domain/email/plantillaConfirmacion.html email/
+COPY internal/domain/email/logo.png email/
+COPY internal/domain/email/logo_cms.png email/
 
 COPY .env .env
 
