@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,8 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			height: 100vh;
+			min-height: 100vh;
+			padding: 20px;
 		}
 
 		.container {
@@ -29,20 +30,13 @@
 			text-align: center;
 			padding-bottom: 10px;
 			border-bottom: 2px solid #9C8414;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
 		}
 
 		.header-top {
 			display: flex;
-			justify-content: space-between;
 			align-items: center;
 			width: 100%;
-		}
-
-		.header img {
-			height: 50px;
+			justify-content: space-between;
 		}
 
 		.header-title {
@@ -50,12 +44,14 @@
 			font-size: 18px;
 			font-weight: bold;
 			text-align: center;
+			flex-grow: 1;
 		}
 
 		.header-subtitle {
 			font-size: 14px;
 			color: #555;
 			margin-top: 5px;
+			text-align: center;
 		}
 
 		.main-title {
@@ -101,7 +97,8 @@
 		}
 
 		.extra-info ul {
-			padding-left: 20px;
+			padding-left: 25px;
+			margin: 10px 0;
 		}
 
 		.extra-info li {
@@ -124,6 +121,31 @@
 			font-weight: bold;
 		}
 
+		/* 🔹 Media query para pantallas pequeñas */
+		@media (max-width: 480px) {
+			.header-top {
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.header img {
+				height: 40px;
+				margin-bottom: 5px;
+			}
+
+			.confirm-button {
+				width: 100%;
+				padding: 12px;
+			}
+
+			.welcome-text, .extra-info {
+				font-size: 13px;
+			}
+
+			.extra-info ul {
+				padding-left: 20px;
+			}
+		}
 	</style>
 </head>
 <body>
@@ -133,9 +155,15 @@
 		<!-- Header -->
 		<div class="header">
 			<div class="header-top">
-				<img src="./logo.png" alt="Logo Izquierdo">
+				<!-- Logo 1: Protegido contra inversión en modo oscuro -->
+				<div style="background-color: white; padding: 5px; display: inline-block;">
+					<img src="cid:{{.Logo1CID}}" alt="Logo Izquierdo" style="display: block;">
+				</div>
+
 				<div class="header-title">UNIVERSIDAD AUTÓNOMA DEL ESTADO DE MÉXICO</div>
-				<img src="./logo_cms.png" alt="Logo Derecho">
+
+				<!-- Logo 2: No se toca -->
+				<img src="cid:{{.Logo2CID}}" alt="Logo Derecho">
 			</div>
 			<div class="header-subtitle">CLÍNICA MULTIDISCIPLINARIA DE SALUD</div>
 		</div>
