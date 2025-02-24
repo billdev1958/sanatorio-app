@@ -54,7 +54,7 @@ func (e *EmailService) SendEmail(ctx context.Context, dd *model.DestinataryData)
 	dd.LinkConfirmacion = fmt.Sprintf("https://cms.ax01.dev/v1/patient/confirm/%s", dd.Token)
 
 	// 🔹 Cargar plantilla HTML
-	tmpl, err := LoadTemplate("./plantillaConfirmacion.html")
+	tmpl, err := LoadTemplate("/app/email/plantillaConfirmacion.html")
 	if err != nil {
 		return false, fmt.Errorf("error cargando plantilla: %w", err)
 	}
@@ -68,8 +68,8 @@ func (e *EmailService) SendEmail(ctx context.Context, dd *model.DestinataryData)
 	m.To(dd.Email)
 	m.Subject("Confirmación de cuenta")
 
-	m.EmbedFile("./logo.png")
-	m.EmbedFile("./logo_cms.png")
+	m.EmbedFile("/app/email/logo.png")
+	m.EmbedFile("/app/email/logo_cms.png")
 
 	// Asignar manualmente los CIDs en la plantilla
 	dd.Logo1CID = "cid:logo.png"
