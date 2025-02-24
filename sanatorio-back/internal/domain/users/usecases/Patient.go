@@ -7,16 +7,20 @@ import (
 	"math/rand"
 	"sanatorioApp/internal/domain/auth"
 	"sanatorioApp/internal/domain/catalogs"
+	"sanatorioApp/internal/domain/email"
 	user "sanatorioApp/internal/domain/users"
 	"sanatorioApp/internal/domain/users/entities"
 	"sanatorioApp/internal/domain/users/http/models"
 	password "sanatorioApp/pkg/pass"
 
+	model "sanatorioApp/internal/domain/email/models"
+
 	"github.com/google/uuid"
 )
 
 type usecase struct {
-	repo user.Repository
+	repo  user.Repository
+	email email.EmailS
 }
 
 func NewUsecase(repo user.Repository) user.Usecase {
@@ -68,6 +72,23 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 	patientResponse, err := u.repo.RegisterPatientTransaction(ctx, registerAccount, registerPatient)
 	if err != nil {
 		return models.UserData{}, fmt.Errorf("failed to register patient: %w", err)
+	}
+
+	token, err := auth.GenerateJWTConfirmation(registerAccount.ID)
+	if err != nil {
+		return models.UserData{}, fmt.Errorf("error al generar el token: %w", err)
+	}
+
+	fullName := fmt.Sprintf(registerPatient.FirstName, registerPatient.LastName1, registerPatient.LastName2)
+
+	dd := model.DestinataryData{
+		FullName: fullName,
+		Email:    registerAccount.Email,
+		Token:    token}
+
+	if _, err := u.email.SendEmail(ctx, &dd); err != nil {
+		log.Printf("Error al enviar el correo a %s: %v", dd.Email, err)
+		return models.UserData{}, err
 	}
 
 	// Retornar los datos del paciente registrado
