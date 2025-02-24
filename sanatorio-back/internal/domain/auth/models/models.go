@@ -6,3 +6,8 @@ type CheckPermission struct {
 	AccountID  uuid.UUID
 	Permission int
 }
+
+type EmailConfirmation struct {
+	FullName string
+	Email    string
+}

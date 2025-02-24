@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Confirmación de Cuenta</title>
+	<style>
+		body {
+			margin: 0;
+			font-family: Arial, sans-serif;
+			background-color: #f4f4f4;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+		}
+
+		.container {
+			width: 100%;
+			max-width: 600px;
+			background-color: white;
+			padding: 20px;
+			box-sizing: border-box;
+			border-radius: 5px;
+		}
+
+		.header {
+			width: 100%;
+			text-align: center;
+			padding-bottom: 10px;
+			border-bottom: 2px solid #9C8414;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.header-top {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			width: 100%;
+		}
+
+		.header img {
+			height: 50px;
+		}
+
+		.header-title {
+			color: #284C34;
+			font-size: 18px;
+			font-weight: bold;
+			text-align: center;
+		}
+
+		.header-subtitle {
+			font-size: 14px;
+			color: #555;
+			margin-top: 5px;
+		}
+
+		.main-title {
+			margin-top: 20px;
+			font-size: 22px;
+			font-weight: bold;
+			color: #333;
+			text-align: center;
+		}
+
+		.welcome-text {
+			margin-top: 10px;
+			font-size: 14px;
+			color: #555;
+			text-align: left;
+			line-height: 1.5;
+		}
+
+		.confirm-button {
+			display: block;
+			width: 200px;
+			margin: 20px auto;
+			padding: 10px;
+			font-size: 16px;
+			color: white;
+			background-color: #284C34;
+			text-align: center;
+			text-decoration: none;
+			border-radius: 5px;
+			font-weight: bold;
+		}
+
+		.confirm-button:hover {
+			background-color: #1f3a27;
+		}
+
+		.extra-info {
+			margin-top: 20px;
+			font-size: 14px;
+			color: #444;
+			text-align: left;
+			line-height: 1.5;
+		}
+
+		.extra-info ul {
+			padding-left: 20px;
+		}
+
+		.extra-info li {
+			margin-bottom: 5px;
+		}
+
+		/* Footer */
+		.footer {
+			margin-top: 30px;
+			padding-top: 15px;
+			border-top: 1px solid #ccc;
+			text-align: center;
+			font-size: 12px;
+			color: #777;
+		}
+
+		.footer a {
+			color: #284C34;
+			text-decoration: none;
+			font-weight: bold;
+		}
+
+	</style>
+</head>
+<body>
+
+	<!-- Contenedor Principal -->
+	<div class="container">
+		<!-- Header -->
+		<div class="header">
+			<div class="header-top">
+				<img src="./logo.png" alt="Logo Izquierdo">
+				<div class="header-title">UNIVERSIDAD AUTÓNOMA DEL ESTADO DE MÉXICO</div>
+				<img src="./logo_cms.png" alt="Logo Derecho">
+			</div>
+			<div class="header-subtitle">CLÍNICA MULTIDISCIPLINARIA DE SALUD</div>
+		</div>
+
+		<!-- Título principal -->
+		<h1 class="main-title">Confirma tu cuenta</h1>
+
+		<!-- Texto de bienvenida -->
+		<p class="welcome-text">
+			¡Hola! <strong>{{.Nombre}}</strong>, te damos la bienvenida al sistema de citas de la Clínica Multidisciplinaria de Salud.<br>
+			A partir de ahora, podrás gestionar tus visitas de manera rápida y sencilla.<br><br>
+			Para comenzar, confirma tu cuenta dando clic en el siguiente botón:
+		</p>
+
+		<!-- Botón de confirmación -->
+		<a href="{{.LinkConfirmacion}}" class="confirm-button">Confirmar Cuenta</a>
+
+		<!-- Información adicional -->
+		<div class="extra-info">
+			<strong>Con el sistema de citas de la CMS podrás:</strong>
+			<ul>
+				<li>Agendar citas en los diferentes servicios de salud.</li>
+				<li>Recibir recordatorios.</li>
+			</ul>
+			<p>
+				Si no fuiste tú, ignora este correo.<br>
+				Si necesitas ayuda, contáctanos en <a href="mailto:soporte@cms.mx">soporte@cms.mx</a>.
+			</p>
+			<p>
+				Atentamente,<br>
+				<strong>Equipo de Informática de CMS.</strong>
+			</p>
+		</div>
+
+		<!-- Footer -->
+		<div class="footer">
+			Este correo fue enviado por la Clínica Multidisciplinaria de Salud.<br>
+			Para más información, visita nuestro <a href="https://www.cms.mx">sitio web</a>.<br>
+			© 2024 CMS. Todos los derechos reservados.
+		</div>
+	</div>
+
+</body>
+</html>

@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	postgres "sanatorioApp/internal/infraestructure/db"
 	"sanatorioApp/middleware"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -62,6 +63,7 @@ func NewApp() (*App, error) {
 }
 
 func (app *App) Run() error {
+
 	// Configuración del logger para que use JSON en la salida estándar
 	middleware.Logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
@@ -85,6 +87,18 @@ func (app *App) Run() error {
 		Handler: handler,                      // Usa el handler con CORS y logging aplicados
 	}
 
+	// variables para servicio de email
+	smtpUsername := os.Getenv("SMTP_USERNAME")
+	smtpPassword := os.Getenv("SMTP_PASSWORD")
+	smtpHost := os.Getenv("SMTP_HOST")
+	smtpPort := os.Getenv("SMTP_PORT")
+
+	sPort, err := strconv.Atoi(smtpPort)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}
+
 	// Inicia el servicio principal de la aplicación (base de datos, enrutador, etc.)
 	if err := UserService(context.Background(), app.DB, app.router); err != nil {
 		return fmt.Errorf("failed to start user service: %w", err) // Devuelve un error si no se pudo iniciar el servicio
@@ -100,6 +114,10 @@ func (app *App) Run() error {
 
 	if err := AppointmentService(context.Background(), app.DB, app.router); err != nil {
 		return fmt.Errorf("failed to start appointment service: %w", err) // Devuelve un error si no se pudo iniciar el servicio
+	}
+
+	if err := EmailService(context.Background(), app.router, smtpUsername, smtpPassword, smtpHost, sPort); err != nil {
+		return fmt.Errorf("failed to start user service: %w", err) // Devuelve un error si no se pudo iniciar el servicio
 	}
 
 	// Canal para escuchar señales del sistema (SIGTERM, SIGINT)

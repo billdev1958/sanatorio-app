@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS account (
     email VARCHAR(75) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role_id INT NOT NULL,
+    is_verified BOOLEAN NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     password_change_at TIMESTAMP,
