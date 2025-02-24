@@ -12,11 +12,13 @@ import (
 	"github.com/wneessen/go-mail"
 )
 
+// Interfaz del servicio de email
 type EmailS interface {
-	SendEmail(ctx context.Context, dd model.DestinataryData) (bool, error)
+	SendEmail(ctx context.Context, dd *model.DestinataryData) (bool, error)
 	ConfirmAccount(ctx context.Context, cr models.ConfirmRequest) (bool, error)
 }
 
+// Implementación del servicio de email
 type EmailService struct {
 	Username string
 	Password string
@@ -34,41 +36,51 @@ func NewEmailService(username, password, smtpHost string, smtPort int) *EmailSer
 }
 
 func LoadTemplate(filePath string) (*template.Template, error) {
-	template, err := template.ParseFiles(filePath)
+	tmpl, err := template.ParseFiles(filePath)
 	if err != nil {
 		return nil, err
 	}
-	return template, nil
+	return tmpl, nil
 }
 
-func (e *EmailService) SendEmail(ctx context.Context, dd model.DestinataryData) (bool, error) {
-	tmpl, err := LoadTemplate("./plantillaConfirmacion.html")
-	if err != nil {
-		return false, fmt.Errorf("error loading template: %w", err)
+// Enviar email
+func (e *EmailService) SendEmail(ctx context.Context, dd *model.DestinataryData) (bool, error) {
+	// 🔹 Validar que el email y el token no estén vacíos
+	if dd.Email == "" || dd.Token == "" {
+		return false, fmt.Errorf("❌ Error: `Email` y `Token` son obligatorios para enviar el correo")
 	}
 
-	confirmationURL := fmt.Sprintf("https://cms.ax01.dev/v1/patient/confirm/%s", dd.Token)
+	// 🔹 Asignar URL de confirmación
+	dd.LinkConfirmacion = fmt.Sprintf("https://cms.ax01.dev/v1/patient/confirm/%s", dd.Token)
 
-	dd.LinkConfirmacion = confirmationURL
+	// 🔹 Cargar plantilla HTML
+	tmpl, err := LoadTemplate("./plantillaConfirmacion.html")
+	if err != nil {
+		return false, fmt.Errorf("error cargando plantilla: %w", err)
+	}
 
+	// 🔹 Crear mensaje de correo
 	m := mail.NewMsg()
 	if err := m.From(e.Username); err != nil {
-		return false, fmt.Errorf("failed to set From address: %w", err)
+		return false, fmt.Errorf("falló al asignar remitente: %w", err)
 	}
 
 	m.To(dd.Email)
-	m.Subject("Confirmacion de cuenta")
+	m.Subject("Confirmación de cuenta")
 
 	m.EmbedFile("./logo.png")
 	m.EmbedFile("./logo_cms.png")
 
-	dd.Logo1CID = "logo.png"
-	dd.Logo2CID = "logo_cms.png"
+	// Asignar manualmente los CIDs en la plantilla
+	dd.Logo1CID = "cid:logo.png"
+	dd.Logo2CID = "cid:logo_cms.png"
 
+	// 🔹 Establecer el cuerpo del correo con la plantilla HTML
 	if err := m.SetBodyHTMLTemplate(tmpl, dd); err != nil {
-		return false, fmt.Errorf("error executing template: %w", err)
+		return false, fmt.Errorf("error ejecutando plantilla: %w", err)
 	}
 
+	// 🔹 Configurar cliente SMTP
 	client, err := mail.NewClient(
 		e.SmtpHost,
 		mail.WithPort(e.SmtpPort),
@@ -78,23 +90,26 @@ func (e *EmailService) SendEmail(ctx context.Context, dd model.DestinataryData) 
 		mail.WithTLSPolicy(mail.TLSMandatory),
 	)
 	if err != nil {
-		return false, fmt.Errorf("failed to create mail client: %w", err)
+		return false, fmt.Errorf("falló al crear cliente SMTP: %w", err)
 	}
 
+	// 🔹 Enviar correo
 	if err := client.DialAndSend(m); err != nil {
-		return false, fmt.Errorf("failed to send email: %w", err)
+		return false, fmt.Errorf("falló al enviar el correo: %w", err)
 	}
 
+	log.Printf("📧 Correo enviado con éxito a %s", dd.Email)
 	return true, nil
 }
 
+// Confirmar cuenta a través del token
 func (e *EmailService) ConfirmAccount(ctx context.Context, cr models.ConfirmRequest) (bool, error) {
 	_, err := auth.ValidateJWTConfirmation(cr.Token)
 	if err != nil {
-		log.Printf("Error validando token de confirmación: %v", err)
+		log.Printf("❌ Error validando token de confirmación: %v", err)
 		return false, err
 	}
 
-	log.Println("Cuenta confirmada con éxito")
+	log.Println("✅ Cuenta confirmada con éxito")
 	return true, nil
 }

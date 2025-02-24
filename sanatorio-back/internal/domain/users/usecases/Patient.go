@@ -87,7 +87,7 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 		Email:    registerAccount.Email,
 		Token:    token}
 
-	if _, err := u.email.SendEmail(ctx, dd); err != nil {
+	if _, err := u.email.SendEmail(ctx, &dd); err != nil {
 		log.Printf("Error al enviar el correo a %s: %v", dd.Email, err)
 		return models.UserData{}, err
 	}
