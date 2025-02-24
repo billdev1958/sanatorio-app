@@ -7,10 +7,10 @@ import (
 	v1 "sanatorioApp/internal/domain/email/http"
 )
 
-func EmailService(ctx context.Context, router *http.ServeMux, username, password, smtpHost string, smtpPort int) error {
+func EmailService(ctx context.Context, router *http.ServeMux, username, password, smtpHost string, smtpPort int) (email.EmailS, error) {
 	e := email.NewEmailService(username, password, smtpHost, smtpPort)
 	h := v1.NewHandler(e)
 	h.EmailRoutes(router)
 
-	return nil
+	return e, nil // 🔹 Ahora devuelve `emailService`
 }

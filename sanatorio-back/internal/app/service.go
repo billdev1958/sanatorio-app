@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"net/http"
+	"sanatorioApp/internal/domain/email"
 	v1 "sanatorioApp/internal/domain/users/http"
 	"sanatorioApp/internal/domain/users/repository"
 
@@ -12,11 +13,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func UserService(ctx context.Context, db *pgxpool.Pool, router *http.ServeMux) error {
+func UserService(ctx context.Context, db *pgxpool.Pool, router *http.ServeMux, emailService email.EmailS) error {
 	storage := postgres.NewPgxStorage(db)
 
 	repo := repository.NewUserRepository(storage)
-	uc := usecase.NewUsecase(repo)
+	uc := usecase.NewUsecase(repo, emailService) // 🔹 PASAMOS EL SERVICIO DE EMAIL
+
 	authUc := AuthService(ctx, db)
 
 	h := v1.NewHandler(uc, authUc)

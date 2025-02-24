@@ -99,8 +99,13 @@ func (app *App) Run() error {
 		return err
 	}
 
+	emailService, err := EmailService(context.Background(), app.router, smtpUsername, smtpPassword, smtpHost, sPort)
+	if err != nil {
+		log.Fatalf("❌ Error al iniciar EmailService: %v", err)
+	}
+
 	// Inicia el servicio principal de la aplicación (base de datos, enrutador, etc.)
-	if err := UserService(context.Background(), app.DB, app.router); err != nil {
+	if err := UserService(context.Background(), app.DB, app.router, emailService); err != nil {
 		return fmt.Errorf("failed to start user service: %w", err) // Devuelve un error si no se pudo iniciar el servicio
 	}
 
@@ -114,10 +119,6 @@ func (app *App) Run() error {
 
 	if err := AppointmentService(context.Background(), app.DB, app.router); err != nil {
 		return fmt.Errorf("failed to start appointment service: %w", err) // Devuelve un error si no se pudo iniciar el servicio
-	}
-
-	if err := EmailService(context.Background(), app.router, smtpUsername, smtpPassword, smtpHost, sPort); err != nil {
-		return fmt.Errorf("failed to start user service: %w", err) // Devuelve un error si no se pudo iniciar el servicio
 	}
 
 	// Canal para escuchar señales del sistema (SIGTERM, SIGINT)
