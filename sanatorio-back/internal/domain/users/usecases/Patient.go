@@ -30,7 +30,7 @@ func NewUsecase(repo user.Repository) user.Usecase {
 func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.UserData, error) {
 	log.Printf("Usecase - Received AfiliationID: %d", request.AfiliationID)
 
-	// 🔹 Validar datos de entrada
+	// 🔹 Validar datos de entrada obligatorios
 	if request.Email == "" || request.Password == "" {
 		return models.UserData{}, fmt.Errorf("❌ Error: Email y Password son obligatorios")
 	}
@@ -41,7 +41,13 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 		return models.UserData{}, fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	// 🔹 Crear ID único para la historia clínica del paciente
+	// 🔹 Verificar que `u.repo` no sea nil antes de intentar acceder a él
+	if u.repo == nil {
+		log.Printf("❌ Error: `u.repo` es nil, la capa de repositorio no está inicializada")
+		return models.UserData{}, fmt.Errorf("repository is not initialized")
+	}
+
+	// 🔹 Crear la historia clínica del paciente
 	patientMedicalHistory := patient{
 		FirstName: request.Name,
 		LastName1: request.Lastname1,
@@ -55,7 +61,7 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 		return models.UserData{}, fmt.Errorf("error creating medical history ID: %w", err)
 	}
 
-	// 🔹 Crear la cuenta del usuario
+	// 🔹 Crear cuenta del usuario
 	registerAccount := entities.Account{
 		ID:           uuid.New(), // Generar UUID
 		AfiliationID: request.AfiliationID,
@@ -65,7 +71,7 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 		IsVerified:   false,
 	}
 
-	// 🔹 Crear la entidad de paciente
+	// 🔹 Crear entidad de paciente
 	registerPatient := entities.PatientUser{
 		MedicalHistoryID: medicalHistoryID,
 		FirstName:        request.Name,
@@ -75,11 +81,17 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 		Sex:              request.Sex,
 	}
 
-	// 🔹 Intentar registrar al paciente en la base de datos
+	// 🔹 Registrar paciente en una transacción
 	patientResponse, err := u.repo.RegisterPatientTransaction(ctx, registerAccount, registerPatient)
 	if err != nil {
 		log.Printf("❌ Error registrando paciente: %v", err)
 		return models.UserData{}, fmt.Errorf("failed to register patient: %w", err)
+	}
+
+	// 🔹 Verificar que `registerAccount.ID` no sea `nil`
+	if registerAccount.ID == uuid.Nil {
+		log.Printf("❌ Error: El UUID del paciente no fue generado correctamente")
+		return models.UserData{}, fmt.Errorf("failed to generate valid UUID for patient")
 	}
 
 	// 🔹 Generar token de confirmación
@@ -99,12 +111,13 @@ func (u *usecase) RegisterPatient(ctx context.Context, request models.RegisterPa
 		Token:    token,
 	}
 
-	// 🔹 Enviar email de confirmación
+	// 🔹 Verificar que `u.email` no sea nil antes de intentar enviar el correo
 	if u.email == nil {
 		log.Printf("❌ Error: `u.email` es nil, el servicio de email no está inicializado")
 		return models.UserData{}, fmt.Errorf("email service not initialized")
 	}
 
+	// 🔹 Enviar email de confirmación
 	if _, err := u.email.SendEmail(ctx, &dd); err != nil {
 		log.Printf("❌ Error al enviar el correo a %s: %v", dd.Email, err)
 		return models.UserData{}, fmt.Errorf("error sending confirmation email: %w", err)
