@@ -28,6 +28,7 @@ func (u *usecase) RegisterReceptionist(ctx context.Context, request models.Regis
 		Email:        request.Email,
 		Password:     hashedPassword,
 		Rol:          entities.Receptionist,
+		IsVerified:   true,
 	}
 
 	// Crear la entidad PatientUser con los datos de la solicitud

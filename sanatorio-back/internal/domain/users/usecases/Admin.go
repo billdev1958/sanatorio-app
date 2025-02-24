@@ -27,6 +27,7 @@ func (u *usecase) RegisterAdmin(ctx context.Context, request models.RegisterAdmi
 		Email:        request.Email,
 		Password:     hashedPassword,
 		Rol:          entities.Admin,
+		IsVerified:   true,
 	}
 
 	registerAdmin := entities.AdminUser{

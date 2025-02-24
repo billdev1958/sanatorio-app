@@ -229,9 +229,9 @@ func (storage *PgxStorage) SeedAdminUser(ctx context.Context) (err error) {
 
 	// Insertar cuenta en la tabla account
 	queryAccount := `
-		INSERT INTO account (id, dependency_id, phone, email, password, role_id) 
-		VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err = storage.DbPool.Exec(ctx, queryAccount, accountID, 1, "1234567890", "bilxd1958@gmail.com", hashedPassword, 1) // 1 es el ID del rol de administrador
+		INSERT INTO account (id, dependency_id, phone, email, password, role_id, registerAccount) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	_, err = storage.DbPool.Exec(ctx, queryAccount, accountID, 1, "1234567890", "bilxd1958@gmail.com", hashedPassword, 1, true) // 1 es el ID del rol de administrador
 	if err != nil {
 		return fmt.Errorf("insert account: %w", err)
 	}

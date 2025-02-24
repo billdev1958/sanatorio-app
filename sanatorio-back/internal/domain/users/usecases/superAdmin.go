@@ -28,6 +28,7 @@ func (u *usecase) RegisterSuperAdmin(ctx context.Context, request models.Registe
 		Email:        request.Email,
 		Password:     hashedPassword,
 		Rol:          entities.SuperAdmin,
+		IsVerified:   true,
 	}
 
 	// Crear la entidad PatientUser con los datos de la solicitud
