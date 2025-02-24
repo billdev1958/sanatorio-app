@@ -28,7 +28,7 @@ func GenerateJWTConfirmation(accountID uuid.UUID) (string, error) {
 		return "", err
 	}
 
-	fmt.Println("Token being generated for confirmation:")
+	fmt.Println("Token being generated for confirmation:", token)
 	return tokenString, nil
 }
 
