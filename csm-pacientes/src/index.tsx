@@ -14,6 +14,7 @@ import RegisterOfficeForm from "./Admin/Pages/RegisterOffice";
 import RegisterOfficeScheduleForm from "./Admin/Pages/RegistrarHorarios";
 import RegisterDoctorForm from "./Admin/Pages/RegistrarDoctores";
 import ConsultasHome from "./Citas/Pages/ConsultasHome";
+import ConfirmationPage from "./core/ConfirmationPage";
 
 const root = document.getElementById("root");
 
@@ -24,6 +25,7 @@ render(
         {/* Rutas públicas */}
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
+        <Route path="/confirmation" component={ConfirmationPage} />
 
         {/* Rutas protegidas */}
         <Route path="/" component={() => (
