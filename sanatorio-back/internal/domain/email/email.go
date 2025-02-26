@@ -51,7 +51,7 @@ func (e *EmailService) SendEmail(ctx context.Context, dd *model.DestinataryData)
 	}
 
 	// 🔹 Asignar URL de confirmación
-	dd.LinkConfirmacion = fmt.Sprintf("https://cms.ax01.dev/v1/patient/confirm/%s", dd.Token)
+	dd.LinkConfirmacion = fmt.Sprintf("https://cms.ax01.dev/confirmation/%s", dd.Token)
 
 	// 🔹 Cargar plantilla HTML
 	tmpl, err := LoadTemplate("/app/email/plantillaConfirmacion.html")
