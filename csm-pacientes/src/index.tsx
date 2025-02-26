@@ -25,7 +25,7 @@ render(
         {/* Rutas públicas */}
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
-        <Route path="/confirmation" component={ConfirmationPage} />
+        <Route path="/confirmation/:token" component={ConfirmationPage} />
 
         {/* Rutas protegidas */}
         <Route path="/" component={() => (
