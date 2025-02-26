@@ -2,6 +2,28 @@
 -- Tablas principales
 -- ====================================
 
+CREATE TABLE IF NOT EXISTS medicines (
+    id SERIAL PRIMARY KEY,
+    substance VARCHAR(100),
+    presentation VARCHAR(100),
+    route_administration VARCHAR(100),
+    dose VARCHAR(50),
+    quantity VARCHAR(50),
+    frequency VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS diagnoses (
+    id SERIAL PRIMARY KEY,
+    key VARCHAR(100),
+    diagnosis VARCHAR (250),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+
 -- Tabla de dependencias
 CREATE TABLE IF NOT EXISTS cat_dependencies(
     id SERIAL PRIMARY KEY,
@@ -582,3 +604,11 @@ CREATE TRIGGER tr_validate_appointment
 BEFORE INSERT ON appointment
 FOR EACH ROW
 EXECUTE PROCEDURE validate_appointment();
+
+-- Indices para optimizar consultas
+CREATE INDEX idx_medicines_substance ON medicines(substance);
+CREATE INDEX idx_medicines_presentation ON medicines(presentation);
+CREATE INDEX idx_medicines_created_at ON medicines(created_at);
+
+CREATE INDEX idx_diagnoses_key ON diagnoses(key);
+CREATE INDEX idx_diagnoses_created_at ON diagnoses(created_at);
