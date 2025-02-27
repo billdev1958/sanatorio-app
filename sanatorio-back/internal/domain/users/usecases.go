@@ -17,7 +17,7 @@ type Usecase interface {
 
 	RegisterBeneficiary(ctx context.Context, request models.RegisterBeneficiaryRequest) (message string, err error)
 
-	LoginUser(ctx context.Context, lu models.LoginUser) (models.LoginResponse, error)
+	LoginUser(ctx context.Context, lu models.LoginUser) (models.Response, error)
 	// GET
 
 	GetDoctorByID(ctx context.Context, doctorID int) (models.DoctorRequest, error)

@@ -96,6 +96,7 @@ type LoginResponse struct {
 	AccountID uuid.UUID `json:"account_id"`
 	Role      int       `json:"role"`
 	Token     string    `json:"token"`
+	IsActive  bool      `json:"isActive"`
 }
 
 // Get users
