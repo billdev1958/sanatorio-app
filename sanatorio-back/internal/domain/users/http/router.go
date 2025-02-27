@@ -10,6 +10,8 @@ func (h *handler) UserRoutes(mux *http.ServeMux) {
 	// Public routes
 	mux.Handle("POST /v1/login", http.HandlerFunc(h.LoginUser))
 
+	mux.Handle("POST /v1/confirmation", http.HandlerFunc(h.AccountVerification))
+
 	mux.Handle("POST /v1/patients", http.HandlerFunc(h.RegisterPatient))
 
 	mux.Handle("PUT /v1/patient",

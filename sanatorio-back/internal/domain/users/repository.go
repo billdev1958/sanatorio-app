@@ -3,6 +3,8 @@ package user
 import (
 	"context"
 	"sanatorioApp/internal/domain/users/entities"
+
+	"github.com/google/uuid"
 )
 
 type Repository interface {
@@ -15,6 +17,7 @@ type Repository interface {
 
 type Autenticador interface {
 	GetUserByIdentifier(ctx context.Context, identifier string) (entities.Account, error)
+	AccountVerification(ctx context.Context, accountID uuid.UUID, isValid bool) (bool, error)
 }
 
 type RegisterU interface {
