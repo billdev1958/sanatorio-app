@@ -24,35 +24,46 @@ func NewUsecase(repo appointment.AppointmentRepository, catalogRepo catalogs.Cat
 }
 
 func (u *usecase) GetParamsForAppointments(ctx context.Context, accountID uuid.UUID) (models.Response, error) {
+	// 1. Obtener Pacientes + Beneficiarios
 	patients, err := u.catalogRepo.GetPatientAndBeneficiaries(ctx, accountID)
 	if err != nil {
+		log.Printf("Error al obtener los pacientes para AccountID=%s: %v", accountID, err)
 		return models.Response{
 			Status:  "error",
 			Message: "Error al obtener los pacientes",
 			Errors:  err.Error(),
 		}, nil
 	}
+	// Log de los pacientes
+	log.Printf("GetParamsForAppointments: patients = %+v", patients)
 
-	log.Print(patients)
-
+	// 2. Obtener Servicios
 	services, err := u.catalogRepo.GetServices(ctx)
 	if err != nil {
+		log.Printf("Error al obtener los servicios: %v", err)
 		return models.Response{
 			Status:  "error",
 			Message: "Error al obtener los servicios",
 			Errors:  err.Error(),
 		}, nil
 	}
+	// Log de los servicios
+	log.Printf("GetParamsForAppointments: services = %+v", services)
 
+	// 3. Obtener Turnos
 	shifts, err := u.catalogRepo.GetShifts(ctx)
 	if err != nil {
+		log.Printf("Error al obtener los turnos: %v", err)
 		return models.Response{
 			Status:  "error",
 			Message: "Error al obtener los turnos",
 			Errors:  err.Error(),
 		}, nil
 	}
+	// Log de los turnos
+	log.Printf("GetParamsForAppointments: shifts = %+v", shifts)
 
+	// 4. Construir y retornar la respuesta final
 	return models.Response{
 		Status: "success",
 		Data: map[string]interface{}{
