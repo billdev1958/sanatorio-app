@@ -1,37 +1,68 @@
-  .confirmation-page {
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 30px;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  
-    h1 {
-      margin-bottom: 20px;
-      font-size: 24px;
-      color: #333;
-    }
-  
-    p {
-      margin-bottom: 20px;
-      font-size: 16px;
-    }
-  
-    .confirm-button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #284C34;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-  
-      &:hover {
-        background-color: #284C34, 10%;
-      }
-    }
-  }
-  
+.confirmation-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100vw;
+	height: 100vh;
+	background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+}
+
+.confirmation-page {
+	background-color: white;
+	border-radius: 12px;
+	padding: 40px;
+	width: 100%;
+	max-width: 450px;
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+	text-align: center;
+	animation: fadeIn 0.5s ease-in-out;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+h1 {
+	margin-bottom: 20px;
+	font-size: 26px;
+	color: var(--color-primary);
+	font-weight: bold;
+}
+
+p {
+	margin-bottom: 20px;
+	font-size: 18px;
+	color: #555;
+}
+
+.confirm-button {
+	padding: 12px 24px;
+	font-size: 18px;
+	background-color: var(--color-accent);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.3s ease-in-out;
+	font-weight: bold;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+	&:hover {
+		background-color: var(--color-accent-hover);
+		transform: scale(1.05);
+		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+	}
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}

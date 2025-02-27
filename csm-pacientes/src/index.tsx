@@ -14,12 +14,15 @@ import RegisterOfficeForm from "./Admin/Pages/RegisterOffice";
 import RegisterOfficeScheduleForm from "./Admin/Pages/RegistrarHorarios";
 import RegisterDoctorForm from "./Admin/Pages/RegistrarDoctores";
 import ConsultasHome from "./Citas/Pages/ConsultasHome";
-import ConfirmationPage from "./core/ConfirmationPage";
+import ConfirmationPage from "./core/pages/ConfirmationPage";
+import { MessageProvider } from "./core/domain/messageProvider";
 
 const root = document.getElementById("root");
 
 render(
   () => (
+    <MessageProvider>
+
     <AuthProvider>
       <Router>
         {/* Rutas públicas */}
@@ -98,6 +101,7 @@ render(
         )} />
       </Router>
     </AuthProvider>
+    </MessageProvider>
   ),
   root!
 );
