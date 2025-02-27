@@ -33,6 +33,8 @@ func (u *usecase) GetParamsForAppointments(ctx context.Context, accountID uuid.U
 		}, nil
 	}
 
+	log.Print(patients)
+
 	services, err := u.catalogRepo.GetServices(ctx)
 	if err != nil {
 		return models.Response{
