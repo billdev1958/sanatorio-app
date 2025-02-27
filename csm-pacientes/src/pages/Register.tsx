@@ -4,9 +4,11 @@ import NavBar from '../components/NavBar'; // Importa el NavBar
 import FormInput from '../components/FormInput'; // Importa el componente reutilizable
 import { registerUser } from '../services/RegisterService'; // Importa el servicio de registro
 import { RegisterPatientRequest } from '../models/Login&Registers';
+import Loader from '../core/components/Loader';
+import { useMessage } from '../core/domain/messageProvider'; // Contexto para mensajes de éxito
+import AlertMessage from '../core/components/AlertMessage'; // Nuestro AlertMessage con auto-cierre
 
 const Register = () => {
-  // Creamos señales para manejar el estado de cada campo de formulario
   const [name, setName] = createSignal<string>("");
   const [lastname1, setLastname1] = createSignal<string>("");
   const [lastname2, setLastname2] = createSignal<string>("");
@@ -16,15 +18,18 @@ const Register = () => {
   const [email, setEmail] = createSignal<string>("");
   const [password, setPassword] = createSignal<string>("");
   const [registerError, setRegisterError] = createSignal<string | null>(null);
-  const navigate = useNavigate();
+  const [loading, setLoading] = createSignal(false);
 
-  // Manejador del evento de submit del formulario
+  const navigate = useNavigate();
+  const { setSuccessMessage } = useMessage();
+
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     setRegisterError(null);
+    setLoading(true);
 
     const user: RegisterPatientRequest = {
-      dependency_id: 1, // Puedes ajustar este valor según la afiliación seleccionada
+      dependency_id: 1,
       name: name(),
       lastname1: lastname1(),
       lastname2: lastname2(),
@@ -37,22 +42,33 @@ const Register = () => {
 
     try {
       await registerUser(user);
-      navigate('/login', { replace: true }); // Redirige al usuario al login después del registro exitoso
+      setSuccessMessage("Registro exitoso, por favor inicia sesión.");
+      navigate('/login', { replace: true });
     } catch (error: any) {
       setRegisterError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      {/* Incluimos el NavBar siempre */}
-      <NavBar toggleMenu={() => {}} /> {/* No necesitamos el menú hamburguesa en el registro, por eso la función está vacía */}
+      {loading() && <Loader fullScreen={true} size="60px" />}
+
+      {registerError() && (
+        <AlertMessage
+          type="error"
+          message={registerError()!}
+          onClose={() => setRegisterError(null)}
+        />
+      )}
+
+      <NavBar toggleMenu={() => {}} />
 
       <div class="form-container">
         <div class="form-card">
           <h2>Registrar Usuario</h2>
           <form class="form" onSubmit={handleSubmit}>
-            {/* Afiliación select */}
             <div class="input-group select-wrapper">
               <label for="afiliation">Afiliación</label>
               <select name="afiliation" id="afiliation" required onInput={(e: InputEvent) => setSex((e.target as HTMLSelectElement).value)}>
@@ -65,7 +81,6 @@ const Register = () => {
               </select>
             </div>
 
-            {/* Nombre */}
             <FormInput
               type="text"
               name="name"
@@ -75,7 +90,6 @@ const Register = () => {
               onInput={(e: InputEvent) => setName((e.target as HTMLInputElement).value)}
             />
 
-            {/* Apellido Paterno */}
             <FormInput
               type="text"
               name="lastname1"
@@ -85,7 +99,6 @@ const Register = () => {
               onInput={(e: InputEvent) => setLastname1((e.target as HTMLInputElement).value)}
             />
 
-            {/* Apellido Materno */}
             <FormInput
               type="text"
               name="lastname2"
@@ -95,7 +108,6 @@ const Register = () => {
               onInput={(e: InputEvent) => setLastname2((e.target as HTMLInputElement).value)}
             />
 
-            {/* CURP */}
             <FormInput
               type="text"
               name="curp"
@@ -105,7 +117,6 @@ const Register = () => {
               onInput={(e: InputEvent) => setCurp((e.target as HTMLInputElement).value)}
             />
 
-            {/* Sexo */}
             <div class="input-group select-wrapper">
               <label for="sex">Sexo</label>
               <select name="sex" id="sex" required onInput={(e: InputEvent) => setSex((e.target as HTMLSelectElement).value)}>
@@ -116,7 +127,6 @@ const Register = () => {
               </select>
             </div>
 
-            {/* Teléfono */}
             <FormInput
               type="tel"
               name="phone"
@@ -126,7 +136,6 @@ const Register = () => {
               onInput={(e: InputEvent) => setPhone((e.target as HTMLInputElement).value)}
             />
 
-            {/* Correo Electrónico */}
             <FormInput
               type="email"
               name="email"
@@ -136,7 +145,6 @@ const Register = () => {
               onInput={(e: InputEvent) => setEmail((e.target as HTMLInputElement).value)}
             />
 
-            {/* Contraseña */}
             <FormInput
               type="password"
               name="password"
@@ -149,7 +157,7 @@ const Register = () => {
             <button type="submit" class="form-button">Registrar</button>
           </form>
 
-          {registerError() && <p class="error-message">Error: {registerError()}</p>}
+          {/* Eliminamos el <p class="error-message"> y usamos AlertMessage en su lugar */}
 
           <div class="form-links">
             <p>¿Ya tienes una cuenta? <a href="#login">Iniciar sesión</a></p>

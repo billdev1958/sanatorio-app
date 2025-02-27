@@ -2,7 +2,7 @@ import { Component, createSignal, onMount } from "solid-js";
 import { useParams } from "@solidjs/router";
 
 const ConfirmationPage: Component = () => {
-	const params = useParams(); // Obtener los parámetros de la URL
+	const params = useParams();
 	const [token, setToken] = createSignal<string | null>(null);
 
 	onMount(() => {
@@ -40,13 +40,16 @@ const ConfirmationPage: Component = () => {
 	};
 
 	return (
-		<div class="confirmation-page">
-			<h1>Confirmación de Cuenta</h1>
-			<p>Por favor, confirma tu cuenta haciendo clic en el botón.</p>
-			<button class="confirm-button" onClick={handleConfirm}>
-				Confirmar Cuenta
-			</button>
-		</div>
+            <div class="confirmation-wrapper">
+                <div class="confirmation-page">
+                    <h1>Confirmación de Cuenta</h1>
+                    <p>Por favor, confirma tu cuenta haciendo clic en el botón.</p>
+                    <button class="confirm-button" onClick={handleConfirm}>
+                        Confirmar Cuenta
+                    </button>
+                </div>
+            </div>
+    
 	);
 };
 
