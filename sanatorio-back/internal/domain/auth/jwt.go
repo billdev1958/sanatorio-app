@@ -21,10 +21,11 @@ func init() {
 type Claims struct {
 	AccountID uuid.UUID
 	Role      int
+	IsActive  bool
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(accountID uuid.UUID, role int) (string, error) {
+func GenerateJWT(accountID uuid.UUID, role int, isActive bool) (string, error) {
 	claims := Claims{
 		AccountID: accountID,
 		Role:      role,

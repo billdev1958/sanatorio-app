@@ -7,10 +7,10 @@ import (
 )
 
 func (ur *userRepository) GetUserByIdentifier(ctx context.Context, identifier string) (entities.Account, error) {
-	query := "SELECT id, email, password, role_id FROM account WHERE email = $1" // Incluye role_id
+	query := "SELECT id, email, password, role_id, is_verified FROM account WHERE email = $1" // Incluye role_id
 
 	var account entities.Account
-	err := ur.storage.DbPool.QueryRow(ctx, query, identifier).Scan(&account.ID, &account.Email, &account.Password, &account.Rol)
+	err := ur.storage.DbPool.QueryRow(ctx, query, identifier).Scan(&account.ID, &account.Email, &account.Password, &account.Rol, &account.IsVerified)
 	if err != nil {
 		return account, fmt.Errorf("failed to find user: %w", err)
 	}

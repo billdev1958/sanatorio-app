@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sanatorioApp/internal/domain/auth"
 	"sanatorioApp/internal/domain/users/entities"
@@ -12,35 +11,65 @@ import (
 	"strconv"
 )
 
-func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (models.LoginResponse, error) {
-	// Validar los datos de login
-	err := validation.ValidateLoginData(request.Email, request.Password)
-	if err != nil {
-		return models.LoginResponse{}, fmt.Errorf("validación fallida: %w", err)
+func (u *usecase) LoginUser(ctx context.Context, request models.LoginUser) (models.Response, error) {
+	// 1. Validar los datos de login
+	if err := validation.ValidateLoginData(request.Email, request.Password); err != nil {
+		return models.Response{
+			Status:  "error",
+			Message: "Validación fallida",
+			Errors:  err.Error(),
+		}, nil
 	}
 
-	// Buscar el usuario por identificador (username o email)
+	// 2. Buscar el usuario por identificador (username o email)
 	account, err := u.repo.GetUserByIdentifier(ctx, request.Email)
 	if err != nil {
-		return models.LoginResponse{}, fmt.Errorf("usuario no encontrado: %w", err)
+		return models.Response{
+			Status:  "error",
+			Message: "Usuario no encontrado",
+			Errors:  err.Error(),
+		}, nil
 	}
 
-	// Verificar la contraseña
+	// 3. Verificar si está verificado
+	if !account.IsVerified {
+		return models.Response{
+			Status:  "error",
+			Message: "Usuario no verificado",
+			Errors:  "El usuario debe verificar su cuenta antes de iniciar sesión",
+		}, nil
+	}
+
+	// 4. Verificar la contraseña
 	if !password.CheckPasswordHash(request.Password, account.Password) {
-		return models.LoginResponse{}, errors.New("contraseña incorrecta")
+		return models.Response{
+			Status:  "error",
+			Message: "Contraseña incorrecta",
+			Errors:  "La contraseña proporcionada no coincide",
+		}, nil
 	}
 
-	// Generar el token JWT usando account.ID y account.Rol
-	token, err := auth.GenerateJWT(account.ID, int(account.Rol))
+	// 5. Generar el token JWT usando account.ID y account.Rol
+	token, err := auth.GenerateJWT(account.ID, int(account.Rol), account.IsVerified)
 	if err != nil {
-		return models.LoginResponse{}, fmt.Errorf("error al generar el token: %w", err)
+		return models.Response{
+			Status:  "error",
+			Message: "Error al generar el token",
+			Errors:  err.Error(),
+		}, nil
 	}
 
-	// Crear y devolver la respuesta del login
-	return models.LoginResponse{
-		AccountID: account.ID,       // ID de account
-		Role:      int(account.Rol), // role_id obtenido de account
+	// 6. Crear la respuesta de login y retornarla dentro de Response
+	loginResp := models.LoginResponse{
+		AccountID: account.ID,
+		Role:      int(account.Rol),
 		Token:     token,
+	}
+
+	return models.Response{
+		Status:  "success",
+		Message: "Login exitoso",
+		Data:    loginResp,
 	}, nil
 }
 
