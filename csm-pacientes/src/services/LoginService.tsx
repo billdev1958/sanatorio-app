@@ -14,30 +14,40 @@ export function useLoginService() {
 
     try {
       const response = await axios.post("https://api.ax01.dev/v1/login", user);
-      console.log("Login successful:", response.data);
-
+    
+      console.log("Login response:", response.data);
+    
+      if (response.data.status === "error") {
+        const combinedError = response.data.errors
+          ? `${response.data.message} - ${response.data.errors}`
+          : response.data.message || "Login failed";
+    
+        setLoginError(combinedError);
+        return; 
+      }
+    
       const receivedToken = response.data?.data?.token;
       if (receivedToken) {
-        auth.login(receivedToken); // Usa el método de login del contexto de autenticación
+        auth.login(receivedToken);
       } else {
         throw new Error("Token not found in response");
       }
-
+    
       return response.data;
     } catch (error: any) {
       if (error.response) {
-        setLoginError(error.response.data.message || "Login failed");
+        setLoginError(error.response.data?.message || "Error HTTP desconocido");
       } else {
         setLoginError("Network error, please try again later.");
       }
       console.error("Error during login:", error);
     } finally {
       setIsLoggingIn(false);
-    }
+    }    
   }
 
   function logout() {
-    auth.logout(); // Utiliza el método de logout del contexto de autenticación
+    auth.logout();
     console.log("User logged out");
   }
 
