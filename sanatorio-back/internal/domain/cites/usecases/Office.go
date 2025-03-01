@@ -15,7 +15,7 @@ func (u *usecase) RegisterOffice(ctx context.Context, request models.RegisterOff
 
 	message, err := u.repo.RegisterOffice(ctx, office)
 	if err != nil {
-		return "", fmt.Errorf("failed to register office %w:", err)
+		return "", fmt.Errorf("failed to register office %w: ", err)
 	}
 
 	return message, nil

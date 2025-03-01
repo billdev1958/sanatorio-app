@@ -10,34 +10,30 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: secret
-      POSTGRES_DB: university_db
+      POSTGRES_DB: cms_db
     networks:
       - my_bridge
 
   app:
-    build:
-      context: ./sanatorio-back
-      dockerfile: Dockerfile
+    image: billdev1958/sanatorio-back:1.0
     depends_on:
       - db
     env_file:
       - ./sanatorio-back/.env
     restart: always
     expose:
-      - "8080"  # Exponer solo internamente para el proxy
+      - "8080"
     networks:
       - my_bridge
 
 
   frontend:
-    build:
-      context: ./csm-pacientes
-      dockerfile: Dockerfile
+    image: billdev1958/csm-pacientes:1.0
     depends_on:
       - app
     restart: always
     expose:
-      - "80"  # Exponer en un puerto interno diferente para el proxy
+      - "80"
     networks:
       - my_bridge
 
@@ -50,7 +46,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
-      - "80:80"  # Exponer el puerto 80 al exterior para el acceso HTTP
+      - "80:80"
     restart: always
     networks:
       - my_bridge
