@@ -28,9 +28,6 @@ COPY internal/domain/email/plantillaConfirmacion.html email/
 COPY internal/domain/email/logo.png email/
 COPY internal/domain/email/logo_cms.png email/
 
-COPY .env .env
-
-
 # Exponer el puerto en el que corre tu aplicación (ajusta según tu configuración)
 EXPOSE 8080
 

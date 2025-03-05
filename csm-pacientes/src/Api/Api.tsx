@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://api.ax01.dev/v1',
+    baseURL: 'VITE_BACKEND_HOST',
     headers: {
       'Content-Type': 'application/json',
     },

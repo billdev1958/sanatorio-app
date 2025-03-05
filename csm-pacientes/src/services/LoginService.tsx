@@ -3,6 +3,8 @@ import { createSignal } from "solid-js";
 import { LoginUser } from "../models/Login&Registers";
 import { useAuth } from './AuthContext';
 
+const API_BASE_URL = import.meta.env.VITE_BACKEND_HOST;
+
 export function useLoginService() {
   const [loginError, setLoginError] = createSignal<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = createSignal(false);
@@ -13,7 +15,7 @@ export function useLoginService() {
     setLoginError(null);
 
     try {
-      const response = await axios.post("https://api.ax01.dev/v1/login", user);
+      const response = await axios.post(`${API_BASE_URL}/v1/login`, user);
     
       console.log("Login response:", response.data);
     

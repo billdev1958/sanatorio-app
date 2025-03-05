@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
@@ -28,15 +27,16 @@ type App struct {
 func NewApp() (*App, error) {
 
 	// Cargar las variables de entorno desde el archivo .env
-	err := godotenv.Load()
-	if err != nil {
-		// Si ocurre un error al cargar el archivo .env, se detiene el programa y se imprime el error
-		log.Fatalf("Error loading .env file: %v", err)
+	port := os.Getenv("BACKEND_PORT")
+	if port == "" {
+		log.Fatalf("BACKEND_PORT no está definido en el entorno")
+	} else {
+		log.Printf("BACKEND_PORT está definido como: %s", port)
 	}
 
 	// Obtener la DSN (cadena de conexión de la base de datos) y el puerto desde las variables de entorno
 	dsn := os.Getenv("DSN")
-	port := os.Getenv("PORT")
+	port = os.Getenv("BACKEND_PORT")
 
 	// Configurar la base de datos utilizando la cadena DSN
 	db, err := setupDatabase(dsn)
