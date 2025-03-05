@@ -1,21 +1,55 @@
-# Makefile
-CONTAINER_NAME=sanatorio-app-db-1
-USER=root
-DATABASE=university_db
+# Variables de entorno
+COMPOSE_DEV = docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.override.yml
+COMPOSE_PROD = docker compose --env-file .env.production -f docker-compose.yml -f docker-compose-production.yml
 
-# Función para obtener el ID del contenedor basado en el nombre
-CONTAINER_ID=$(shell docker ps -qf "name=$(CONTAINER_NAME)")
+# Construir la imagen de desarrollo y ejecutar con hot reload
+dev:
+	@echo "🚀 Iniciando entorno de desarrollo..."
+	$(COMPOSE_DEV) up -d --build
 
-# Entra a la base de datos para revisar registros
-showdb:
-	@docker exec -it $(CONTAINER_ID) psql -U $(USER) -d $(DATABASE)
+# Detener y eliminar los contenedores de desarrollo
+dev-down:
+	@echo "🛑 Deteniendo entorno de desarrollo..."
+	$(COMPOSE_DEV) down
 
-dockeri:
-	@sudo dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+# Construir la imagen de producción y ejecutar
+prod:
+	@echo "🚀 Iniciando entorno de producción..."
+	$(COMPOSE_PROD) up -d --build
 
-cloud:
-	@curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && 
+# Detener y eliminar los contenedores de producción
+prod-down:
+	@echo "🛑 Deteniendo entorno de producción..."
+	$(COMPOSE_PROD) down
 
-	@sudo dpkg -i cloudflared.deb && 
+# Ver los logs del backend en desarrollo
+logs-dev:
+	@echo "📜 Mostrando logs del backend en desarrollo..."
+	docker logs -f sanatorio-app-app-1
 
-	@sudo cloudflared service install eyJhIjoiMTQzYmNhMmRjZTk4NzA5MDk3ZTZmNjU4MmY5YjIzZGYiLCJ0IjoiMDlhMjQxMzItOTZhMi00NjFkLTliMTctZDJkZTcyYzkxYzU4IiwicyI6IlltSmhZVGhoWlRNdE0yTmtZUzAwWmpOaUxUaGxZakV0TkdRNE9UUTNZMlEwT1dKayJ9
+# Ver los logs del backend en producción
+logs-prod:
+	@echo "📜 Mostrando logs del backend en producción..."
+	docker logs -f sanatorio-app-app-1
+
+# Construir manualmente la imagen de producción y subirla a Docker Hub
+build-prod:
+	@echo "🐳 Construyendo imagen de producción..."
+	docker build -t billdev1958/sanatorio-back:1.0 -f sanatorio-back/Dockerfile sanatorio-back/
+	@echo "🚀 Pushing a Docker Hub..."
+	docker push billdev1958/sanatorio-back:1.0
+
+# Construir la imagen de desarrollo localmente
+build-dev:
+	@echo "🐳 Construyendo imagen de desarrollo..."
+	docker build -t billdev1958/sanatorio-back:dev -f sanatorio-back/Dockerfile.dev sanatorio-back/
+
+# Ver las imágenes de Docker
+images:
+	@echo "🔍 Listando imágenes de Docker..."
+	docker images
+
+# Limpiar imágenes y contenedores no utilizados
+clean:
+	@echo "🧹 Limpiando contenedores, volúmenes e imágenes sin usar..."
+	docker system prune -af

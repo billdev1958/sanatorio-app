@@ -6,14 +6,16 @@ services:
       - "5433:5432"
 
   app:
-    image: billdev1958/sanatorio-back:dev
+    build:
+      context: ./sanatorio-back
+      dockerfile: Dockerfile.dev
     env_file:
       - ./.env.dev
     volumes:
-      - ./.env.dev:/app/.env:ro
+      - ./sanatorio-back:/app
+      - /app/tmp 
     ports:
       - "8080:8080"
-
 
   frontend:
     image: node:20

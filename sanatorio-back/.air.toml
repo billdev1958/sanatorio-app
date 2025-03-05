@@ -1,0 +1,13 @@
+# Carpeta raíz del proyecto
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  bin = "./tmp/main"  # Ruta del binario generado
+  cmd = "go build -o ./tmp/main ./cmd/main.go"  # Asegúrate de que la ruta sea correcta
+  include_ext = ["go"]  # Archivos a observar
+  exclude_dir = ["tmp", "vendor", "node_modules"]  # Ignorar carpetas innecesarias
+
+[run]
+  cmd = "./tmp/main"  # Ejecutar el binario compilado
+
