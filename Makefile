@@ -1,5 +1,5 @@
 # Variables de entorno
-COMPOSE_DEV = docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.override.yml
+#COMPOSE_DEV = docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.override.yml
 COMPOSE_PROD = docker compose --env-file .env.production -f docker-compose.yml -f docker-compose-production.yml
 
 # Construir la imagen de desarrollo y ejecutar con hot reload
