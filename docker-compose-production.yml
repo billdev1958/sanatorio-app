@@ -52,6 +52,9 @@ services:
       - ./nginx.conf.template:/etc/nginx/nginx.conf.template:ro
       - ./.env.production:/etc/nginx/.env:ro
       - ./entrypoint.sh:/docker-entrypoint.d/99-entrypoint.sh:ro
+    environment:
+      - VITE_BACKEND_HOST=${VITE_BACKEND_HOST}
+      - VITE_FRONTEND_HOST=${VITE_FRONTEND_HOST}
 
 volumes:
   db_data:
