@@ -40,19 +40,23 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             set -e  # Detener el script en caso de error
-            
-            # Moverse al directorio del proyecto en el servidor
+
+            # 📌 Moverse al directorio del proyecto
             cd /home/bill/sanatorio-app
 
-            # Asegurar que docker-compose-production.yml siempre use la versión fija
+            # 📌 Asegurar que tenemos los últimos cambios del código
+            git reset --hard HEAD  # Descarta cualquier cambio local
+            git pull origin main  # Obtiene los últimos cambios del repositorio
+
+            # 📌 Actualizar las imágenes en docker-compose-production.yml
             sed -i 's|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:1.0|' docker-compose-production.yml
             sed -i 's|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:1.0|' docker-compose-production.yml
 
-            # Descargar las nuevas imágenes
+            # 📌 Descargar las nuevas imágenes
             docker compose pull
 
-            # Usar make para iniciar el entorno de producción
-            make prod
+            # Levantar los contenedores sin `Makefile`
+            docker compose --env-file .env.production -f docker-compose.yml -f docker-compose-production.yml up -d --build
 
-            # Limpiar imágenes antiguas y archivos innecesarios
+            # 📌 Limpiar imágenes antiguas y archivos innecesarios
             docker system prune -f
