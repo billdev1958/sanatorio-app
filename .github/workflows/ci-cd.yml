@@ -20,15 +20,13 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
         run: |
-          # Backend - Forzar reconstrucción sin caché
-          docker build --no-cache -t $DOCKER_USER/sanatorio-back:1.0 -t $DOCKER_USER/sanatorio-back:latest ./sanatorio-back
+          # Backend - Mantener la versión fija
+          docker build --no-cache -t $DOCKER_USER/sanatorio-back:1.0 ./sanatorio-back
           docker push $DOCKER_USER/sanatorio-back:1.0
-          docker push $DOCKER_USER/sanatorio-back:latest
 
-          # Frontend - Forzar reconstrucción sin caché
-          docker build --no-cache -t $DOCKER_USER/csm-pacientes:1.0 -t $DOCKER_USER/csm-pacientes:latest ./csm-pacientes
+          # Frontend - Mantener la versión fija
+          docker build --no-cache -t $DOCKER_USER/csm-pacientes:1.0 ./csm-pacientes
           docker push $DOCKER_USER/csm-pacientes:1.0
-          docker push $DOCKER_USER/csm-pacientes:latest
 
   deploy:
     needs: build
@@ -46,9 +44,9 @@ jobs:
             # Moverse al directorio del proyecto en el servidor
             cd /home/bill/sanatorio-app
 
-            # Actualizar las etiquetas en docker-compose.yml para usar la nueva versión
-            sed -i 's|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:${{ github.run_number }}|' docker-compose-production.yml
-            sed -i 's|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:${{ github.run_number }}|' docker-compose-production.yml
+            # Asegurar que docker-compose-production.yml siempre use la versión fija
+            sed -i 's|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:1.0|' docker-compose-production.yml
+            sed -i 's|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:1.0|' docker-compose-production.yml
 
             # Descargar las nuevas imágenes
             docker compose pull
