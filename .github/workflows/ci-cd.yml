@@ -44,7 +44,7 @@ jobs:
             set -e  # Detener el script en caso de error
             
             # Moverse al directorio del proyecto en el servidor
-            cd /ruta/de/tu/proyecto
+            cd /home/bill/sanatorio-app
 
             # Actualizar las etiquetas en docker-compose.yml para usar la nueva versión
             sed -i 's|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:${{ github.run_number }}|' docker-compose.yml
