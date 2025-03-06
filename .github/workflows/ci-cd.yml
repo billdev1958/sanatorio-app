@@ -52,9 +52,9 @@ jobs:
 
             # Descargar las nuevas imágenes
             docker compose pull
-
-            # Reiniciar los contenedores con las nuevas imágenes
-            docker compose up -d --remove-orphans
+            
+            # Usar make para iniciar el entorno de producción
+            make prod
 
             # Limpiar imágenes antiguas y archivos innecesarios
             docker system prune -f
