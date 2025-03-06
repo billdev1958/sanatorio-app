@@ -56,7 +56,7 @@ jobs:
             docker compose pull
 
             # Levantar los contenedores sin `Makefile`
-            docker compose --env-file .env.production -f docker-compose.yml -f docker-compose-production.yml up -d --build
+            make prod
 
             # 📌 Limpiar imágenes antiguas y archivos innecesarios
             docker system prune -f
