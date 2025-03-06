@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 import { LoginUser } from "../models/Login&Registers";
 import { useAuth } from "./AuthContext";
-import api from "./Api";
+import api from "../Api/Api";
 
 export function useLoginService() {
 	const [loginError, setLoginError] = createSignal<string | null>(null);

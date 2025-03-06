@@ -1,6 +1,6 @@
-import api from './Api';
 import { RegisterBeneficiaryRequest, RegisterPatientRequest } from '../models/Login&Registers';
 import { ScheduleAppointment } from '../models/Horarios';
+import api from '../Api/Api';
 // import { useAuth } from './AuthContext';
 
 
