@@ -47,12 +47,12 @@ jobs:
             cd /home/bill/sanatorio-app
 
             # Actualizar las etiquetas en docker-compose.yml para usar la nueva versión
-            sed -i 's|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:${{ github.run_number }}|' docker-compose.yml
-            sed -i 's|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:${{ github.run_number }}|' docker-compose.yml
+            sed -i 's|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:${{ github.run_number }}|' docker-compose-production.yml
+            sed -i 's|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:${{ github.run_number }}|' docker-compose-production.yml
 
             # Descargar las nuevas imágenes
             docker compose pull
-            
+
             # Usar make para iniciar el entorno de producción
             make prod
 
