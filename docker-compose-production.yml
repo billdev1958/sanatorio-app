@@ -37,6 +37,8 @@ services:
       - my_bridge
     env_file:
       - .env.production
+    environment:
+      - VITE_BACKEND_HOST=${VITE_BACKEND_HOST}
 
   proxy:
     image: nginx:latest
