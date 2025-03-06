@@ -20,14 +20,14 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
         run: |
-          # Backend
-          docker build -t $DOCKER_USER/sanatorio-back:${{ github.run_number }} -t $DOCKER_USER/sanatorio-back:latest ./sanatorio-back
-          docker push $DOCKER_USER/sanatorio-back:${{ github.run_number }}
+          # Backend - Forzar reconstrucción sin caché
+          docker build --no-cache -t $DOCKER_USER/sanatorio-back:1.0 -t $DOCKER_USER/sanatorio-back:latest ./sanatorio-back
+          docker push $DOCKER_USER/sanatorio-back:1.0
           docker push $DOCKER_USER/sanatorio-back:latest
 
-          # Frontend
-          docker build -t $DOCKER_USER/csm-pacientes:${{ github.run_number }} -t $DOCKER_USER/csm-pacientes:latest ./csm-pacientes
-          docker push $DOCKER_USER/csm-pacientes:${{ github.run_number }}
+          # Frontend - Forzar reconstrucción sin caché
+          docker build --no-cache -t $DOCKER_USER/csm-pacientes:1.0 -t $DOCKER_USER/csm-pacientes:latest ./csm-pacientes
+          docker push $DOCKER_USER/csm-pacientes:1.0
           docker push $DOCKER_USER/csm-pacientes:latest
 
   deploy:
