@@ -1,7 +1,14 @@
 import axios from 'axios';
 
+// Production
+const FRONTEND_HOST:string = "https://api.ax01.dev/v1"
+
+// Dev
+// const FRONTEND_HOST = "http://localhost:8080"
+
+
 const api = axios.create({
-    baseURL: 'VITE_BACKEND_HOST',
+    baseURL: FRONTEND_HOST,
     headers: {
       'Content-Type': 'application/json',
     },
