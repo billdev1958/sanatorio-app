@@ -13,21 +13,25 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Login en Docker Hub
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-        run: echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+        run: |
+          echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
 
       - name: Construir y subir imágenes a Docker Hub
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
         run: |
-          docker build -t $DOCKER_USER/sanatorio-back:${{ github.run_number }} ./sanatorio-back
+          # Backend
+          docker build -t $DOCKER_USER/sanatorio-back:${{ github.run_number }} -t $DOCKER_USER/sanatorio-back:latest ./sanatorio-back
           docker push $DOCKER_USER/sanatorio-back:${{ github.run_number }}
+          docker push $DOCKER_USER/sanatorio-back:latest
 
-          docker build -t $DOCKER_USER/csm-pacientes:${{ github.run_number }} ./csm-pacientes
+          # Frontend
+          docker build -t $DOCKER_USER/csm-pacientes:${{ github.run_number }} -t $DOCKER_USER/csm-pacientes:latest ./csm-pacientes
           docker push $DOCKER_USER/csm-pacientes:${{ github.run_number }}
+          docker push $DOCKER_USER/csm-pacientes:latest
 
   deploy:
-    needs: build  # Solo se ejecuta si el job "build" fue exitoso
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Desplegar en el servidor vía SSH
@@ -37,9 +41,20 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            set -e  # Detener el script en caso de error
+            
+            # Moverse al directorio del proyecto en el servidor
             cd /ruta/de/tu/proyecto
-            sed -i 's/:.*$/:${{ github.run_number }}/g' docker-compose.yml
-            docker compose pull
-            docker compose up -d --remove-orphans
-            docker image prune -f
 
+            # Actualizar las etiquetas en docker-compose.yml para usar la nueva versión
+            sed -i 's|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:${{ github.run_number }}|' docker-compose.yml
+            sed -i 's|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:${{ github.run_number }}|' docker-compose.yml
+
+            # Descargar las nuevas imágenes
+            docker compose pull
+
+            # Reiniciar los contenedores con las nuevas imágenes
+            docker compose up -d --remove-orphans
+
+            # Limpiar imágenes antiguas y archivos innecesarios
+            docker system prune -f
