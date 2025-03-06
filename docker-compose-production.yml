@@ -13,7 +13,7 @@ services:
       - my_bridge
 
   app:
-    image: billdev1958/sanatorio-back:1.0
+    image: billdev1958/sanatorio-back:latest
     depends_on:
       - db
     restart: always
@@ -27,7 +27,7 @@ services:
       - ./.env.production:/app/.env:ro
 
   frontend:
-    image: billdev1958/csm-pacientes:1.0
+    image: billdev1958/csm-pacientes:latest
     depends_on:
       - app
     restart: always
