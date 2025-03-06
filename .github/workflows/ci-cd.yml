@@ -29,7 +29,7 @@ jobs:
           docker build -t $DOCKER_USER/csm-pacientes:${{ github.run_number }} -t $DOCKER_USER/csm-pacientes:latest ./csm-pacientes
           docker push $DOCKER_USER/csm-pacientes:${{ github.run_number }}
           docker push $DOCKER_USER/csm-pacientes:latest
-  
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -45,39 +45,16 @@ jobs:
             
             # Moverse al directorio del proyecto en el servidor
             cd /home/bill/sanatorio-app
-  
-            # Mostrar archivos en el servidor antes de ejecutar cualquier comando
-            echo "📂 Archivos en el servidor:"
-            ls -lah /home/bill/sanatorio-app/
-  
-            # Verificar si .env.dev sigue existiendo
-            if [ -f .env.dev ]; then
-              echo "⚠️ Advertencia: .env.dev aún existe. Eliminándolo..."
-              rm .env.dev
-            fi
-  
-            # Mostrar contenido del Makefile para ver qué variables usa
-            echo "📜 Contenido del Makefile:"
-            cat Makefile
-  
-            # Mostrar contenido del docker-compose-production.yml
-            echo "📜 Contenido del docker-compose-production.yml:"
-            cat docker-compose-production.yml
-  
-            # Actualizar las etiquetas en docker-compose-production.yml para usar la nueva versión
+
+            # Actualizar las etiquetas en docker-compose.yml para usar la nueva versión
             sed -i 's|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:${{ github.run_number }}|' docker-compose-production.yml
             sed -i 's|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:${{ github.run_number }}|' docker-compose-production.yml
-  
+
             # Descargar las nuevas imágenes
             docker compose pull
-  
-            # Mostrar qué entorno está cargando `docker-compose`
-            echo "🛠️ Variables de entorno en uso:"
-            docker compose config | grep -i env
-  
+
             # Usar make para iniciar el entorno de producción
             make prod
-  
+
             # Limpiar imágenes antiguas y archivos innecesarios
             docker system prune -f
-  
