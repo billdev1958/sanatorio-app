@@ -16,7 +16,8 @@ type Usecase interface {
 	RegisterPatient(ctx context.Context, request models.RegisterPatientRequest) (models.UserData, error)
 	AccountVerification(ctx context.Context, token string) (models.Response, error)
 	RegisterBeneficiary(ctx context.Context, request models.RegisterBeneficiaryRequest) (message string, err error)
-
+	SendEmailVerification(ctx context.Context, email string) (string, error)
+	CodeVerification(ctx context.Context, cd models.ConfirmationData) (string, error)
 	LoginUser(ctx context.Context, lu models.LoginUser) (models.Response, error)
 	// GET
 

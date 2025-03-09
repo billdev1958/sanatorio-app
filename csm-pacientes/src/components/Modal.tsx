@@ -1,29 +1,25 @@
 import { createSignal, createEffect, onCleanup } from "solid-js";
+import { sendVerificationEmail, verifyCode } from "../services/RegisterService";
 
 interface ModalProps {
   type: "success" | "error";
   message: string;
+  email: string;
   onClose: () => void;
 }
 
 function Modal(props: ModalProps) {
-  // Contador (60 segundos) para deshabilitar el botón tras el reenvío
   const [counter, setCounter] = createSignal(60);
-  // Bandera para saber si el contador está activo (cuando se presiona el botón de reenvío)
   const [isCounting, setIsCounting] = createSignal(false);
-  // Bandera para mostrar el input solo cuando se haya presionado "Reenviar código"
   const [showInput, setShowInput] = createSignal(false);
-  // Señal para almacenar el código de verificación ingresado por el usuario
   const [verificationCode, setVerificationCode] = createSignal("");
 
-  // Efecto para decrementar el contador cada segundo cuando esté activo
   createEffect(() => {
     let timer: number;
     if (isCounting()) {
       timer = setInterval(() => {
         setCounter((prev) => {
           if (prev <= 1) {
-            // Cuando el contador llega a 0, se reinicia y se habilita el botón nuevamente
             setIsCounting(false);
             clearInterval(timer);
             return 60;
@@ -35,20 +31,29 @@ function Modal(props: ModalProps) {
     onCleanup(() => timer && clearInterval(timer));
   });
 
-  // Handler para reenviar el código; inicia el contador y muestra el input al ejecutarse
-  const handleResend = () => {
+  const handleResend = async () => {
     if (!isCounting()) {
-      // Aquí puedes agregar la lógica para reenviar el código, por ejemplo llamar a una API.
-      console.log("Reenviando código...");
-      setIsCounting(true);
-      setShowInput(true);
+      try {
+        console.log("Reenviando código...");
+        const result = await sendVerificationEmail(props.email);
+        console.log("Código de verificación enviado:", result);
+        setIsCounting(true);
+        setShowInput(true);
+      } catch (error: any) {
+        console.error("Error al reenviar código:", error);
+      }
     }
   };
 
-  // Handler para confirmar el código ingresado
-  const handleConfirm = () => {
-    console.log("Código ingresado:", verificationCode());
-    // Agrega validaciones o envía el código al backend según sea necesario
+  const handleConfirm = async () => {
+    try {
+      const confirmationData = { email: props.email, code: verificationCode() };
+      const result = await verifyCode(confirmationData);
+      console.log("Código verificado:", result);
+      props.onClose();
+    } catch (error: any) {
+      console.error("Error al verificar el código:", error);
+    }
   };
 
   return (

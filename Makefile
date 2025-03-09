@@ -1,11 +1,11 @@
 # Variables de entorno
-#COMPOSE_DEV = docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.override.yml
+COMPOSE_DEV = docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.override.yml
 COMPOSE_PROD = docker compose --env-file .env.production -f docker-compose.yml -f docker-compose-production.yml
 
 # Construir la imagen de desarrollo y ejecutar con hot reload
 dev:
 	@echo "🚀 Iniciando entorno de desarrollo..."
-	$(COMPOSE_DEV) up -d --build
+	$(COMPOSE_DEV) up --build
 
 # Detener y eliminar los contenedores de desarrollo
 dev-down:

@@ -23,3 +23,9 @@ export interface LoginUser {
     sex: string;
   }
   
+
+  export interface ConfirmationData {
+    email: string;
+    code: string;
+  }
+  

@@ -16,6 +16,7 @@ import (
 type EmailS interface {
 	SendEmail(ctx context.Context, dd *model.DestinataryData) (bool, error)
 	ConfirmAccount(ctx context.Context, cr models.ConfirmRequest) (bool, error)
+	ForwardEmail(ctx context.Context, email string, code string) (string, error)
 }
 
 // Implementación del servicio de email
@@ -100,6 +101,55 @@ func (e *EmailService) SendEmail(ctx context.Context, dd *model.DestinataryData)
 
 	log.Printf("📧 Correo enviado con éxito a %s", dd.Email)
 	return true, nil
+}
+
+func (e *EmailService) ForwardEmail(ctx context.Context, email, code string) (string, error) {
+	if email == "" {
+		return "", fmt.Errorf("❌ Error: `Email` y `Token` son obligatorios para enviar el correo")
+	}
+
+	tmpl, err := LoadTemplate("/app/email/plantillaConfirmacionC.html")
+	if err != nil {
+		return "", fmt.Errorf("error cargando plantilla: %w", err)
+	}
+
+	m := mail.NewMsg()
+	if err := m.From(e.Username); err != nil {
+		return "", fmt.Errorf("falló al asignar remitente: %w", err)
+	}
+
+	m.To(email)
+	m.Subject("Confirmación de cuenta")
+
+	m.EmbedFile("/app/email/logo.png")
+	m.EmbedFile("/app/email/logo_cms.png")
+
+	Logo1CID := "logo.png"
+	Logo2CID := "logo_cms.png"
+	dd := []string{Logo1CID, Logo2CID, code, email}
+
+	if err := m.SetBodyHTMLTemplate(tmpl, dd); err != nil {
+		return "", fmt.Errorf("error ejecutando plantilla: %w", err)
+	}
+
+	client, err := mail.NewClient(
+		e.SmtpHost,
+		mail.WithPort(e.SmtpPort),
+		mail.WithSMTPAuth(mail.SMTPAuthPlain),
+		mail.WithUsername(e.Username),
+		mail.WithPassword(e.Password),
+		mail.WithTLSPolicy(mail.TLSMandatory),
+	)
+	if err != nil {
+		return "", fmt.Errorf("falló al crear cliente SMTP: %w", err)
+	}
+
+	if err := client.DialAndSend(m); err != nil {
+		return "", fmt.Errorf("falló al enviar el correo: %w", err)
+	}
+
+	log.Printf("📧 Correo enviado con éxito a %s", email)
+	return "", nil
 }
 
 // Confirmar cuenta a través del token

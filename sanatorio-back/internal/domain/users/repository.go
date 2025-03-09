@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"sanatorioApp/internal/domain/users/entities"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -13,6 +14,7 @@ type Repository interface {
 	GetU
 	UpdateU
 	DeleteU
+	Verification
 }
 
 type Autenticador interface {
@@ -27,6 +29,11 @@ type RegisterU interface {
 	RegisterDoctorTransaction(ctx context.Context, account entities.Account, du entities.DoctorUser) (entities.DoctorUser, error)
 	RegisterPatientTransaction(ctx context.Context, account entities.Account, pu entities.PatientUser) (entities.PatientUser, error)
 	RegisterBeneficiary(ctx context.Context, request entities.BeneficiaryUser) (message string, err error)
+}
+
+type Verification interface {
+	SaveCodeVerification(ctx context.Context, email, code string, expired_at time.Time) error
+	VerifyCode(ctx context.Context, code, email string) (bool, error)
 }
 
 type GetU interface {

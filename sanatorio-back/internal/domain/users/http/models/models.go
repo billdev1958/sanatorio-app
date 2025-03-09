@@ -156,3 +156,8 @@ type CheckPermission struct {
 	RoleID     int
 	Permission int
 }
+
+type ConfirmationData struct {
+	Email string `json:"email"`
+	Code  string `json:"code"`
+}
