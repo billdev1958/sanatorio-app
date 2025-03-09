@@ -7,6 +7,12 @@ WORKDIR /app
 # Instalar Air para hot reload
 RUN go install github.com/air-verse/air@latest
 
+COPY internal/domain/email/plantillaConfirmacion.html email/
+COPY internal/domain/email/plantillaConfirmacionC.html email/
+
+COPY internal/domain/email/logo.png email/
+COPY internal/domain/email/logo_cms.png email/
+
 # Copiar dependencias primero (para aprovechar la caché)
 COPY go.mod go.sum ./
 RUN go mod download

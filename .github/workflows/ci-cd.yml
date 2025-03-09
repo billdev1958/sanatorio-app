@@ -43,6 +43,8 @@ jobs:
 
             # 📌 Moverse al directorio del proyecto
             cd /home/bill/sanatorio-app
+            
+            make prod-reset
 
             # 📌 Asegurar que tenemos los últimos cambios del código
             git reset --hard HEAD  # Descarta cualquier cambio local

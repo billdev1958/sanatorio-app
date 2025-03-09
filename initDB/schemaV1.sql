@@ -428,6 +428,15 @@ CREATE TABLE IF NOT EXISTS incapacity (
     key_code VARCHAR(10) NOT NULL -- clave
 );
 
+CREATE TABLE verification_codes (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(50),
+    code VARCHAR(6) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ====================================
 -- Claves foráneas
 -- ====================================

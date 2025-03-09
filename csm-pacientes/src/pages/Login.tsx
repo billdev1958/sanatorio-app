@@ -17,6 +17,7 @@ const Login = () => {
   const [modalProps, setModalProps] = createSignal({
     type: "error" as "success" | "error",
     message: "",
+    email: "",
     onClose: () => setShowModal(false),
   });
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ const Login = () => {
       setModalProps({
         type: "error",
         message: loginError() ?? "Ocurrió un error inesperado.",
+        email: email(),
         onClose: () => setShowModal(false),
       });
       setShowModal(true);

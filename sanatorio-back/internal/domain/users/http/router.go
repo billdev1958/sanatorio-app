@@ -12,6 +12,10 @@ func (h *handler) UserRoutes(mux *http.ServeMux) {
 
 	mux.Handle("POST /v1/confirmation", http.HandlerFunc(h.AccountVerification))
 
+	mux.Handle("POST /v1/confirmation/forward", http.HandlerFunc(h.ForwardEmail))
+
+	mux.Handle("POST /v1/confirmation/verify", http.HandlerFunc(h.VerifyCodeHandler))
+
 	mux.Handle("POST /v1/patients", http.HandlerFunc(h.RegisterPatient))
 
 	mux.Handle("PUT /v1/patient",

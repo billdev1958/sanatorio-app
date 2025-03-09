@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Confirmación de Cuenta</title>
+	<style>
+		body {
+			margin: 0;
+			font-family: Arial, sans-serif;
+			background-color: #f4f4f4;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			min-height: 100vh;
+			padding: 20px;
+		}
+
+		.container {
+			width: 100%;
+			max-width: 600px;
+			background-color: white;
+			padding: 20px;
+			box-sizing: border-box;
+			border-radius: 5px;
+		}
+
+		.header {
+			width: 100%;
+			text-align: center;
+			padding-bottom: 10px;
+			border-bottom: 2px solid #9C8414;
+		}
+
+		.header-top {
+			display: flex;
+			align-items: center;
+			width: 100%;
+			justify-content: space-between;
+		}
+
+		.header-title {
+			color: #284C34;
+			font-size: 18px;
+			font-weight: bold;
+			text-align: center;
+			flex-grow: 1;
+		}
+
+		.header-subtitle {
+			font-size: 14px;
+			color: #555;
+			margin-top: 5px;
+			text-align: center;
+		}
+
+		.header-logo {
+			max-width: 80px;
+			height: auto;
+			display: block;
+		}
+
+		.main-title {
+			margin-top: 20px;
+			font-size: 22px;
+			font-weight: bold;
+			color: #333;
+			text-align: center;
+		}
+
+		.welcome-text {
+			margin-top: 10px;
+			font-size: 14px;
+			color: #555;
+			text-align: left;
+			line-height: 1.5;
+		}
+
+		.code-box {
+			display: block;
+			width: 300px;
+			margin: 20px auto;
+			padding: 15px;
+			font-size: 20px;
+			color: #284C34;
+			background-color: #f9f9f9;
+			border: 2px dashed #284C34;
+			text-align: center;
+			border-radius: 5px;
+			font-weight: bold;
+		}
+
+		.extra-info {
+			margin-top: 20px;
+			font-size: 14px;
+			color: #444;
+			text-align: left;
+			line-height: 1.5;
+		}
+
+		.extra-info ul {
+			padding-left: 20px;
+			margin: 10px 0;
+			list-style-position: inside;
+		}
+
+		.extra-info li {
+			margin-bottom: 5px;
+		}
+
+		/* Footer */
+		.footer {
+			margin-top: 30px;
+			padding-top: 15px;
+			border-top: 1px solid #ccc;
+			text-align: center;
+			font-size: 12px;
+			color: #777;
+		}
+
+		.footer a {
+			color: #284C34;
+			text-decoration: none;
+			font-weight: bold;
+		}
+
+		/* Media query para pantallas pequeñas */
+		@media (max-width: 480px) {
+			.header-top {
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.header img {
+				max-width: 60px;
+				margin-bottom: 5px;
+			}
+
+			.code-box {
+				width: 100%;
+				padding: 12px;
+			}
+
+			.welcome-text, .extra-info {
+				font-size: 13px;
+			}
+
+			.extra-info ul {
+				padding-left: 10px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<!-- Contenedor Principal -->
+	<div class="container">
+		<!-- Header -->
+		<div class="header">
+			<div class="header-top">
+				<!-- Logo Izquierdo -->
+				<img src="cid:{{.Logo1CID}}" alt="Logo Izquierdo" class="header-logo">
+				<!-- Título -->
+				<div class="header-title">UNIVERSIDAD AUTÓNOMA DEL ESTADO DE MÉXICO</div>
+				<!-- Logo Derecho -->
+				<img src="cid:{{.Logo2CID}}" alt="Logo Derecho" class="header-logo">
+			</div>
+			<div class="header-subtitle">CLÍNICA MULTIDISCIPLINARIA DE SALUD</div>
+		</div>
+
+		<!-- Título principal -->
+		<h1 class="main-title">Confirma tu cuenta</h1>
+
+		<!-- Texto de bienvenida -->
+		<p class="welcome-text">
+			¡Hola! te damos la bienvenida al sistema de citas de la Clínica Multidisciplinaria de Salud.<br>
+			A partir de ahora, podrás gestionar tus visitas de manera rápida y sencilla.<br><br>
+			Para confirmar tu cuenta, utiliza el siguiente código:
+		</p>
+
+		<!-- Recuadro con el código -->
+		<div class="code-box">
+			{{.Code}}
+		</div>
+
+		<!-- Información adicional -->
+		<div class="extra-info">
+			<strong>Con el sistema de citas de la CMS podrás:</strong>
+			<ul>
+				<li>Agendar citas en los diferentes servicios de salud.</li>
+				<li>Recibir recordatorios.</li>
+			</ul>
+			<p>
+				Si no fuiste tú, ignora este correo.<br>
+				Si necesitas ayuda, contáctanos en <a href="mailto:soporte@cms.mx">soporte@cms.mx</a>.
+			</p>
+			<p>
+				Atentamente,<br>
+				<strong>Equipo de Informática de CMS.</strong>
+			</p>
+		</div>
+
+		<!-- Footer -->
+		<div class="footer">
+			Este correo fue enviado por la Clínica Multidisciplinaria de Salud.<br>
+			Para más información, visita nuestro <a href="https://www.cms.mx">sitio web</a>.<br>
+			© 2024 CMS. Todos los derechos reservados.
+		</div>
+	</div>
+</body>
+</html>
