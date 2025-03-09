@@ -22,6 +22,10 @@ prod-down:
 	@echo "🛑 Deteniendo entorno de producción..."
 	$(COMPOSE_PROD) down
 
+prod-reset:
+	@echo "🛑 Deteniendo entorno de producción..."
+	$(COMPOSE_PROD) down -v
+
 # Ver los logs del backend en desarrollo
 logs-dev:
 	@echo "📜 Mostrando logs del backend en desarrollo..."
