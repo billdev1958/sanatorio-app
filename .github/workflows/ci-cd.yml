@@ -12,6 +12,11 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
 
+      - name: Actualizar repositorio (git pull)
+        run: |
+          git reset --hard HEAD
+          git pull origin main
+
       - name: Login en Docker Hub
         run: |
           echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
