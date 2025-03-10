@@ -430,7 +430,7 @@ CREATE TABLE IF NOT EXISTS incapacity (
 
 CREATE TABLE verification_codes (
     id SERIAL PRIMARY KEY,
-    email VARCHAR(50),
+    email VARCHAR(75),
     code VARCHAR(6) NOT NULL,
     expires_at TIMESTAMP NOT NULL,
     used BOOLEAN DEFAULT FALSE,
