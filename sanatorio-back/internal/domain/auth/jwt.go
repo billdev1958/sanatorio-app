@@ -29,6 +29,7 @@ func GenerateJWT(accountID uuid.UUID, role int, isActive bool) (string, error) {
 	claims := Claims{
 		AccountID: accountID,
 		Role:      role,
+		IsActive:  isActive,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(8 * time.Hour)),
 			Issuer:    "sanatorio-app",

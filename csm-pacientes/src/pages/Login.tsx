@@ -1,4 +1,4 @@
-import { createSignal, createEffect, Show } from "solid-js";
+import { createSignal, createEffect, Show, Switch, Match } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import logoCMS from '../assets/logo_cms.png'; 
 import FormInput from '../components/FormInput'; 
@@ -8,6 +8,7 @@ import NavBar from '../components/NavBar';
 import AlertMessage from '../core/components/AlertMessage';
 import { useMessage } from '../core/domain/messageProvider';
 import ModalEmailForward from "../components/modalEmailForward";
+import Modal from "../components/Modal";
 
 const Login = () => {
   const { login, loginError, isLoggingIn, token } = useLoginService(); 
@@ -20,6 +21,7 @@ const Login = () => {
     email: "",
     onClose: () => setShowModal(false),
   });
+  const [isActive, setIsActive] = createSignal<boolean | null>(null);
   const navigate = useNavigate();
   const { successMessage, setSuccessMessage } = useMessage();
 
@@ -31,22 +33,36 @@ const Login = () => {
       password: password(),
     };
 
-    await login(user);
+    const response = await login(user);
 
     if (loginError()) {
       setModalProps({
         type: "error",
         message: loginError() ?? "Ocurrió un error inesperado.",
-        email: email(),
+        email: "",
         onClose: () => setShowModal(false),
       });
       setShowModal(true);
+      return;
+    }
+
+    if (response && response.status === "success") {
+      setIsActive(response.data.isActive);
+      if (response.data.isActive === false) {
+        setModalProps({
+          type: "error",
+          message: "Tu cuenta no está verificada. Por favor, reenvía el código de verificación.",
+          email: email(),
+          onClose: () => setShowModal(false),
+        });
+        setShowModal(true);
+      }
     }
   };
 
   createEffect(() => {
-    if (token()) {
-      console.log("Login successful, navigating to home page...");
+    if (token() && isActive() === true) {
+      console.log("Login exitoso, navegando a la home...");
       navigate("/", { replace: true });
     }
   });
@@ -101,7 +117,18 @@ const Login = () => {
       </div>
 
       <Show when={showModal()}>
-        <ModalEmailForward {...modalProps()} />
+        <Switch>
+          <Match when={modalProps().email !== ""}>
+            <ModalEmailForward {...modalProps()} />
+          </Match>
+          <Match when={true}>
+            <Modal 
+              type={modalProps().type} 
+              message={modalProps().message} 
+              onClose={modalProps().onClose} 
+            />
+          </Match>
+        </Switch>
       </Show>
     </>
   );

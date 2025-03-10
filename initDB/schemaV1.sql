@@ -430,12 +430,16 @@ CREATE TABLE IF NOT EXISTS incapacity (
 
 CREATE TABLE verification_codes (
     id SERIAL PRIMARY KEY,
-    email VARCHAR(50),
+    email VARCHAR(75),
     code VARCHAR(6) NOT NULL,
     expires_at TIMESTAMP NOT NULL,
     used BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE verification_codes
+ADD CONSTRAINT fk_verification_codes_email
+FOREIGN KEY (email) REFERENCES account(email);
 
 -- ====================================
 -- Claves foráneas

@@ -12,10 +12,8 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Actualizar repositorio (git pull)
-        run: |
-          git reset --hard HEAD
-          git pull origin main
+      - name: Mostrar build number
+        run: echo "Build number: ${{ github.run_number }}"
 
       - name: Login en Docker Hub
         run: |
@@ -24,18 +22,23 @@ jobs:
       - name: Construir y subir imágenes a Docker Hub
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          BUILD_TAG: 1.${{ github.run_number }}
         run: |
-          # Backend - Mantener la versión fija
-          docker build --no-cache -t $DOCKER_USER/sanatorio-back:1.0 ./sanatorio-back
-          docker push $DOCKER_USER/sanatorio-back:1.0
+          echo "Tag para build: $BUILD_TAG"
 
-          # Frontend - Mantener la versión fija
-          docker build --no-cache -t $DOCKER_USER/csm-pacientes:1.0 ./csm-pacientes
-          docker push $DOCKER_USER/csm-pacientes:1.0
+          # Construir y subir imagen del Backend
+          docker build --no-cache -t $DOCKER_USER/sanatorio-back:$BUILD_TAG ./sanatorio-back
+          docker push $DOCKER_USER/sanatorio-back:$BUILD_TAG
+
+          # Construir y subir imagen del Frontend
+          docker build --no-cache -t $DOCKER_USER/csm-pacientes:$BUILD_TAG ./csm-pacientes
+          docker push $DOCKER_USER/csm-pacientes:$BUILD_TAG
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    env:
+      BUILD_TAG: 1.${{ github.run_number }}
     steps:
       - name: Desplegar en el servidor vía SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -46,24 +49,23 @@ jobs:
           script: |
             set -e  # Detener el script en caso de error
 
-            # 📌 Moverse al directorio del proyecto
+            # Moverse al directorio del proyecto
             cd /home/bill/sanatorio-app
             
-            # 📌 Asegurar que tenemos los últimos cambios del código
-            git reset --hard HEAD  # Descarta cualquier cambio local
-            git pull origin main  # Obtiene los últimos cambios del repositorio
+            # Actualizar repositorio con los últimos cambios
+            git reset --hard HEAD
+            git pull origin main
 
-            # 📌 Actualizar las imágenes en docker-compose-production.yml
-            sed -i 's|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:1.0|' docker-compose-production.yml
-            sed -i 's|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:1.0|' docker-compose-production.yml
+            # Actualizar las imágenes en docker-compose-production.yml usando el tag serial
+            sed -i "s|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:$BUILD_TAG|" docker-compose-production.yml
+            sed -i "s|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:$BUILD_TAG|" docker-compose-production.yml
 
+            # Reiniciar contenedores para usar las nuevas imágenes
             make prod-reset
 
-            # 📌 Descargar las nuevas imágenes
+            # Descargar las nuevas imágenes y levantar los contenedores
             docker compose pull
-
-            # Levantar los contenedores sin `Makefile`
             make prod
 
-            # 📌 Limpiar imágenes antiguas y archivos innecesarios
+            # Limpiar imágenes y archivos innecesarios
             docker system prune -f
