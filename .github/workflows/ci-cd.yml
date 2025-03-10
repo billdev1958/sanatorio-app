@@ -13,12 +13,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Mostrar build number
-        run: |
-          echo "Build number: ${{ github.run_number }}"
+        run: echo "Build number: ${{ github.run_number }}"
 
       - name: Login en Docker Hub
-        run: |
-          echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
 
       - name: Construir y subir imágenes a Docker Hub
         env:
@@ -26,6 +24,7 @@ jobs:
           BUILD_TAG: "1.${{ github.run_number }}"
         run: |
           echo "Tag para build: $BUILD_TAG"
+          
           # Construir y subir imagen del Backend
           docker build --no-cache -t $DOCKER_USER/sanatorio-back:$BUILD_TAG ./sanatorio-back
           docker push $DOCKER_USER/sanatorio-back:$BUILD_TAG
@@ -46,6 +45,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: BUILD_TAG
           script: |
             set -e  # Detener el script en caso de error
 
@@ -56,13 +56,21 @@ jobs:
             git reset --hard HEAD
             git pull origin main
 
-            # Actualizar las imágenes en docker-compose-production.yml usando el tag serial
-            sed -i "s|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:${BUILD_TAG}|g" docker-compose-production.yml
-            sed -i "s|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:${BUILD_TAG}|g" docker-compose-production.yml
+            # Verificar el tag antes de usarlo
+            echo "Usando tag: ${BUILD_TAG}"
 
-            # Descargar las nuevas imágenes y levantar los contenedores
-            docker compose pull
-            make prod
+            # Actualizar las imágenes en docker-compose-production.yml usando el tag serial
+            sed -i "s|image: billdev1958/sanatorio-back:.*|image: billdev1958/sanatorio-back:${BUILD_TAG}|g" docker-compose-production.yml
+            sed -i "s|image: billdev1958/csm-pacientes:.*|image: billdev1958/csm-pacientes:${BUILD_TAG}|g" docker-compose-production.yml
+
+            # Verificar que el archivo se actualizó correctamente
+            cat docker-compose-production.yml | grep "image: billdev1958"
+
+            # Reiniciar entorno de producción
+            make prod-reset
+
+            # Descargar nuevas imágenes y levantar los contenedores con Makefile
+            make prod BUILD_TAG=${BUILD_TAG}
 
             # Limpiar imágenes y archivos innecesarios
             docker system prune -f
