@@ -437,6 +437,10 @@ CREATE TABLE verification_codes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE verification_codes
+ADD CONSTRAINT fk_verification_codes_email
+FOREIGN KEY (email) REFERENCES account(email);
+
 -- ====================================
 -- Claves foráneas
 -- ====================================
