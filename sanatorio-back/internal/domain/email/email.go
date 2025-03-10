@@ -124,11 +124,21 @@ func (e *EmailService) ForwardEmail(ctx context.Context, email, code string) (st
 	m.EmbedFile("/app/email/logo.png")
 	m.EmbedFile("/app/email/logo_cms.png")
 
-	Logo1CID := "logo.png"
-	Logo2CID := "logo_cms.png"
-	dd := []string{Logo1CID, Logo2CID, code, email}
+	type ForwardTemplateData struct {
+		Logo1CID string
+		Logo2CID string
+		Code     string
+		Email    string
+	}
 
-	if err := m.SetBodyHTMLTemplate(tmpl, dd); err != nil {
+	data := ForwardTemplateData{
+		Logo1CID: "logo.png",
+		Logo2CID: "logo_cms.png",
+		Code:     code,
+		Email:    email,
+	}
+
+	if err := m.SetBodyHTMLTemplate(tmpl, data); err != nil {
 		return "", fmt.Errorf("error ejecutando plantilla: %w", err)
 	}
 
