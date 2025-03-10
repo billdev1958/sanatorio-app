@@ -23,10 +23,9 @@ jobs:
       - name: Construir y subir imágenes a Docker Hub
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          BUILD_TAG: 1.${{ github.run_number }}
+          BUILD_TAG: "1.${{ github.run_number }}"
         run: |
           echo "Tag para build: $BUILD_TAG"
-
           # Construir y subir imagen del Backend
           docker build --no-cache -t $DOCKER_USER/sanatorio-back:$BUILD_TAG ./sanatorio-back
           docker push $DOCKER_USER/sanatorio-back:$BUILD_TAG
@@ -39,7 +38,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      BUILD_TAG: 1.${{ github.run_number }}
+      BUILD_TAG: "1.${{ github.run_number }}"
     steps:
       - name: Desplegar en el servidor vía SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -58,8 +57,8 @@ jobs:
             git pull origin main
 
             # Actualizar las imágenes en docker-compose-production.yml usando el tag serial
-            sed -i "s|^\( *image:\s*\).*billdev1958/sanatorio-back:.*|\1\"billdev1958/sanatorio-back:$BUILD_TAG\"|g" docker-compose-production.yml
-            sed -i "s|^\( *image:\s*\).*billdev1958/csm-pacientes:.*|\1\"billdev1958/csm-pacientes:$BUILD_TAG\"|g" docker-compose-production.yml
+            sed -i "s|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:${BUILD_TAG}|g" docker-compose-production.yml
+            sed -i "s|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:${BUILD_TAG}|g" docker-compose-production.yml
 
             # Reiniciar contenedores para usar las nuevas imágenes
             make prod-reset
