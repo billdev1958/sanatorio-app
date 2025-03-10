@@ -5,9 +5,9 @@ import FormInput from '../components/FormInput';
 import { useLoginService } from '../services/LoginService'; 
 import { LoginUser } from '../models/Login&Registers'; 
 import NavBar from '../components/NavBar';
-import Modal from "../components/Modal";
 import AlertMessage from '../core/components/AlertMessage';
 import { useMessage } from '../core/domain/messageProvider';
+import ModalEmailForward from "../components/modalEmailForward";
 
 const Login = () => {
   const { login, loginError, isLoggingIn, token } = useLoginService(); 
@@ -101,7 +101,7 @@ const Login = () => {
       </div>
 
       <Show when={showModal()}>
-        <Modal {...modalProps()} />
+        <ModalEmailForward {...modalProps()} />
       </Show>
     </>
   );
