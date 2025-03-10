@@ -12,29 +12,23 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Mostrar build number
-        run: echo "Build number: ${{ github.run_number }}"
-
       - name: Login en Docker Hub
-        env:
-          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-        run: echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+        run: |
+          echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
 
       - name: Construir y subir imágenes a Docker Hub
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          BUILD_TAG: "1.${{ github.run_number }}"
         run: |
-          echo "Tag para build: $BUILD_TAG"
+          # Backend
+          docker build -t $DOCKER_USER/sanatorio-back:${{ github.run_number }} -t $DOCKER_USER/sanatorio-back:latest ./sanatorio-back
+          docker push $DOCKER_USER/sanatorio-back:${{ github.run_number }}
+          docker push $DOCKER_USER/sanatorio-back:latest
 
-          # Construir y subir imagen del Backend
-          docker build --no-cache -t "$DOCKER_USER/sanatorio-back:$BUILD_TAG" ./sanatorio-back
-          docker push "$DOCKER_USER/sanatorio-back:$BUILD_TAG"
-
-          # Construir y subir imagen del Frontend
-          docker build --no-cache -t "$DOCKER_USER/csm-pacientes:$BUILD_TAG" ./csm-pacientes
-          docker push "$DOCKER_USER/csm-pacientes:$BUILD_TAG"
+          # Frontend
+          docker build -t $DOCKER_USER/csm-pacientes:${{ github.run_number }} -t $DOCKER_USER/csm-pacientes:latest ./csm-pacientes
+          docker push $DOCKER_USER/csm-pacientes:${{ github.run_number }}
+          docker push $DOCKER_USER/csm-pacientes:latest
 
   deploy:
     needs: build
@@ -42,7 +36,6 @@ jobs:
     steps:
       - name: Desplegar en el servidor vía SSH
         uses: appleboy/ssh-action@v1.0.3
-        envs: BUILD_TAG
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
@@ -50,35 +43,22 @@ jobs:
           script: |
             set -e  # Detener el script en caso de error
 
-            # Moverse al directorio del proyecto
+            # 📌 Moverse al directorio del proyecto
             cd /home/bill/sanatorio-app
             
-            # Actualizar repositorio con los últimos cambios
-            git reset --hard HEAD
-            git pull origin main
+            # 📌 Asegurar que tenemos los últimos cambios del código
+            git reset --hard HEAD  # Descarta cualquier cambio local
+            git pull origin main   # Obtiene los últimos cambios del repositorio
 
-            # Verificar el tag antes de usarlo
-            echo "Usando tag: $BUILD_TAG"
+            # Actualizar las etiquetas en docker-compose-production.yml para usar la nueva versión
+            sed -i 's|billdev1958/sanatorio-back:.*|billdev1958/sanatorio-back:${{ github.run_number }}|' docker-compose-production.yml
+            sed -i 's|billdev1958/csm-pacientes:.*|billdev1958/csm-pacientes:${{ github.run_number }}|' docker-compose-production.yml
 
-            # Asegurar que BUILD_TAG no está vacío
-            if [ -z "$BUILD_TAG" ]; then
-              echo "🚨 ERROR: BUILD_TAG está vacío. Abortando despliegue."
-              exit 1
-            fi
+            # 📌 Descargar las nuevas imágenes
+            docker compose pull
 
-            # Actualizar las imágenes en docker-compose-production.yml usando el tag serial
-            sed -i "s|image: billdev1958/sanatorio-back:.*|image: billdev1958/sanatorio-back:$BUILD_TAG|g" docker-compose-production.yml
-            sed -i "s|image: billdev1958/csm-pacientes:.*|image: billdev1958/csm-pacientes:$BUILD_TAG|g" docker-compose-production.yml
+            # Levantar los contenedores (con Makefile)
+            make prod
 
-            # Verificar que el archivo se actualizó correctamente
-            echo "📝 Verificando actualización de docker-compose-production.yml:"
-            grep "image: billdev1958" docker-compose-production.yml
-
-            # Reiniciar entorno de producción
-            make prod-reset
-
-            # Descargar nuevas imágenes y levantar los contenedores con Makefile
-            make prod BUILD_TAG=$BUILD_TAG
-
-            # Limpiar imágenes y archivos innecesarios
+            # 📌 Limpiar imágenes antiguas y archivos innecesarios
             docker system prune -f
