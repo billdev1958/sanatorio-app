@@ -16,8 +16,10 @@ jobs:
         run: echo "Build number: ${{ github.run_number }}"
 
       - name: Login en Docker Hub
-        run: |
-          echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+        env:
+          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        run: echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
       - name: Construir y subir imágenes a Docker Hub
         env:
@@ -25,14 +27,14 @@ jobs:
           BUILD_TAG: "1.${{ github.run_number }}"
         run: |
           echo "Tag para build: $BUILD_TAG"
-          
+
           # Construir y subir imagen del Backend
-          docker build --no-cache -t $DOCKER_USER/sanatorio-back:$BUILD_TAG ./sanatorio-back
-          docker push $DOCKER_USER/sanatorio-back:$BUILD_TAG
+          docker build --no-cache -t "$DOCKER_USER/sanatorio-back:$BUILD_TAG" ./sanatorio-back
+          docker push "$DOCKER_USER/sanatorio-back:$BUILD_TAG"
 
           # Construir y subir imagen del Frontend
-          docker build --no-cache -t $DOCKER_USER/csm-pacientes:$BUILD_TAG ./csm-pacientes
-          docker push $DOCKER_USER/csm-pacientes:$BUILD_TAG
+          docker build --no-cache -t "$DOCKER_USER/csm-pacientes:$BUILD_TAG" ./csm-pacientes
+          docker push "$DOCKER_USER/csm-pacientes:$BUILD_TAG"
 
   deploy:
     needs: build
