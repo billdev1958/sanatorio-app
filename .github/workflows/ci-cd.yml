@@ -58,8 +58,8 @@ jobs:
             git pull origin main
 
             # Actualizar las imágenes en docker-compose-production.yml usando el tag serial
-            sed -i "s|image: \"billdev1958/sanatorio-back:.*\"|image: \"billdev1958/sanatorio-back:$BUILD_TAG\"|g" docker-compose-production.yml
-            sed -i "s|image: \"billdev1958/csm-pacientes:.*\"|image: \"billdev1958/csm-pacientes:$BUILD_TAG\"|g" docker-compose-production.yml
+            sed -i "s|image: billdev1958/sanatorio-back:.*|image: billdev1958/sanatorio-back:$BUILD_TAG|g" docker-compose-production.yml
+            sed -i "s|image: billdev1958/csm-pacientes:.*|image: billdev1958/csm-pacientes:$BUILD_TAG|g" docker-compose-production.yml
 
             # Reiniciar contenedores para usar las nuevas imágenes
             make prod-reset
