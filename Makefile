@@ -1,76 +1,59 @@
-name: CI/CD Pipeline
+# Variables de entorno
+COMPOSE_DEV = docker compose --env-file .env.dev -f docker-compose.yml -f docker-compose.override.yml
+COMPOSE_PROD = docker compose --env-file .env.production -f docker-compose.yml -f docker-compose-production.yml
 
-on:
-  push:
-    branches:
-      - main
+# Construir la imagen de desarrollo y ejecutar con hot reload
+dev:
+	@echo "🚀 Iniciando entorno de desarrollo..."
+	$(COMPOSE_DEV) up --build
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4
+# Detener y eliminar los contenedores de desarrollo
+dev-down:
+	@echo "🛑 Deteniendo entorno de desarrollo..."
+	$(COMPOSE_DEV) down
 
-      - name: Mostrar build number
-        run: echo "Build number: ${{ github.run_number }}"
+# Construir la imagen de producción y ejecutar
+prod:
+	@echo "🚀 Iniciando entorno de producción..."
+	$(COMPOSE_PROD) up -d --build
 
-      - name: Login en Docker Hub
-        run: echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+# Detener y eliminar los contenedores de producción
+prod-down:
+	@echo "🛑 Deteniendo entorno de producción..."
+	$(COMPOSE_PROD) down
 
-      - name: Construir y subir imágenes a Docker Hub
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          BUILD_TAG: "1.${{ github.run_number }}"
-        run: |
-          echo "Tag para build: $BUILD_TAG"
-          
-          # Construir y subir imagen del Backend
-          docker build --no-cache -t $DOCKER_USER/sanatorio-back:$BUILD_TAG ./sanatorio-back
-          docker push $DOCKER_USER/sanatorio-back:$BUILD_TAG
+prod-reset:
+	@echo "🛑 Deteniendo entorno de producción..."
+	$(COMPOSE_PROD) down -v
 
-          # Construir y subir imagen del Frontend
-          docker build --no-cache -t $DOCKER_USER/csm-pacientes:$BUILD_TAG ./csm-pacientes
-          docker push $DOCKER_USER/csm-pacientes:$BUILD_TAG
+# Ver los logs del backend en desarrollo
+logs-dev:
+	@echo "📜 Mostrando logs del backend en desarrollo..."
+	docker logs -f sanatorio-app-app-1
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      BUILD_TAG: "1.${{ github.run_number }}"
-    steps:
-      - name: Desplegar en el servidor vía SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: BUILD_TAG
-          script: |
-            set -e  # Detener el script en caso de error
+# Ver los logs del backend en producción
+logs-prod:
+	@echo "📜 Mostrando logs del backend en producción..."
+	docker logs -f sanatorio-app-app-1
 
-            # Moverse al directorio del proyecto
-            cd /home/bill/sanatorio-app
-            
-            # Actualizar repositorio con los últimos cambios
-            git reset --hard HEAD
-            git pull origin main
+# Construir manualmente la imagen de producción y subirla a Docker Hub
+build-prod:
+	@echo "🐳 Construyendo imagen de producción..."
+	docker build -t billdev1958/sanatorio-back:1.0 -f sanatorio-back/Dockerfile sanatorio-back/
+	@echo "🚀 Pushing a Docker Hub..."
+	docker push billdev1958/sanatorio-back:1.0
 
-            # Verificar el tag antes de usarlo
-            echo "Usando tag: ${BUILD_TAG}"
+# Construir la imagen de desarrollo localmente
+build-dev:
+	@echo "🐳 Construyendo imagen de desarrollo..."
+	docker build -t billdev1958/sanatorio-back:dev -f sanatorio-back/Dockerfile.dev sanatorio-back/
 
-            # Actualizar las imágenes en docker-compose-production.yml usando el tag serial
-            sed -i "s|image: billdev1958/sanatorio-back:.*|image: billdev1958/sanatorio-back:${BUILD_TAG}|g" docker-compose-production.yml
-            sed -i "s|image: billdev1958/csm-pacientes:.*|image: billdev1958/csm-pacientes:${BUILD_TAG}|g" docker-compose-production.yml
+# Ver las imágenes de Docker
+images:
+	@echo "🔍 Listando imágenes de Docker..."
+	docker images
 
-            # Verificar que el archivo se actualizó correctamente
-            cat docker-compose-production.yml | grep "image: billdev1958"
-
-            # Reiniciar entorno de producción
-            make prod-reset
-
-            # Descargar nuevas imágenes y levantar los contenedores con Makefile
-            make prod BUILD_TAG=${BUILD_TAG}
-
-            # Limpiar imágenes y archivos innecesarios
-            docker system prune -f
+# Limpiar imágenes y contenedores no utilizados
+clean:
+	@echo "🧹 Limpiando contenedores, volúmenes e imágenes sin usar..."
+	docker system prune -af
