@@ -23,7 +23,7 @@ WORKDIR /app
 
 # Copiar el binario desde la etapa de construcción
 COPY --from=builder /app/sanatorio-back /app/sanatorio-back
-
+COPY internal/domain/email/plantillaConfirmacionC.html email/
 COPY internal/domain/email/plantillaConfirmacion.html email/
 COPY internal/domain/email/logo.png email/
 COPY internal/domain/email/logo_cms.png email/
